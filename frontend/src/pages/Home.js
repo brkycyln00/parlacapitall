@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, API } from '../App';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-
-const REDIRECT_URL = 'https://investparla.preview.emergentagent.com/dashboard';
-const AUTH_URL = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(REDIRECT_URL)}`;
+import Navbar from '../components/Navbar';
 
 export default function Home() {
   const { user } = useAuth();
@@ -28,44 +26,9 @@ export default function Home() {
     }
   };
 
-  const handleLogin = () => {
-    window.location.href = AUTH_URL;
-  };
-
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <div className="home-page">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md z-50 border-b border-amber-500/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <img 
-                src="https://customer-assets.emergentagent.com/job_investparla/artifacts/pu93i0x2_ChatGPT%20Image%20Nov%209%2C%202025%2C%2008_35_50%20PM.png" 
-                alt="ParlaCapital Logo" 
-                className="h-12 w-auto"
-              />
-            </div>
-            <div className="hidden md:flex space-x-8">
-              <button onClick={() => scrollToSection('vision')} className="text-gray-300 hover:text-amber-400 transition-colors">Vizyon</button>
-              <button onClick={() => navigate('/about')} className="text-gray-300 hover:text-amber-400 transition-colors">Hakkımızda</button>
-              <button onClick={() => navigate('/packages')} className="text-gray-300 hover:text-amber-400 transition-colors">Paketler</button>
-              <button onClick={() => navigate('/earning-systems')} className="text-gray-300 hover:text-amber-400 transition-colors">Kazanç Sistemleri</button>
-              <button onClick={() => navigate('/faq')} className="text-gray-300 hover:text-amber-400 transition-colors">SSS</button>
-              <button onClick={() => navigate('/contact')} className="text-gray-300 hover:text-amber-400 transition-colors">İletişim</button>
-            </div>
-            <Button onClick={handleLogin} data-testid="login-button" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-2 rounded-full font-semibold">
-              Giriş Yap
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="hero-section pt-32 pb-20 px-4 relative overflow-hidden">
