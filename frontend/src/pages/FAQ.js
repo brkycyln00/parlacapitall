@@ -68,23 +68,7 @@ export default function FAQ() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      {/* Header */}
-      <header className="bg-slate-900/80 backdrop-blur-md border-b border-amber-500/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <img 
-                src="https://customer-assets.emergentagent.com/job_investparla/artifacts/pu93i0x2_ChatGPT%20Image%20Nov%209%2C%202025%2C%2008_35_50%20PM.png\" 
-                alt="ParlaCapital Logo" 
-                className="h-12 w-auto"
-              />
-            </div>
-            <Button onClick={() => navigate('/')} variant="outline" className="border-amber-500 text-amber-400 hover:bg-amber-500/10">
-              Ana Sayfa
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-16">
