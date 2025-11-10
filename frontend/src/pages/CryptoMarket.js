@@ -23,7 +23,7 @@ export default function CryptoMarket() {
   const fetchCryptoData = async () => {
     try {
       const response = await axios.get(
-        'https://api.coingecko.com/api/v3/coins/markets',
+        `${process.env.REACT_APP_COINGECKO_API_URL}/coins/markets`,
         {
           params: {
             vs_currency: 'usd',
