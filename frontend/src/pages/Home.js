@@ -27,8 +27,8 @@ export default function Home() {
   };
 
   const handleLogin = () => {
-    const REDIRECT_URL = 'https://investparla.preview.emergentagent.com/dashboard';
-    const AUTH_URL = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(REDIRECT_URL)}`;
+    const REDIRECT_URL = `${process.env.REACT_APP_BASE_URL}/dashboard`;
+    const AUTH_URL = `${process.env.REACT_APP_AUTH_URL}/?redirect=${encodeURIComponent(REDIRECT_URL)}`;
     window.location.href = AUTH_URL;
   };
 
