@@ -196,11 +196,12 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-slate-900 border-t border-amber-500/20 py-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="flex items-center justify-center space-x-2 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
-              <span className="text-slate-900 font-bold text-xl">P</span>
-            </div>
-            <span className="text-2xl font-bold text-white">ParlaCapital</span>
+          <div className="flex items-center justify-center mb-6">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_investparla/artifacts/pu93i0x2_ChatGPT%20Image%20Nov%209%2C%202025%2C%2008_35_50%20PM.png" 
+              alt="ParlaCapital Logo" 
+              className="h-12 w-auto"
+            />
           </div>
           <p className="text-gray-400 mb-6">Kripto yatırımlarınızı güvenle yönetin</p>
           <p className="text-gray-500 text-sm">© 2025 ParlaCapital. Tüm hakları saklıdır.</p>
