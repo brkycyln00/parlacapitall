@@ -176,6 +176,12 @@ export default function Home() {
           <p className="text-gray-500 text-sm">© 2025 ParlaCapital. Tüm hakları saklıdır.</p>
         </div>
       </footer>
+      
+      <AuthModal 
+        open={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={checkAuth}
+      />
     </div>
   );
 }
