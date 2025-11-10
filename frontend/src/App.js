@@ -138,6 +138,7 @@ import About from './pages/About';
 import EarningSystems from './pages/EarningSystems';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
+import CryptoMarket from './pages/CryptoMarket';
 
 function App() {
   return (
@@ -149,6 +150,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/packages" element={<Packages />} />
+            <Route path="/crypto-market" element={<CryptoMarket />} />
             <Route path="/earning-systems" element={<EarningSystems />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />
