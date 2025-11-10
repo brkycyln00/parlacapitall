@@ -115,9 +115,16 @@ export default function AdminPanel() {
       <header className="bg-slate-900/80 backdrop-blur-md border-b border-amber-500/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-              <p className="text-sm text-gray-400">ParlaCapital Yönetim Paneli</p>
+            <div className="flex items-center space-x-4">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_investparla/artifacts/pu93i0x2_ChatGPT%20Image%20Nov%209%2C%202025%2C%2008_35_50%20PM.png" 
+                alt="ParlaCapital Logo" 
+                className="h-10 w-auto"
+              />
+              <div>
+                <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
+                <p className="text-sm text-gray-400">ParlaCapital Yönetim Paneli</p>
+              </div>
             </div>
             <div className="flex gap-3">
               <Button onClick={() => navigate('/dashboard')} data-testid="user-dashboard-button" variant="outline" className="border-amber-500 text-amber-400 hover:bg-amber-500/10">
