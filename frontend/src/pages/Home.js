@@ -55,7 +55,7 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button onClick={handleLogin} data-testid="get-started-button" size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-6 rounded-full text-lg font-bold">
+            <Button onClick={handleOpenAuthModal} data-testid="get-started-button" size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-6 rounded-full text-lg font-bold">
               Hemen Başla
             </Button>
             <Button onClick={() => navigate('/packages')} data-testid="view-packages-button" size="lg" variant="outline" className="border-2 border-amber-500 text-amber-400 hover:bg-amber-500/10 px-8 py-6 rounded-full text-lg font-semibold">
