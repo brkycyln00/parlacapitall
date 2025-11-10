@@ -34,6 +34,7 @@ class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     email: str
     name: str
+    password_hash: Optional[str] = None
     picture: Optional[str] = None
     referral_code: str = Field(default_factory=lambda: secrets.token_urlsafe(8))
     upline_id: Optional[str] = None
