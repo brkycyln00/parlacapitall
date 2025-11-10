@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { Button } from '@/components/ui/button';
+import AuthModal from './AuthModal';
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, checkAuth } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   return (
     <nav className="fixed top-0 w-full bg-slate-900/95 backdrop-blur-md z-50 border-b border-amber-500/30 shadow-lg">
