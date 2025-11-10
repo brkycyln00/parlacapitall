@@ -235,17 +235,12 @@ class ParlaCapitalAPITester:
         """Test withdrawal request functionality"""
         print("\n💸 Testing Withdrawal Endpoints...")
         
-        # Test withdrawal request
+        # Test withdrawal request (using query parameters)
         success, response = self.run_test(
             "Create Withdrawal Request",
             "POST",
-            "withdrawal/request",
-            200,
-            data={
-                "amount": 50.0,
-                "crypto_type": "usdt",
-                "wallet_address": "0x1234567890abcdef1234567890abcdef12345678"
-            }
+            "withdrawal/request?amount=50.0&crypto_type=usdt&wallet_address=0x1234567890abcdef1234567890abcdef12345678",
+            200
         )
         
         if success:
