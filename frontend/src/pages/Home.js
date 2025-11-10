@@ -26,6 +26,12 @@ export default function Home() {
     }
   };
 
+  const handleLogin = () => {
+    const REDIRECT_URL = 'https://investparla.preview.emergentagent.com/dashboard';
+    const AUTH_URL = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(REDIRECT_URL)}`;
+    window.location.href = AUTH_URL;
+  };
+
   return (
     <div className="home-page">
       <Navbar />
