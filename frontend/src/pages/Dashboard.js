@@ -69,7 +69,7 @@ export default function Dashboard() {
   };
 
   const copyReferralLink = () => {
-    const link = `https://investparla.preview.emergentagent.com/?ref=${user.referral_code}`;
+    const link = `${process.env.REACT_APP_BASE_URL}/?ref=${user.referral_code}`;
     navigator.clipboard.writeText(link);
     toast.success('Referans linki kopyalandı!');
   };
