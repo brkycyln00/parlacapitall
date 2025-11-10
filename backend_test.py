@@ -220,17 +220,12 @@ class ParlaCapitalAPITester:
         """Test investment creation and related endpoints"""
         print("\n💰 Testing Investment Endpoints...")
         
-        # Test investment creation with mock payment
+        # Test investment creation with mock payment (using query parameters)
         success, response = self.run_test(
             "Create Investment - Silver Package",
             "POST",
-            "investments/create",
-            200,
-            data={
-                "package": "silver",
-                "crypto_type": "mock",
-                "referral_code": None
-            }
+            "investments/create?package=silver&crypto_type=mock",
+            200
         )
         
         if success:
