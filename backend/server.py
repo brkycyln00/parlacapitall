@@ -164,7 +164,7 @@ async def create_session(request: Request, response: Response):
     async with httpx.AsyncClient() as client:
         try:
             auth_response = await client.get(
-                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                os.environ.get('AUTH_SERVICE_URL', 'https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data'),
                 headers={"X-Session-ID": session_id}
             )
             auth_response.raise_for_status()
