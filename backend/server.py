@@ -124,6 +124,10 @@ async def get_current_user(request: Request) -> Optional[User]:
         # Ensure timezone awareness
         if expires_at.tzinfo is None:
             expires_at = expires_at.replace(tzinfo=timezone.utc)
+    elif isinstance(expires_at, datetime):
+        # Handle datetime objects from MongoDB
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
     
     if expires_at < datetime.now(timezone.utc):
         await db.user_sessions.delete_one({"session_token": token})
