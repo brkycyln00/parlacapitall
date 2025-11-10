@@ -21,10 +21,19 @@ function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get(`${API}/auth/me`, { withCredentials: true });
+      // Check for JWT token
+      const token = localStorage.getItem('auth_token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const response = await axios.get(`${API}/auth/me`, { 
+        withCredentials: true,
+        headers
+      });
       setUser(response.data);
     } catch (error) {
       setUser(null);
+      // Clear invalid token
+      localStorage.removeItem('auth_token');
     } finally {
       setLoading(false);
     }
@@ -33,9 +42,14 @@ function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
+      localStorage.removeItem('auth_token');
       setUser(null);
+      window.location.href = '/';
     } catch (error) {
       console.error("Logout error:", error);
+      localStorage.removeItem('auth_token');
+      setUser(null);
+      window.location.href = '/';
     }
   };
 
