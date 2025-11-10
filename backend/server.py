@@ -111,37 +111,8 @@ async def get_session_token(request: Request) -> Optional[str]:
     return None
 
 async def get_current_user(request: Request) -> Optional[User]:
-    token = await get_session_token(request)
-    if not token:
-        return None
-    
-    # Check if session exists and is valid
-    session_doc = await db.user_sessions.find_one({"session_token": token})
-    if not session_doc:
-        return None
-    
-    # Check expiry
-    expires_at = session_doc["expires_at"]
-    if isinstance(expires_at, str):
-        expires_at = datetime.fromisoformat(expires_at)
-        # Ensure timezone awareness
-        if expires_at.tzinfo is None:
-            expires_at = expires_at.replace(tzinfo=timezone.utc)
-    elif isinstance(expires_at, datetime):
-        # Handle datetime objects from MongoDB
-        if expires_at.tzinfo is None:
-            expires_at = expires_at.replace(tzinfo=timezone.utc)
-    
-    if expires_at < datetime.now(timezone.utc):
-        await db.user_sessions.delete_one({"session_token": token})
-        return None
-    
-    # Get user
-    user_doc = await db.users.find_one({"id": session_doc["user_id"]}, {"_id": 0})
-    if not user_doc:
-        return None
-    
-    return User(**user_doc)
+    # Use JWT-aware function
+    return await get_current_user_jwt(request)
 
 async def require_auth(request: Request) -> User:
     user = await get_current_user(request)
