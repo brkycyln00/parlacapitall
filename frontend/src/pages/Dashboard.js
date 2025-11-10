@@ -238,7 +238,7 @@ export default function Dashboard() {
               <div className="flex gap-2">
                 <Input
                   data-testid="referral-link-input"
-                  value={`https://investparla.preview.emergentagent.com/?ref=${user?.referral_code}`}
+                  value={`${process.env.REACT_APP_BASE_URL}/?ref=${user?.referral_code}`}
                   readOnly
                   className="bg-slate-700 border-amber-500/30 text-white"
                 />
