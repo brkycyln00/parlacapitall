@@ -452,6 +452,14 @@ class ParlaCapitalAPITester:
         # Test admin endpoints
         self.test_admin_endpoints()
         
+        # Test logout at the end
+        success, response = self.run_test(
+            "Logout",
+            "POST",
+            "auth/logout",
+            200
+        )
+        
         # Cleanup
         self.cleanup_test_data()
         
