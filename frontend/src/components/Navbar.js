@@ -8,50 +8,50 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md z-50 border-b border-amber-500/20">
+    <nav className="fixed top-0 w-full bg-slate-900/95 backdrop-blur-md z-50 border-b border-amber-500/30 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <img 
               src="https://customer-assets.emergentagent.com/job_investparla/artifacts/pu93i0x2_ChatGPT%20Image%20Nov%209%2C%202025%2C%2008_35_50%20PM.png" 
               alt="ParlaCapital Logo" 
-              className="h-16 w-auto object-contain cursor-pointer rounded-xl"
+              className="h-10 w-auto object-contain cursor-pointer rounded-lg"
               onClick={() => navigate('/')}
             />
-            <div className="hidden md:flex space-x-6">
+            <div className="hidden md:flex space-x-3">
               <button 
                 onClick={() => navigate('/')} 
-                className="text-gray-300 hover:text-amber-400 transition-colors font-medium"
+                className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70 whitespace-nowrap"
               >
                 Ana Sayfa
               </button>
               <button 
                 onClick={() => navigate('/about')} 
-                className="text-gray-300 hover:text-amber-400 transition-colors font-medium"
+                className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
                 Hakkımızda
               </button>
               <button 
                 onClick={() => navigate('/packages')} 
-                className="text-gray-300 hover:text-amber-400 transition-colors font-medium"
+                className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
                 Paketler
               </button>
               <button 
                 onClick={() => navigate('/earning-systems')} 
-                className="text-gray-300 hover:text-amber-400 transition-colors font-medium"
+                className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
                 Kazanç Sistemleri
               </button>
               <button 
                 onClick={() => navigate('/faq')} 
-                className="text-gray-300 hover:text-amber-400 transition-colors font-medium"
+                className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
                 SSS
               </button>
               <button 
                 onClick={() => navigate('/contact')} 
-                className="text-gray-300 hover:text-amber-400 transition-colors font-medium"
+                className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
                 İletişim
               </button>
