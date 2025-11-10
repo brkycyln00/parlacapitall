@@ -156,7 +156,7 @@ export default function Home() {
           <p className="text-xl text-slate-800 mb-8">
             ParlaCapital ile kripto dünyasında güvenli ve karlı yatırım deneyimi yaşayın
           </p>
-          <Button onClick={handleLogin} data-testid="cta-button" size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-12 py-6 rounded-full text-lg font-bold">
+          <Button onClick={handleOpenAuthModal} data-testid="cta-button" size="lg" className="bg-slate-900 hover:bg-slate-800 text-white px-12 py-6 rounded-full text-lg font-bold">
             Üye Ol ve Kazanmaya Başla
           </Button>
         </div>
