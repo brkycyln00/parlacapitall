@@ -196,13 +196,7 @@ class ParlaCapitalAPITester:
             print(f"   ✓ Email: {response.get('email', 'Unknown')}")
             print(f"   ✓ Wallet Balance: ${response.get('wallet_balance', 0)}")
         
-        # Test logout
-        success, response = self.run_test(
-            "Logout",
-            "POST",
-            "auth/logout",
-            200
-        )
+        # Don't logout here - save it for the end
 
     def test_dashboard_endpoints(self):
         """Test dashboard and user data endpoints"""
