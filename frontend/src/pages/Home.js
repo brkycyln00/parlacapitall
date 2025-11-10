@@ -45,11 +45,12 @@ export default function Home() {
       <nav className="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md z-50 border-b border-amber-500/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
-                <span className="text-slate-900 font-bold text-xl">P</span>
-              </div>
-              <span className="text-2xl font-bold text-white">ParlaCapital</span>
+            <div className="flex items-center">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_investparla/artifacts/pu93i0x2_ChatGPT%20Image%20Nov%209%2C%202025%2C%2008_35_50%20PM.png" 
+                alt="ParlaCapital Logo" 
+                className="h-12 w-auto"
+              />
             </div>
             <div className="hidden md:flex space-x-8">
               <button onClick={() => scrollToSection('vision')} className="text-gray-300 hover:text-amber-400 transition-colors">Vizyon</button>
