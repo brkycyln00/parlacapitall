@@ -154,7 +154,139 @@ async def require_admin(request: Request) -> User:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
-# ==================== AUTH ENDPOINTS ====================
+# ==================== JWT AUTH CONFIG ====================
+
+JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
+JWT_ALGORITHM = 'HS256'
+JWT_EXPIRATION_DAYS = 7
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: str
+    referral_code: Optional[str] = None
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def create_jwt_token(user_id: str) -> str:
+    payload = {
+        'user_id': user_id,
+        'exp': datetime.now(timezone.utc) + timedelta(days=JWT_EXPIRATION_DAYS)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+def verify_jwt_token(token: str) -> Optional[str]:
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+async def get_current_user_jwt(request: Request) -> Optional[User]:
+    # Check for JWT token
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.replace("Bearer ", "")
+        user_id = verify_jwt_token(token)
+        if user_id:
+            user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+            if user_doc:
+                return User(**user_doc)
+    
+    # Fallback to session token
+    token = request.cookies.get("session_token")
+    if token:
+        session_doc = await db.user_sessions.find_one({"session_token": token})
+        if session_doc:
+            expires_at = session_doc["expires_at"]
+            if isinstance(expires_at, str):
+                expires_at = datetime.fromisoformat(expires_at)
+            
+            if expires_at >= datetime.now(timezone.utc):
+                user_doc = await db.users.find_one({"id": session_doc["user_id"]}, {"_id": 0})
+                if user_doc:
+                    return User(**user_doc)
+    
+    return None
+
+# ==================== JWT AUTH ENDPOINTS ====================
+
+@api_router.post("/auth/register")
+async def register(req: RegisterRequest):
+    # Check if user exists
+    existing_user = await db.users.find_one({"email": req.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user
+    user = User(
+        email=req.email,
+        name=req.name,
+        password_hash=hash_password(req.password)
+    )
+    
+    # Handle referral if provided
+    if req.referral_code:
+        upline = await db.users.find_one({"referral_code": req.referral_code}, {"_id": 0})
+        if upline:
+            user.upline_id = upline["id"]
+    
+    user_dict = user.model_dump()
+    await db.users.insert_one(user_dict)
+    
+    # Create JWT token
+    token = create_jwt_token(user.id)
+    
+    return {
+        "message": "Registration successful",
+        "token": token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "referral_code": user.referral_code
+        }
+    }
+
+@api_router.post("/auth/login")
+async def login(req: LoginRequest):
+    # Find user
+    user_doc = await db.users.find_one({"email": req.email}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Verify password
+    if not user_doc.get("password_hash"):
+        raise HTTPException(status_code=401, detail="Please use Google login for this account")
+    
+    if user_doc["password_hash"] != hash_password(req.password):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Create JWT token
+    token = create_jwt_token(user_doc["id"])
+    
+    user = User(**user_doc)
+    
+    return {
+        "message": "Login successful",
+        "token": token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "referral_code": user.referral_code,
+            "is_admin": user.is_admin
+        }
+    }
+
+# ==================== GOOGLE AUTH ENDPOINTS ====================
 
 @api_router.post("/auth/session")
 async def create_session(request: Request, response: Response):
