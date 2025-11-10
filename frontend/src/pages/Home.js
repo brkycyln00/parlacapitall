@@ -4,11 +4,13 @@ import { useAuth, API } from '../App';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import Navbar from '../components/Navbar';
+import AuthModal from '../components/AuthModal';
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, checkAuth } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({ total_users: 0, total_volume: 0 });
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
