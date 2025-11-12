@@ -1586,12 +1586,12 @@ export default function Dashboard() {
               <input
                 type="text"
                 value={joinReferralCode}
-                onChange={(e) => setJoinReferralCode(e.target.value.toUpperCase())}
-                placeholder="Örn: ABC123XYZ"
-                className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 uppercase"
+                onChange={(e) => setJoinReferralCode(e.target.value.trim())}
+                placeholder="Kodunuzu buraya yapıştırın"
+                className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 font-mono"
               />
               <p className="text-xs text-gray-400 mt-2">
-                💡 İpucu: Referans kodunu sponsor kişiden alın
+                💡 İpucu: Referans kodunu sponsor kişiden alın ve buraya yapıştırın (büyük/küçük harf, sayı, özel karakter)
               </p>
             </div>
 
