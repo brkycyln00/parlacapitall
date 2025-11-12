@@ -17,10 +17,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [withdrawalOpen, setWithdrawalOpen] = useState(false);
-  const [withdrawalAmount, setWithdrawalAmount] = useState('');
-  const [cryptoType, setCryptoType] = useState('usdt');
-  const [walletAddress, setWalletAddress] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [commissionsOpen, setCommissionsOpen] = useState(false);
