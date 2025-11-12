@@ -122,6 +122,11 @@ export default function Dashboard() {
       setWithdrawalFullName('');
       setWithdrawalIban('');
       setWithdrawalAmount('');
+      
+      // Scroll to top to see pending withdrawals
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Refresh dashboard data
       fetchDashboard();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Çekim talebi başarısız');
