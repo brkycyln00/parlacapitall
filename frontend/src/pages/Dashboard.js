@@ -242,6 +242,9 @@ export default function Dashboard() {
             <Award size={20} />
             <span>Komisyonlar</span>
           </button>
+          )}
+          
+          {!user?.is_admin && (
           <button 
             onClick={() => {
               setNetworkOpen(true);
