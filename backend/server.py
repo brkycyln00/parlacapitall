@@ -356,6 +356,12 @@ async def login(req: LoginRequest):
     # Create JWT token
     token = create_jwt_token(user_doc["id"])
     
+    # Update last login time
+    await db.users.update_one(
+        {"id": user_doc["id"]},
+        {"$set": {"last_login": datetime.now(timezone.utc).isoformat()}}
+    )
+    
     user = User(**user_doc)
     
     return {
