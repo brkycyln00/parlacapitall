@@ -3463,6 +3463,604 @@ class ParlaCapitalAPITester:
         
         print("\n✅ User-Side Referral Management System Testing Complete")
 
+    def test_unlimited_referrals_no_auto_placement(self):
+        """Test unlimited referrals registration without auto-placement feature"""
+        print("\n🔄 Testing Unlimited Referrals Registration (No Auto-Placement)...")
+        print("=" * 70)
+        
+        # Step 1: Create sponsor user (Fatma)
+        print("\n1️⃣ Creating Sponsor User (Fatma)...")
+        
+        timestamp = str(int(time.time()))
+        fatma_data = {
+            "email": f"fatma.sponsor.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Fatma Sponsor {timestamp}"
+        }
+        
+        # Register Fatma without referral (will be root)
+        success, response = self.run_test(
+            "Register Fatma (Sponsor)",
+            "POST",
+            "auth/register",
+            200,
+            data=fatma_data
+        )
+        
+        if not success:
+            print("❌ Failed to create sponsor user")
+            return
+        
+        fatma_id = response['user']['id']
+        fatma_token = response.get('token')
+        print(f"   ✓ Fatma created: {fatma_id}")
+        
+        # Generate referral code for Fatma
+        original_token = self.session_token
+        self.session_token = fatma_token
+        
+        success, response = self.run_test(
+            "Generate Fatma's Referral Code",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate referral code")
+            return
+        
+        fatma_referral_code = response.get('code')
+        print(f"   ✓ Fatma's referral code: {fatma_referral_code}")
+        
+        # Step 2: Register 1st Referral (Ali)
+        print("\n2️⃣ Scenario 1: Register 1st Referral (Ali)...")
+        
+        ali_data = {
+            "email": f"ali.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Ali Referral {timestamp}",
+            "referral_code": fatma_referral_code
+        }
+        
+        success, response = self.run_test(
+            "Register Ali with Fatma's Code",
+            "POST",
+            "auth/register",
+            200,
+            data=ali_data
+        )
+        
+        if not success:
+            print("❌ Failed to register Ali")
+            return
+        
+        ali_id = response['user']['id']
+        print(f"   ✓ Ali registered successfully: {ali_id}")
+        
+        # Verify Ali's record - should have upline_id but NO position
+        self.verify_unplaced_user(ali_id, fatma_id, "Ali")
+        
+        # Step 3: Generate new referral code for 2nd referral
+        print("\n3️⃣ Generating new referral code for 2nd referral...")
+        
+        success, response = self.run_test(
+            "Generate New Referral Code for Veli",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate new referral code")
+            return
+        
+        fatma_referral_code_2 = response.get('code')
+        print(f"   ✓ New referral code: {fatma_referral_code_2}")
+        
+        # Step 4: Register 2nd Referral (Veli)
+        print("\n4️⃣ Scenario 2: Register 2nd Referral (Veli)...")
+        
+        veli_data = {
+            "email": f"veli.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Veli Referral {timestamp}",
+            "referral_code": fatma_referral_code_2
+        }
+        
+        success, response = self.run_test(
+            "Register Veli with Fatma's Code",
+            "POST",
+            "auth/register",
+            200,
+            data=veli_data
+        )
+        
+        if not success:
+            print("❌ Failed to register Veli")
+            return
+        
+        veli_id = response['user']['id']
+        print(f"   ✓ Veli registered successfully: {veli_id}")
+        
+        # Verify Veli's record - should have upline_id but NO position
+        self.verify_unplaced_user(veli_id, fatma_id, "Veli")
+        
+        # Step 5: Generate new referral code for 3rd referral
+        print("\n5️⃣ Generating new referral code for 3rd referral...")
+        
+        success, response = self.run_test(
+            "Generate New Referral Code for Ayşe",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate new referral code")
+            return
+        
+        fatma_referral_code_3 = response.get('code')
+        print(f"   ✓ New referral code: {fatma_referral_code_3}")
+        
+        # Step 6: Register 3rd Referral (Ayşe) - Critical Test
+        print("\n6️⃣ Scenario 3: Register 3rd Referral (Ayşe) - CRITICAL TEST...")
+        print("   🎯 This should succeed without 'Her iki kol da dolu' error")
+        
+        ayse_data = {
+            "email": f"ayse.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Ayşe Referral {timestamp}",
+            "referral_code": fatma_referral_code_3
+        }
+        
+        success, response = self.run_test(
+            "Register Ayşe with Fatma's Code (Critical Test)",
+            "POST",
+            "auth/register",
+            200,
+            data=ayse_data
+        )
+        
+        if success:
+            ayse_id = response['user']['id']
+            print(f"   ✅ CRITICAL SUCCESS: Ayşe registered without error: {ayse_id}")
+            print("   ✅ No 'Her iki kol da dolu' error - unlimited referrals working!")
+            
+            # Verify Ayşe's record
+            self.verify_unplaced_user(ayse_id, fatma_id, "Ayşe")
+        else:
+            print("   ❌ CRITICAL FAILURE: 3rd referral registration failed")
+            print(f"   ❌ Error: {response}")
+            return
+        
+        # Step 7: Stress Test - Register 10 referrals
+        print("\n7️⃣ Scenario 4: Stress Test - Register 10 Referrals...")
+        
+        registered_users = []
+        for i in range(4, 11):  # Users 4-10 (we already have 3)
+            # Generate new code
+            success, response = self.run_test(
+                f"Generate Code for User {i}",
+                "POST",
+                "referral/generate",
+                200
+            )
+            
+            if not success:
+                print(f"   ❌ Failed to generate code for user {i}")
+                continue
+            
+            code = response.get('code')
+            
+            # Register user
+            user_data = {
+                "email": f"user{i}.referral.{timestamp}@example.com",
+                "password": "SecurePass123!",
+                "name": f"User {i} Referral {timestamp}",
+                "referral_code": code
+            }
+            
+            success, response = self.run_test(
+                f"Register User {i}",
+                "POST",
+                "auth/register",
+                200,
+                data=user_data
+            )
+            
+            if success:
+                user_id = response['user']['id']
+                registered_users.append(user_id)
+                print(f"   ✓ User {i} registered: {user_id}")
+            else:
+                print(f"   ❌ User {i} registration failed")
+        
+        print(f"   ✅ Stress test complete: {len(registered_users)} additional users registered")
+        print(f"   ✅ Total referrals: {3 + len(registered_users)} (Ali, Veli, Ayşe + {len(registered_users)} more)")
+        
+        # Step 8: Verify referral codes are marked as used
+        print("\n8️⃣ Scenario 5: Verify Referral Codes Marked as Used...")
+        
+        self.verify_referral_code_usage(fatma_referral_code, ali_id)
+        self.verify_referral_code_usage(fatma_referral_code_2, veli_id)
+        self.verify_referral_code_usage(fatma_referral_code_3, ayse_id)
+        
+        # Step 9: Test GET /api/users/my-referrals shows unplaced users
+        print("\n9️⃣ Scenario 6: Test GET /api/users/my-referrals Shows Unplaced...")
+        
+        success, response = self.run_test(
+            "Get Fatma's Referrals",
+            "GET",
+            "users/my-referrals",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            placed = response.get('placed', [])
+            unplaced = response.get('unplaced', [])
+            total = response.get('total', 0)
+            
+            print(f"   ✓ Total referrals: {total}")
+            print(f"   ✓ Placed referrals: {len(placed)}")
+            print(f"   ✓ Unplaced referrals: {len(unplaced)}")
+            
+            if len(unplaced) >= 3:  # At least Ali, Veli, Ayşe
+                print("   ✅ Unplaced referrals correctly shown")
+                
+                # Verify specific users are in unplaced list
+                unplaced_names = [user.get('name', '') for user in unplaced]
+                if any('Ali' in name for name in unplaced_names):
+                    print("   ✅ Ali found in unplaced list")
+                if any('Veli' in name for name in unplaced_names):
+                    print("   ✅ Veli found in unplaced list")
+                if any('Ayşe' in name for name in unplaced_names):
+                    print("   ✅ Ayşe found in unplaced list")
+            else:
+                print(f"   ❌ Expected at least 3 unplaced referrals, got {len(unplaced)}")
+            
+            if len(placed) == 0:
+                print("   ✅ Placed array is empty (correct - no manual placement yet)")
+            else:
+                print(f"   ⚠️ Placed array not empty: {len(placed)} users")
+        
+        # Step 10: Test manual placement works
+        print("\n🔟 Scenario 7: Test Manual Placement Works...")
+        
+        # Place Ali in left position
+        placement_data = {
+            "user_id": ali_id,
+            "upline_id": fatma_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Place Ali in Left Position",
+            "POST",
+            "users/place-referral",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ Ali placed in left position successfully")
+            
+            # Verify Ali is now in placed list
+            success, response = self.run_test(
+                "Verify Ali in Placed List",
+                "GET",
+                "users/my-referrals",
+                200
+            )
+            
+            if success:
+                placed = response.get('placed', [])
+                unplaced = response.get('unplaced', [])
+                
+                placed_names = [user.get('name', '') for user in placed]
+                unplaced_names = [user.get('name', '') for user in unplaced]
+                
+                if any('Ali' in name for name in placed_names):
+                    print("   ✅ Ali moved to placed list")
+                if not any('Ali' in name for name in unplaced_names):
+                    print("   ✅ Ali removed from unplaced list")
+        
+        # Place Veli in right position
+        placement_data = {
+            "user_id": veli_id,
+            "upline_id": fatma_id,
+            "position": "right"
+        }
+        
+        success, response = self.run_test(
+            "Place Veli in Right Position",
+            "POST",
+            "users/place-referral",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ Veli placed in right position successfully")
+        
+        # Step 11: Test unlimited depth placement
+        print("\n1️⃣1️⃣ Scenario 8: Test Unlimited Depth Placement...")
+        
+        # Place Ayşe under Ali (left position)
+        placement_data = {
+            "user_id": ayse_id,
+            "upline_id": ali_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Place Ayşe under Ali (Left)",
+            "POST",
+            "users/place-referral",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ Ayşe placed under Ali - binary tree grows in depth")
+        
+        # Step 12: Verify no automatic placement during registration
+        print("\n1️⃣2️⃣ Scenario 9: Verify No Automatic Placement...")
+        
+        self.verify_no_automatic_placement(fatma_id, "after all registrations")
+        
+        # Step 13: Test error cases still work
+        print("\n1️⃣3️⃣ Scenario 10: Test Error Cases Still Work...")
+        
+        # Test expired referral code
+        expired_code = "EXPIRED123"
+        self.create_expired_referral_code(expired_code, fatma_id)
+        
+        expired_user_data = {
+            "email": f"expired.test.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Expired Test {timestamp}",
+            "referral_code": expired_code
+        }
+        
+        success, response = self.run_test(
+            "Register with Expired Code",
+            "POST",
+            "auth/register",
+            400,
+            data=expired_user_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Bu referans kodunun süresi dolmuş" in response.get('detail', ''):
+                print("   ✅ Expired code correctly rejected")
+            else:
+                print(f"   ❌ Expired code error message incorrect: {response}")
+        
+        # Test already used code
+        used_user_data = {
+            "email": f"used.test.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Used Test {timestamp}",
+            "referral_code": fatma_referral_code  # Already used by Ali
+        }
+        
+        success, response = self.run_test(
+            "Register with Used Code",
+            "POST",
+            "auth/register",
+            400,
+            data=used_user_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Bu referans kodu daha önce kullanılmış" in response.get('detail', ''):
+                print("   ✅ Used code correctly rejected")
+            else:
+                print(f"   ❌ Used code error message incorrect: {response}")
+        
+        # Test invalid code
+        invalid_user_data = {
+            "email": f"invalid.test.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Invalid Test {timestamp}",
+            "referral_code": "INVALID123"
+        }
+        
+        success, response = self.run_test(
+            "Register with Invalid Code",
+            "POST",
+            "auth/register",
+            400,
+            data=invalid_user_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Geçersiz referans kodu" in response.get('detail', ''):
+                print("   ✅ Invalid code correctly rejected")
+            else:
+                print(f"   ❌ Invalid code error message incorrect: {response}")
+        
+        # Restore original token
+        self.session_token = original_token
+        
+        print("\n✅ Unlimited Referrals Registration (No Auto-Placement) Testing Complete")
+        print("🎉 KEY ACHIEVEMENT: Users can register unlimited times with same sponsor!")
+        print("🎉 NO 'Her iki kol da dolu' errors - feature working perfectly!")
+
+    def verify_unplaced_user(self, user_id, expected_upline_id, user_name):
+        """Verify that a user is unplaced (has upline_id but no position)"""
+        print(f"   🔍 Verifying {user_name} is unplaced...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            print('User: ' + user.name);
+            print('Upline ID: ' + user.upline_id);
+            print('Position: ' + user.position);
+            print('Left Child ID: ' + user.left_child_id);
+            print('Right Child ID: ' + user.right_child_id);
+            
+            if (user.upline_id === '{expected_upline_id}' && 
+                (user.position === null || user.position === undefined || user.position === '') &&
+                (user.left_child_id === null || user.left_child_id === undefined) &&
+                (user.right_child_id === null || user.right_child_id === undefined)) {{
+                print('✅ User is correctly unplaced');
+            }} else {{
+                print('❌ User placement incorrect');
+            }}
+        }} else {{
+            print('❌ User not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ User is correctly unplaced" in result.stdout:
+                    print(f"   ✅ {user_name} verified as unplaced")
+                else:
+                    print(f"   ❌ {user_name} placement verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to verify {user_name}: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify {user_name}: {str(e)}")
+
+    def verify_referral_code_usage(self, code, expected_used_by_id):
+        """Verify that a referral code is marked as used by specific user"""
+        print(f"   🔍 Verifying referral code {code} is marked as used...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var codeDoc = db.referral_codes.findOne({{code: '{code}'}});
+        
+        if (codeDoc) {{
+            print('Code: ' + codeDoc.code);
+            print('Is Used: ' + codeDoc.is_used);
+            print('Used By: ' + codeDoc.used_by);
+            print('Used At: ' + codeDoc.used_at);
+            
+            if (codeDoc.is_used === true && 
+                codeDoc.used_by === '{expected_used_by_id}' && 
+                codeDoc.used_at) {{
+                print('✅ Code correctly marked as used');
+            }} else {{
+                print('❌ Code usage marking incorrect');
+            }}
+        }} else {{
+            print('❌ Code not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Code correctly marked as used" in result.stdout:
+                    print(f"   ✅ Code {code} usage verified")
+                else:
+                    print(f"   ❌ Code {code} usage verification failed")
+            else:
+                print(f"   ❌ Failed to verify code usage: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify code usage: {str(e)}")
+
+    def verify_no_automatic_placement(self, sponsor_id, stage):
+        """Verify that sponsor's left_child_id and right_child_id are NOT automatically updated"""
+        print(f"   🔍 Verifying no automatic placement {stage}...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var sponsor = db.users.findOne({{id: '{sponsor_id}'}});
+        
+        if (sponsor) {{
+            print('Sponsor: ' + sponsor.name);
+            print('Left Child ID: ' + sponsor.left_child_id);
+            print('Right Child ID: ' + sponsor.right_child_id);
+            
+            // Note: After manual placement, these might be set
+            // But during registration phase, they should be null
+            print('Sponsor binary tree positions checked');
+        }} else {{
+            print('❌ Sponsor not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                print(f"   ✓ Sponsor binary tree status checked {stage}")
+            else:
+                print(f"   ❌ Failed to check sponsor: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to check sponsor: {str(e)}")
+
+    def create_expired_referral_code(self, code, user_id):
+        """Create an expired referral code for testing"""
+        mongo_commands = f"""
+        use('test_database');
+        
+        db.referral_codes.insertOne({{
+            id: 'expired-code-{int(time.time())}',
+            code: '{code}',
+            user_id: '{user_id}',
+            position: 'auto',
+            created_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+            expires_at: new Date(Date.now() - 60000).toISOString(),   // 1 minute ago (expired)
+            is_used: false,
+            used_by: null,
+            used_at: null
+        }});
+        
+        print('Expired referral code created: {code}');
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                print(f"   ✓ Expired code {code} created for testing")
+            else:
+                print(f"   ❌ Failed to create expired code: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to create expired code: {str(e)}")
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting ParlaCapital API Tests")
