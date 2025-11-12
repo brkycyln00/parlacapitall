@@ -690,6 +690,9 @@ async def update_volumes_upline(user_id: str, amount: float):
 
 @api_router.get("/dashboard")
 async def get_dashboard(user: User = Depends(require_auth)):
+    # Ensure user has an active referral code
+    active_code = await ensure_user_has_referral_code(user.id)
+    
     # Get direct referrals
     referrals = await db.users.find({"upline_id": user.id}, {"_id": 0}).to_list(100)
     
@@ -721,6 +724,7 @@ async def get_dashboard(user: User = Depends(require_auth)):
     
     return {
         "user": user.model_dump(),
+        "active_referral_code": active_code,
         "referrals": referrals,
         "investment": investment,
         "transactions": transactions,
