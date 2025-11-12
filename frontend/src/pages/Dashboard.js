@@ -1563,6 +1563,67 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* Join Network Dialog */}
+      <Dialog open={joinNetworkOpen} onOpenChange={setJoinNetworkOpen}>
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">Ağa Katıl</DialogTitle>
+            <p className="text-gray-400">Başkasının referans kodunu girerek ağına katılın</p>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-blue-400 text-sm">
+                ℹ️ <strong>Önemli:</strong> Referans kodu sadece BİR KEZ girebilirsiniz. 
+                Bir kez bir ağa katıldıktan sonra değiştiremezsiniz.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Referans Kodu
+              </label>
+              <input
+                type="text"
+                value={joinReferralCode}
+                onChange={(e) => setJoinReferralCode(e.target.value.toUpperCase())}
+                placeholder="Örn: ABC123XYZ"
+                className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500 uppercase"
+              />
+              <p className="text-xs text-gray-400 mt-2">
+                💡 İpucu: Referans kodunu sponsor kişiden alın
+              </p>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+              <p className="text-amber-400 text-sm">
+                ⚠️ <strong>Uyarı:</strong> Kendi oluşturduğunuz kodları kullanamazsınız.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+                onClick={() => {
+                  setJoinNetworkOpen(false);
+                  setJoinReferralCode('');
+                }}
+              >
+                İptal
+              </Button>
+              <Button
+                className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                onClick={handleJoinNetwork}
+                disabled={joinLoading}
+              >
+                {joinLoading ? 'Kontrol ediliyor...' : '✅ Katıl'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl max-h-[90vh] overflow-y-auto">
