@@ -24,6 +24,12 @@ export default function AuthModal({ open, onClose, onSuccess }) {
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerName, setRegisterName] = useState('');
   const [referralCode, setReferralCode] = useState('');
+  
+  // Referral code validation
+  const [referralValidating, setReferralValidating] = useState(false);
+  const [referralValid, setReferralValid] = useState(false);
+  const [referralError, setReferralError] = useState('');
+  const [uplineName, setUplineName] = useState('');
 
   // Check for referral code in URL
   React.useEffect(() => {
@@ -31,8 +37,52 @@ export default function AuthModal({ open, onClose, onSuccess }) {
     const ref = params.get('ref');
     if (ref) {
       setReferralCode(ref);
+      validateReferralCode(ref);
     }
   }, [location]);
+  
+  // Validate referral code with debounce
+  React.useEffect(() => {
+    if (!referralCode || referralCode.length < 3) {
+      setReferralValid(false);
+      setReferralError('');
+      setUplineName('');
+      return;
+    }
+    
+    const timer = setTimeout(() => {
+      validateReferralCode(referralCode);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [referralCode]);
+  
+  const validateReferralCode = async (code) => {
+    if (!code || code.length < 3) return;
+    
+    setReferralValidating(true);
+    setReferralError('');
+    
+    try {
+      const response = await axios.get(`${API}/auth/validate-referral/${code}`);
+      
+      if (response.data.valid) {
+        setReferralValid(true);
+        setReferralError('');
+        setUplineName(response.data.upline_name);
+      } else {
+        setReferralValid(false);
+        setReferralError('Yanlış referans kodu girdiniz!');
+        setUplineName('');
+      }
+    } catch (error) {
+      setReferralValid(false);
+      setReferralError('Yanlış referans kodu girdiniz!');
+      setUplineName('');
+    } finally {
+      setReferralValidating(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
