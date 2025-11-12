@@ -822,54 +822,6 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* Withdrawal Dialog */}
-      <Dialog open={withdrawalOpen} onOpenChange={setWithdrawalOpen}>
-        <DialogContent className="bg-slate-800 border-amber-500/30">
-          <DialogHeader>
-            <DialogTitle className="text-white">Para Çekme Talebi</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <div>
-              <Label className="text-gray-300">Miktar (USD)</Label>
-              <Input
-                type="number"
-                value={withdrawalAmount}
-                onChange={(e) => setWithdrawalAmount(e.target.value)}
-                placeholder="100"
-                className="bg-slate-700 border-amber-500/30 text-white"
-              />
-              <p className="text-sm text-gray-400 mt-1">Mevcut bakiye: ${user?.wallet_balance?.toFixed(2)}</p>
-            </div>
-            <div>
-              <Label className="text-gray-300">Kripto Tipi</Label>
-              <Select value={cryptoType} onValueChange={setCryptoType}>
-                <SelectTrigger className="bg-slate-700 border-amber-500/30 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-amber-500/30">
-                  <SelectItem value="usdt">USDT</SelectItem>
-                  <SelectItem value="btc">BTC</SelectItem>
-                  <SelectItem value="eth">ETH</SelectItem>
-                  <SelectItem value="mock">Mock (Test)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-gray-300">Cüzdan Adresi</Label>
-              <Input
-                value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
-                placeholder="0x..."
-                className="bg-slate-700 border-amber-500/30 text-white"
-              />
-            </div>
-            <Button onClick={handleWithdrawal} className="w-full bg-gradient-to-r from-amber-500 to-amber-600">
-              Talep Gönder
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       {/* Commissions Dialog */}
       <Dialog open={commissionsOpen} onOpenChange={setCommissionsOpen}>
         <DialogContent className="bg-slate-800 border-amber-500/30 max-w-4xl max-h-[90vh] overflow-y-auto">
