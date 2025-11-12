@@ -311,7 +311,12 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Manual user placement system - Admin can place users in binary tree"
+    - "POST /api/admin/place-user endpoint"
+    - "Placement history tracking"
+    - "Volume recalculation after repositioning"
+    - "Frontend user placement interface in Admin Panel"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
