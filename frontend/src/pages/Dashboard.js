@@ -42,6 +42,11 @@ export default function Dashboard() {
   const [placementPosition, setPlacementPosition] = useState('left');
   const [selectedUpline, setSelectedUpline] = useState('');
   const [placementModalOpen, setPlacementModalOpen] = useState(false);
+  
+  // Join network state
+  const [joinNetworkOpen, setJoinNetworkOpen] = useState(false);
+  const [joinReferralCode, setJoinReferralCode] = useState('');
+  const [joinLoading, setJoinLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
