@@ -95,6 +95,38 @@ export default function Dashboard() {
     }
   };
   
+  const fetchMyReferrals = async () => {
+    try {
+      const response = await axios.get(`${API}/users/my-referrals`, { withCredentials: true });
+      setMyReferrals(response.data);
+    } catch (error) {
+      console.error('My referrals error:', error);
+      toast.error('Referanslar yüklenirken hata oluştu');
+    }
+  };
+  
+  const handlePlaceReferral = async (referralId, uplineId, position) => {
+    try {
+      await axios.post(
+        `${API}/users/place-referral`,
+        {
+          user_id: referralId,
+          upline_id: uplineId,
+          position: position
+        },
+        { withCredentials: true }
+      );
+      toast.success('Kullanıcı başarıyla yerleştirildi!');
+      fetchMyReferrals();
+      fetchDashboard();
+      setManagementOpen(false);
+      setSelectedReferral(null);
+    } catch (error) {
+      console.error('Place referral error:', error);
+      toast.error(error.response?.data?.detail || 'Yerleştirme başarısız');
+    }
+  };
+  
   const generateNewCode = async (position = 'auto') => {
     setGeneratingCode(true);
     try {
