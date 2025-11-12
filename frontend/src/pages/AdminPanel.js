@@ -106,6 +106,37 @@ export default function AdminPanel() {
   };
 
 
+
+  const handleApproveWithdrawal = async (requestId) => {
+    try {
+      await axios.post(
+        `${API}/admin/withdrawal-requests/${requestId}/approve`,
+        {},
+        { withCredentials: true }
+      );
+      toast.success('Çekim talebi onaylandı');
+      fetchAdminData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Onaylama başarısız');
+    }
+  };
+
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`${userName} kullanıcısını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!`)) return;
+    
+    try {
+      await axios.delete(
+        `${API}/admin/users/${userId}`,
+        { withCredentials: true }
+      );
+      toast.success('Kullanıcı silindi');
+      fetchAdminData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Silme başarısız');
+    }
+  };
+
+
   const handleMakeAdmin = async (userId) => {
     if (!window.confirm('Bu kullanıcıyı admin yapmak istediğinizden emin misiniz?')) return;
     
