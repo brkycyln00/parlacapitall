@@ -4752,6 +4752,9 @@ class ParlaCapitalAPITester:
         # Test public endpoints first
         self.test_public_endpoints()
         
+        # PRIORITY: Test Join Network with Referral Code Feature
+        self.test_join_network_with_referral_code()
+        
         # PRIORITY: Test Unlimited Referrals Registration (No Auto-Placement)
         self.test_unlimited_referrals_no_auto_placement()
         
