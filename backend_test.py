@@ -363,78 +363,51 @@ class ParlaCapitalAPITester:
         except Exception as e:
             print(f"   ❌ Failed to verify binary tree: {str(e)}")
 
-    def create_test_user_session(self):
-        """Create test user and session in MongoDB for testing"""
-        print("\n🔧 Creating test user and session...")
+    def create_test_user_and_login(self):
+        """Create test user and login to get JWT token"""
+        print("\n🔧 Creating test user and logging in...")
         
         # Generate unique IDs
         timestamp = str(int(time.time()))
         self.test_user_id = f"test-user-{timestamp}"
-        self.session_token = f"test_session_{timestamp}"
+        test_email = f"test.user.{timestamp}@example.com"
+        test_password = "SecureTestPass123!"
         
-        # MongoDB commands to create test data
-        mongo_commands = f"""
-        use('test_database');
+        # First create a referral code for the test user to use during registration
+        seed_user_id, seed_referral_code = self.create_seed_user()
+        if not seed_user_id:
+            print("❌ Cannot create test user - seed user creation failed")
+            return False
         
-        // Create test user
-        db.users.insertOne({{
-            id: '{self.test_user_id}',
-            email: 'test.user.{timestamp}@example.com',
-            name: 'Test User {timestamp}',
-            picture: 'https://via.placeholder.com/150',
-            referral_code: 'TEST{timestamp[-6:]}',
-            upline_id: null,
-            package: null,
-            package_amount: 0.0,
-            investment_date: null,
-            total_invested: 0.0,
-            weekly_earnings: 0.0,
-            total_commissions: 0.0,
-            left_child_id: null,
-            right_child_id: null,
-            position: null,
-            left_volume: 0.0,
-            right_volume: 0.0,
-            binary_earnings: 0.0,
-            career_level: 'None',
-            career_points: 0.0,
-            career_rewards: 0.0,
-            wallet_balance: 100.0,
-            is_admin: false,
-            created_at: new Date().toISOString()
-        }});
+        # Register the test user
+        registration_data = {
+            "email": test_email,
+            "password": test_password,
+            "name": f"Test User {timestamp}",
+            "referral_code": seed_referral_code
+        }
         
-        // Create test session
-        db.user_sessions.insertOne({{
-            user_id: '{self.test_user_id}',
-            session_token: '{self.session_token}',
-            expires_at: new Date(Date.now() + 7*24*60*60*1000),
-            created_at: new Date()
-        }});
+        success, response = self.run_test(
+            "Register Test User",
+            "POST",
+            "auth/register",
+            200,
+            data=registration_data
+        )
         
-        print('Test user created with ID: {self.test_user_id}');
-        print('Session token: {self.session_token}');
-        """
-        
-        try:
-            import subprocess
-            result = subprocess.run(
-                ['mongosh', '--eval', mongo_commands],
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
-            
-            if result.returncode == 0:
-                print(f"✅ Test user created: {self.test_user_id}")
-                print(f"✅ Session token: {self.session_token}")
+        if success and isinstance(response, dict):
+            jwt_token = response.get('token')
+            if jwt_token:
+                self.session_token = jwt_token
+                self.test_user_id = response['user']['id']
+                print(f"✅ Test user registered and logged in: {self.test_user_id}")
+                print(f"✅ JWT token obtained")
                 return True
             else:
-                print(f"❌ MongoDB setup failed: {result.stderr}")
+                print(f"❌ Registration successful but no token received: {response}")
                 return False
-                
-        except Exception as e:
-            print(f"❌ Failed to create test data: {str(e)}")
+        else:
+            print("❌ Test user registration failed")
             return False
 
     def test_auth_endpoints(self):
