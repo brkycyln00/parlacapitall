@@ -662,9 +662,12 @@ class ParlaCapitalAPITester:
         var result24 = db.investment_requests.deleteMany({email: /\.placement\./});
         
         // Remove test transactions
-        var result23 = db.transactions.deleteMany({user_id: /test-user-/});
-        var result24 = db.transactions.deleteMany({user_id: /admin-user-/});
-        var result25 = db.transactions.deleteMany({user_id: /seed-user-/});
+        var result25 = db.transactions.deleteMany({user_id: /test-user-/});
+        var result26 = db.transactions.deleteMany({user_id: /admin-user-/});
+        var result27 = db.transactions.deleteMany({user_id: /seed-user-/});
+        
+        // Remove test placement history
+        var result28 = db.placement_history.deleteMany({admin_name: /Admin User/});
         
         print('Cleanup completed');
         print('Users deleted: ' + (result1.deletedCount + result2.deletedCount + result3.deletedCount + result4.deletedCount + result5.deletedCount + result6.deletedCount + result7.deletedCount + result8.deletedCount + result9.deletedCount + result10.deletedCount + result11.deletedCount + result12.deletedCount));
