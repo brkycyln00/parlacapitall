@@ -1334,22 +1334,17 @@ export default function Dashboard() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
-                            onClick={() => handlePlaceReferral(referral.id, user.id, 'left')}
-                          >
-                            👈 Sol Kola
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="flex-1 bg-purple-500 hover:bg-purple-600 text-white"
-                            onClick={() => handlePlaceReferral(referral.id, user.id, 'right')}
-                          >
-                            👉 Sağ Kola
-                          </Button>
-                        </div>
+                        <Button
+                          size="sm"
+                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                          onClick={() => {
+                            setSelectedReferral(referral);
+                            setSelectedUpline(user.id);
+                            setPlacementModalOpen(true);
+                          }}
+                        >
+                          🎯 Yerleştir
+                        </Button>
                       </CardContent>
                     </Card>
                   ))
