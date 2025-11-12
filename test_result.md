@@ -216,6 +216,18 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - Dashboard endpoint working perfectly. Tested: 1) Returns active_referral_code field in response 2) Auto-generates code if user doesn't have one 3) Shows correct referral statistics 4) Integrates seamlessly with new referral system 5) All dashboard functionality intact. Active code display working as expected."
 
+  - task: "Position parameter support in referral code generation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - CRITICAL P0 FEATURE! Position parameter support in POST /api/referral/generate endpoint working perfectly. Tested: 1) position=left creates codes for left branch placement 2) position=right creates codes for right branch placement 3) position=auto maintains existing behavior 4) ReferralCode model stores position field correctly 5) Registration respects position preference and places users accordingly 6) Binary tree structure updated correctly with left_child_id and right_child_id. This enables the core binary tree position selection feature requested by user."
+
 frontend:
   - task: "Remove toUpperCase from referral code input"
     implemented: true
