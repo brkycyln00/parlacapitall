@@ -213,10 +213,26 @@ async def register(req: RegisterRequest):
     if not req.referral_code:
         raise HTTPException(status_code=400, detail="Referans kodu zorunludur. Lütfen sizi davet eden kişinin kodunu girin.")
     
-    # Find upline
-    upline = await db.users.find_one({"referral_code": req.referral_code}, {"_id": 0})
-    if not upline:
+    # Find referral code in referral_codes collection
+    referral_doc = await db.referral_codes.find_one({"code": req.referral_code}, {"_id": 0})
+    if not referral_doc:
         raise HTTPException(status_code=400, detail="Geçersiz referans kodu. Lütfen doğru kodu girdiğinizden emin olun.")
+    
+    referral = ReferralCode(**referral_doc)
+    
+    # Check if code is expired
+    expires_at = datetime.fromisoformat(referral.expires_at)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Bu referans kodunun süresi dolmuş. Lütfen yeni bir kod isteyin.")
+    
+    # Check if code is already used
+    if referral.is_used:
+        raise HTTPException(status_code=400, detail="Bu referans kodu daha önce kullanılmış. Her kod sadece bir kez kullanılabilir.")
+    
+    # Find upline user
+    upline = await db.users.find_one({"id": referral.user_id}, {"_id": 0})
+    if not upline:
+        raise HTTPException(status_code=400, detail="Geçersiz referans kodu.")
     
     upline_user = User(**upline)
     
@@ -250,6 +266,16 @@ async def register(req: RegisterRequest):
     
     user_dict = user.model_dump()
     await db.users.insert_one(user_dict)
+    
+    # Mark referral code as used
+    await db.referral_codes.update_one(
+        {"id": referral.id},
+        {"$set": {
+            "is_used": True,
+            "used_by": user.id,
+            "used_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
     
     # Create JWT token
     token = create_jwt_token(user.id)
