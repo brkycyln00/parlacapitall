@@ -60,11 +60,15 @@ export default function AuthModal({ open, onClose, onSuccess }) {
   const validateReferralCode = async (code) => {
     if (!code || code.length < 3) return;
     
+    // Trim and clean the code
+    const cleanCode = code.trim().replace(/\s/g, '');
+    if (!cleanCode || cleanCode.length < 3) return;
+    
     setReferralValidating(true);
     setReferralError('');
     
     try {
-      const response = await axios.get(`${API}/auth/validate-referral/${code}`);
+      const response = await axios.get(`${API}/auth/validate-referral/${encodeURIComponent(cleanCode)}`);
       
       if (response.data.valid) {
         setReferralValid(true);
