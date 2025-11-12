@@ -308,23 +308,13 @@ async def register(req: RegisterRequest):
     user_dict = user.model_dump()
     await db.users.insert_one(user_dict)
     
-    # Mark referral code as used
-    await db.referral_codes.update_one(
-        {"id": referral.id},
-        {"$set": {
-            "is_used": True,
-            "used_by": user.id,
-            "used_at": datetime.now(timezone.utc).isoformat()
-        }}
-    )
-    
     # Create JWT token
     token = create_jwt_token(user.id)
     
-    return {
-        "message": "Kayıt başarılı! " + upline_user.name + " ağına eklendi.",
-        "token": token,
-        "user": {
+    # Prepare response
+    if upline_user:
+        message = f"Kayıt başarılı! {upline_user.name} ağına eklendiniz."
+        response_user = {
             "id": user.id,
             "email": user.email,
             "name": user.name,
@@ -334,6 +324,19 @@ async def register(req: RegisterRequest):
                 "referral_code": upline_user.referral_code
             }
         }
+    else:
+        message = "Kayıt başarılı!"
+        response_user = {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "referral_code": user.referral_code
+        }
+    
+    return {
+        "message": message,
+        "token": token,
+        "user": response_user
     }
 
 @api_router.post("/auth/login")
