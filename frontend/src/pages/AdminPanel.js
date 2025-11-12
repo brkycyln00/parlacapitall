@@ -377,21 +377,54 @@ export default function AdminPanel() {
                     <div key={idx} data-testid={`user-${idx}`} className="bg-slate-700/50 rounded-lg p-4">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-white font-semibold">{u.name}</p>
+                          <div className="flex items-center gap-2 mb-2">
+                            <p className="text-white font-semibold text-lg">{u.name}</p>
                             {u.is_admin && (
                               <span className="bg-amber-500 text-slate-900 text-xs px-2 py-1 rounded font-bold">ADMIN</span>
                             )}
                           </div>
-                          <p className="text-gray-400 text-sm">{u.email}</p>
-                          <p className="text-gray-500 text-xs mt-1">ID: {u.id}</p>
-                          <p className="text-gray-500 text-xs">Referans Kodu: {u.referral_code}</p>
+                          <div className="grid md:grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <p className="text-gray-500">E-posta</p>
+                              <p className="text-gray-300">{u.email}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Kullanıcı ID</p>
+                              <p className="text-gray-300 font-mono text-xs">{u.id}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Referans Kodu</p>
+                              <p className="text-amber-400 font-mono">{u.referral_code}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Kayıt Tarihi</p>
+                              <p className="text-gray-300">{new Date(u.created_at).toLocaleDateString('tr-TR', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Son Giriş</p>
+                              <p className="text-green-400">
+                                {u.last_login ? new Date(u.last_login).toLocaleDateString('tr-TR', { 
+                                  year: 'numeric', 
+                                  month: 'short', 
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                }) : 'Henüz giriş yapmadı'}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right ml-4">
-                          <p className="text-amber-400 font-semibold">{u.package ? u.package.toUpperCase() : 'Paket Yok'}</p>
-                          <p className="text-gray-400 text-sm">Bakiye: ${u.wallet_balance?.toFixed(2) || '0.00'}</p>
-                          <p className="text-gray-400 text-sm">Yatırım: ${u.total_invested?.toFixed(2) || '0.00'}</p>
-                          <p className="text-gray-400 text-sm">Komisyon: ${u.total_commissions?.toFixed(2) || '0.00'}</p>
+                        <div className="text-right ml-4 space-y-1">
+                          <p className="text-amber-400 font-semibold text-lg">{u.package ? u.package.toUpperCase() : 'Paket Yok'}</p>
+                          <p className="text-gray-400 text-sm">Bakiye: ₺{u.wallet_balance?.toLocaleString('tr-TR') || '0'}</p>
+                          <p className="text-gray-400 text-sm">Yatırım: ₺{u.total_invested?.toLocaleString('tr-TR') || '0'}</p>
+                          <p className="text-gray-400 text-sm">Komisyon: ₺{u.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
                         </div>
                       </div>
                       {!u.is_admin && (
