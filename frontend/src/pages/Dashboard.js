@@ -280,6 +280,7 @@ export default function Dashboard() {
             <span>❓</span>
             <span>Destek</span>
           </button>
+          </>
           )}
           
           {user?.is_admin && (
