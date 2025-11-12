@@ -213,7 +213,7 @@ export default function AdminPanel() {
         </Card>
 
         {/* Tabs */}
-        <Tabs defaultValue="transactions" className="space-y-4">
+        <Tabs defaultValue="investments" className="space-y-4">
           <TabsList className="bg-slate-800 border border-amber-500/30">
             <TabsTrigger value="investments" className="data-[state=active]:bg-amber-500">Yatırım Talepleri</TabsTrigger>
             <TabsTrigger data-testid="transactions-tab" value="transactions" className="data-[state=active]:bg-amber-500">İşlemler</TabsTrigger>
