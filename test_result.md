@@ -312,11 +312,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User-side referral management interface in Dashboard"
-    - "POST /api/users/place-referral endpoint (non-admin users)"
-    - "GET /api/users/my-referrals endpoint"
-    - "Interactive placement system with unplaced/placed referrals"
-    - "Drag-and-drop or click-to-place functionality"
+    - "Real-time referral code validation"
+    - "Frontend form validation with referral check"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -331,6 +328,11 @@ test_plan:
     - "Placement history tracking ✅"
     - "Volume recalculation after repositioning ✅"
     - "Frontend user placement interface in Admin Panel ✅"
+    - "User-side referral management interface in Dashboard ✅"
+    - "POST /api/users/place-referral endpoint (non-admin users) ✅"
+    - "GET /api/users/my-referrals endpoint ✅"
+    - "Interactive placement system with unplaced/placed referrals ✅"
+    - "Click-to-place functionality (👈 Sol Kola / 👉 Sağ Kola buttons) ✅"
 
 agent_communication:
   - agent: "main"
