@@ -228,6 +228,158 @@ export default function Dashboard() {
             </Card>
           </div>
 
+          {/* Referral Section */}
+          <Card className="bg-gradient-to-r from-amber-500/10 to-amber-600/10 border-amber-500/30 mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-white text-2xl">Referans Kodunuz</CardTitle>
+                  <p className="text-sm text-gray-400 mt-1">Bu kodu paylaşarak yeni üyeler kazanın ve komisyon elde edin</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-400">Toplam Referans</p>
+                  <p className="text-4xl font-bold text-amber-400">{dashboard?.referrals?.length || 0}</p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-slate-800/80 rounded-xl p-6 border border-amber-500/20">
+                  <p className="text-sm text-gray-400 mb-2">Referans Kodunuz</p>
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="flex-1 bg-slate-900 rounded-lg px-4 py-3 border border-amber-500/30">
+                      <p className="text-2xl font-bold text-amber-400 font-mono">{user?.referral_code}</p>
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(user?.referral_code);
+                        toast.success('Referans kodu kopyalandı!');
+                      }}
+                      className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6"
+                    >
+                      Kopyala
+                    </Button>
+                  </div>
+                  <p className="text-sm text-gray-400 mb-2">Davet Linkiniz</p>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      value={`${process.env.REACT_APP_BASE_URL}/?ref=${user?.referral_code}`}
+                      readOnly
+                      className="bg-slate-900 border-amber-500/30 text-white text-sm"
+                    />
+                    <Button 
+                      onClick={copyReferralLink}
+                      className="bg-amber-500 hover:bg-amber-600 text-slate-900"
+                    >
+                      Kopyala
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="bg-slate-800/80 rounded-xl p-6 border border-amber-500/20">
+                  <p className="text-sm text-gray-400 mb-4">Komisyon Oranları</p>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-300">Silver Paket</span>
+                      <span className="text-purple-400 font-bold">%5 Komisyon</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-300">Gold Paket</span>
+                      <span className="text-amber-400 font-bold">%10 Komisyon</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-300">Platinum Paket</span>
+                      <span className="text-cyan-400 font-bold">%15 Komisyon</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-slate-700">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-sm">Toplam Kazancınız</span>
+                      <span className="text-2xl font-bold text-green-400">₺{user?.total_commissions?.toLocaleString('tr-TR') || '0'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Referral List */}
+          {dashboard?.referrals && dashboard.referrals.length > 0 && (
+            <Card className="bg-slate-800 border-slate-700 mb-8">
+              <CardHeader>
+                <CardTitle className="text-white text-xl">Referanslarınız</CardTitle>
+                <p className="text-sm text-gray-400">Davet ettiğiniz kullanıcılar ve kazançları</p>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-700">
+                        <th className="text-left py-3 px-4 text-gray-400 font-semibold">Kullanıcı</th>
+                        <th className="text-left py-3 px-4 text-gray-400 font-semibold">E-posta</th>
+                        <th className="text-center py-3 px-4 text-gray-400 font-semibold">Paket</th>
+                        <th className="text-center py-3 px-4 text-gray-400 font-semibold">Pozisyon</th>
+                        <th className="text-right py-3 px-4 text-gray-400 font-semibold">Yatırım</th>
+                        <th className="text-right py-3 px-4 text-gray-400 font-semibold">Komisyon</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dashboard.referrals.map((ref, idx) => (
+                        <tr key={idx} className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                          <td className="py-4 px-4">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
+                                <span className="text-slate-900 font-bold">{ref.name?.charAt(0)}</span>
+                              </div>
+                              <span className="text-white font-semibold">{ref.name}</span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-gray-300">{ref.email}</td>
+                          <td className="py-4 px-4 text-center">
+                            {ref.package ? (
+                              <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                                ref.package === 'platinum' ? 'bg-cyan-500/20 text-cyan-400' :
+                                ref.package === 'gold' ? 'bg-amber-500/20 text-amber-400' :
+                                'bg-purple-500/20 text-purple-400'
+                              }`}>
+                                {ref.package?.toUpperCase()}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">Yok</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-4 text-center">
+                            {ref.position ? (
+                              <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                                ref.position === 'left' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'
+                              }`}>
+                                {ref.position === 'left' ? 'Sol Kol' : 'Sağ Kol'}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-4 text-right text-white font-semibold">
+                            ₺{ref.total_invested?.toLocaleString('tr-TR') || '0'}
+                          </td>
+                          <td className="py-4 px-4 text-right">
+                            <span className="text-green-400 font-bold">
+                              +₺{((ref.package_amount || 0) * (
+                                ref.package === 'platinum' ? 0.15 :
+                                ref.package === 'gold' ? 0.10 :
+                                ref.package === 'silver' ? 0.05 : 0
+                              )).toLocaleString('tr-TR')}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="grid grid-cols-2 gap-6 mb-8">
             {/* Weekly Earnings Chart */}
             <Card className="bg-slate-800 border-slate-700">
