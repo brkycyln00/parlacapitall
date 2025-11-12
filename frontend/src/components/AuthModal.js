@@ -206,20 +206,33 @@ export default function AuthModal({ open, onClose, onSuccess }) {
                   minLength={6}
                 />
               </div>
-              {referralCode && (
-                <div>
-                  <Label className="text-gray-300">Referans Kodu</Label>
-                  <Input
-                    type="text"
-                    value={referralCode}
-                    onChange={(e) => setReferralCode(e.target.value)}
-                    className="bg-slate-700 border-amber-500/30 text-white mt-2"
-                    data-testid="register-referral-input"
-                    readOnly
-                  />
-                  <p className="text-green-400 text-sm mt-1">✓ Referans kodu otomatik uygulandı</p>
-                </div>
-              )}
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                <Label className="text-amber-400 font-semibold">
+                  Referans Kodu {referralCode ? '(Otomatik)' : '(Zorunlu)'}
+                </Label>
+                <Input
+                  type="text"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  placeholder="Referans kodunu girin"
+                  className="bg-slate-700 border-amber-500/50 text-white mt-2 font-mono text-lg"
+                  data-testid="register-referral-input"
+                  required
+                  readOnly={!!referralCode}
+                />
+                {referralCode ? (
+                  <p className="text-green-400 text-sm mt-2 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                    </svg>
+                    Referans kodu geçerli
+                  </p>
+                ) : (
+                  <p className="text-gray-400 text-xs mt-2">
+                    Davet eden kişinin referans kodunu girin. Kayıt için zorunludur.
+                  </p>
+                )}
+              </div>
               <Button
                 type="submit"
                 disabled={loading}
