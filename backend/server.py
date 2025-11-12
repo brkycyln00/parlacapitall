@@ -560,6 +560,92 @@ PACKAGES = {
 async def get_packages():
     return list(PACKAGES.values())
 
+
+@api_router.post("/investment/request")
+async def create_investment_request(
+    full_name: str,
+    username: str,
+    email: str,
+    whatsapp: str,
+    platform: str,
+    package: str,
+    user: User = Depends(require_auth)
+):
+    if package not in PACKAGES:
+        raise HTTPException(status_code=400, detail="Invalid package")
+    
+    package_info = PACKAGES[package]
+    
+    # Create investment request
+    request = InvestmentRequest(
+        user_id=user.id,
+        full_name=full_name,
+        username=username,
+        email=email,
+        whatsapp=whatsapp,
+        platform=platform,
+        package=package,
+        amount=package_info.amount
+    )
+    
+    await db.investment_requests.insert_one(request.model_dump())
+    
+    return {
+        "success": True,
+        "message": "Yatırım talebiniz alındı! Admin onayından sonra hesabınıza yansıyacaktır.",
+        "request_id": request.id
+    }
+
+@api_router.get("/admin/investment-requests")
+async def get_investment_requests(user: User = Depends(require_admin)):
+    requests = await db.investment_requests.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"requests": requests}
+
+@api_router.post("/admin/investment-requests/{request_id}/approve")
+async def approve_investment_request(request_id: str, user: User = Depends(require_admin)):
+    request_doc = await db.investment_requests.find_one({"id": request_id}, {"_id": 0})
+    if not request_doc:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    request = InvestmentRequest(**request_doc)
+    
+    # Get user
+    user_doc = await db.users.find_one({"id": request.user_id}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    target_user = User(**user_doc)
+    
+    # Create actual investment
+    investment = Investment(
+        user_id=target_user.id,
+        package=request.package,
+        amount=request.amount,
+        investment_date=datetime.now(timezone.utc).isoformat()
+    )
+    
+    await db.investments.insert_one(investment.model_dump())
+    
+    # Update user
+    await db.users.update_one(
+        {"id": target_user.id},
+        {"$set": {
+            "package": request.package,
+            "package_amount": request.amount,
+            "investment_date": investment.investment_date,
+            "total_invested": target_user.total_invested + request.amount
+        }}
+    )
+    
+    # Mark request as approved
+    await db.investment_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "approved"}}
+    )
+    
+    return {"success": True, "message": "Investment approved"}
+
+
 @api_router.post("/investments/create")
 async def create_investment(
     package: str,
