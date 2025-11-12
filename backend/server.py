@@ -329,19 +329,44 @@ async def login(req: LoginRequest):
 
 @api_router.get("/auth/validate-referral/{referral_code}")
 async def validate_referral_code(referral_code: str):
-    """Validate if a referral code exists"""
-    user = await db.users.find_one({"referral_code": referral_code}, {"_id": 0, "id": 1, "name": 1, "referral_code": 1})
+    """Validate if a referral code exists and is valid"""
+    referral_doc = await db.referral_codes.find_one({"code": referral_code}, {"_id": 0})
     
-    if user:
-        return {
-            "valid": True,
-            "upline_name": user.get("name", "Unknown")
-        }
-    else:
+    if not referral_doc:
         return {
             "valid": False,
             "message": "Yanlış referans kodu girdiniz!"
         }
+    
+    referral = ReferralCode(**referral_doc)
+    
+    # Check if expired
+    expires_at = datetime.fromisoformat(referral.expires_at)
+    if expires_at < datetime.now(timezone.utc):
+        return {
+            "valid": False,
+            "message": "Bu kodun süresi dolmuş!"
+        }
+    
+    # Check if already used
+    if referral.is_used:
+        return {
+            "valid": False,
+            "message": "Bu kod kullanılmış!"
+        }
+    
+    # Get upline user info
+    upline = await db.users.find_one({"id": referral.user_id}, {"_id": 0, "name": 1})
+    if not upline:
+        return {
+            "valid": False,
+            "message": "Geçersiz kod!"
+        }
+    
+    return {
+        "valid": True,
+        "upline_name": upline.get("name", "Unknown")
+    }
 
 # ==================== GOOGLE AUTH ENDPOINTS ====================
 
