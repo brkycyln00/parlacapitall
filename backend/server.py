@@ -288,6 +288,23 @@ async def login(req: LoginRequest):
         }
     }
 
+
+@api_router.get("/auth/validate-referral/{referral_code}")
+async def validate_referral_code(referral_code: str):
+    """Validate if a referral code exists"""
+    user = await db.users.find_one({"referral_code": referral_code}, {"_id": 0, "id": 1, "name": 1, "referral_code": 1})
+    
+    if user:
+        return {
+            "valid": True,
+            "upline_name": user.get("name", "Unknown")
+        }
+    else:
+        return {
+            "valid": False,
+            "message": "Yanlış referans kodu girdiniz!"
+        }
+
 # ==================== GOOGLE AUTH ENDPOINTS ====================
 
 @api_router.post("/auth/session")
