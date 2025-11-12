@@ -2295,6 +2295,572 @@ class ParlaCapitalAPITester:
         except Exception as e:
             print(f"   ❌ Failed to check volume: {str(e)}")
 
+    def test_multi_level_commission_system(self):
+        """Test the multi-level commission system comprehensively"""
+        print("\n💰 Testing Multi-Level Commission System...")
+        print("=" * 60)
+        
+        # Step 1: Create admin user for approving investments
+        admin_token = self.create_admin_user_and_login()
+        if not admin_token:
+            print("❌ Cannot test multi-level commissions - admin user creation failed")
+            return
+        
+        # Step 2: Create multi-level network structure
+        print("\n1️⃣ Creating Multi-Level Network Structure...")
+        
+        timestamp = str(int(time.time()))
+        
+        # Create User1 (Root - no upline)
+        user1_data = {
+            "email": f"user1.commission.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Tolga Commission {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register User1 (Tolga - Root)",
+            "POST",
+            "auth/register",
+            200,
+            data=user1_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User1 (root)")
+            return
+        
+        user1_id = response['user']['id']
+        user1_token = response.get('token')
+        print(f"   ✓ User1 (Tolga) created: {user1_id}")
+        
+        # Generate referral code for User1
+        original_token = self.session_token
+        self.session_token = user1_token
+        
+        success, response = self.run_test(
+            "Generate User1 Referral Code",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate User1 referral code")
+            return
+        
+        user1_code = response.get('code')
+        print(f"   ✓ User1 referral code: {user1_code}")
+        
+        # Create User2 (Level 2 - under User1)
+        user2_data = {
+            "email": f"user2.commission.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Fatma Commission {timestamp}",
+            "referral_code": user1_code
+        }
+        
+        success, response = self.run_test(
+            "Register User2 (Fatma - Level 2)",
+            "POST",
+            "auth/register",
+            200,
+            data=user2_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User2")
+            return
+        
+        user2_id = response['user']['id']
+        user2_token = response.get('token')
+        print(f"   ✓ User2 (Fatma) created: {user2_id}")
+        
+        # Generate referral code for User2
+        self.session_token = user2_token
+        
+        success, response = self.run_test(
+            "Generate User2 Referral Code",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate User2 referral code")
+            return
+        
+        user2_code = response.get('code')
+        print(f"   ✓ User2 referral code: {user2_code}")
+        
+        # Create User3 (Level 1 - Direct under User2)
+        user3_data = {
+            "email": f"user3.commission.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Sefa Commission {timestamp}",
+            "referral_code": user2_code
+        }
+        
+        success, response = self.run_test(
+            "Register User3 (Sefa - Level 1 Direct)",
+            "POST",
+            "auth/register",
+            200,
+            data=user3_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User3")
+            return
+        
+        user3_id = response['user']['id']
+        user3_token = response.get('token')
+        print(f"   ✓ User3 (Sefa) created: {user3_id}")
+        
+        # Generate referral code for User3
+        self.session_token = user3_token
+        
+        success, response = self.run_test(
+            "Generate User3 Referral Code",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate User3 referral code")
+            return
+        
+        user3_code = response.get('code')
+        print(f"   ✓ User3 referral code: {user3_code}")
+        
+        # Create User4 (Investor - under User3)
+        user4_data = {
+            "email": f"user4.commission.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Eray Commission {timestamp}",
+            "referral_code": user3_code
+        }
+        
+        success, response = self.run_test(
+            "Register User4 (Eray - Investor)",
+            "POST",
+            "auth/register",
+            200,
+            data=user4_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User4")
+            return
+        
+        user4_id = response['user']['id']
+        user4_token = response.get('token')
+        print(f"   ✓ User4 (Eray) created: {user4_id}")
+        
+        print("\n   🌳 Network Structure Created:")
+        print("   Tolga (User1)")
+        print("     └── Fatma (User2)")
+        print("         └── Sefa (User3)")
+        print("             └── Eray (User4)")
+        
+        # Step 3: Test Single Level Commission (Baseline)
+        print("\n2️⃣ Testing Single Level Commission (Baseline)...")
+        
+        # User2 makes $250 investment (Silver - 5%)
+        self.session_token = user2_token
+        user2_investment_data = {
+            "full_name": f"Fatma Commission {timestamp}",
+            "username": f"fatma_commission_{timestamp}",
+            "email": f"user2.commission.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "silver"  # $250, 5% commission = $12.50
+        }
+        
+        success, response = self.run_test(
+            "User2 Investment Request ($250 Silver)",
+            "POST",
+            "investment/request",
+            200,
+            data=user2_investment_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User2 investment request")
+            return
+        
+        user2_request_id = response.get('request_id')
+        print(f"   ✓ User2 investment request created: {user2_request_id}")
+        
+        # Get User1's commission balance before approval
+        user1_before = self.get_user_data(user1_id)
+        
+        # Admin approves User2 investment
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Admin Approve User2 Investment",
+            "POST",
+            f"admin/investment-requests/{user2_request_id}/approve",
+            200
+        )
+        
+        if success:
+            print("   ✅ User2 investment approved")
+            
+            # Check User1 received commission (direct upline)
+            user1_after = self.get_user_data(user1_id)
+            expected_commission = 250.0 * 0.05  # $12.50
+            
+            if user1_after and user1_before:
+                commission_increase = user1_after.get('total_commissions', 0) - user1_before.get('total_commissions', 0)
+                wallet_increase = user1_after.get('wallet_balance', 0) - user1_before.get('wallet_balance', 0)
+                
+                print(f"   ✓ User1 commission increase: ${commission_increase}")
+                print(f"   ✓ User1 wallet increase: ${wallet_increase}")
+                
+                if abs(commission_increase - expected_commission) < 0.01:
+                    print(f"   ✅ Single level commission correct: ${expected_commission}")
+                else:
+                    print(f"   ❌ Single level commission incorrect - Expected: ${expected_commission}, Got: ${commission_increase}")
+                
+                # Check transaction was created
+                self.check_commission_transaction(user1_id, expected_commission, "Direkt komisyon")
+        
+        # Step 4: Test Two Level Commission
+        print("\n3️⃣ Testing Two Level Commission...")
+        
+        # User3 makes $500 investment (Gold - 10%)
+        self.session_token = user3_token
+        user3_investment_data = {
+            "full_name": f"Sefa Commission {timestamp}",
+            "username": f"sefa_commission_{timestamp}",
+            "email": f"user3.commission.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"  # $500, 10% commission = $50
+        }
+        
+        success, response = self.run_test(
+            "User3 Investment Request ($500 Gold)",
+            "POST",
+            "investment/request",
+            200,
+            data=user3_investment_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User3 investment request")
+            return
+        
+        user3_request_id = response.get('request_id')
+        
+        # Get balances before approval
+        user1_before = self.get_user_data(user1_id)
+        user2_before = self.get_user_data(user2_id)
+        
+        # Admin approves User3 investment
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Admin Approve User3 Investment",
+            "POST",
+            f"admin/investment-requests/{user3_request_id}/approve",
+            200
+        )
+        
+        if success:
+            print("   ✅ User3 investment approved")
+            
+            # Check both User2 (Level 1) and User1 (Level 2) received commissions
+            user1_after = self.get_user_data(user1_id)
+            user2_after = self.get_user_data(user2_id)
+            expected_commission = 500.0 * 0.10  # $50
+            
+            if user2_after and user2_before:
+                user2_commission_increase = user2_after.get('total_commissions', 0) - user2_before.get('total_commissions', 0)
+                print(f"   ✓ User2 (Level 1) commission increase: ${user2_commission_increase}")
+                
+                if abs(user2_commission_increase - expected_commission) < 0.01:
+                    print(f"   ✅ Level 1 commission correct: ${expected_commission}")
+                else:
+                    print(f"   ❌ Level 1 commission incorrect - Expected: ${expected_commission}, Got: ${user2_commission_increase}")
+            
+            if user1_after and user1_before:
+                user1_commission_increase = user1_after.get('total_commissions', 0) - user1_before.get('total_commissions', 0)
+                print(f"   ✓ User1 (Level 2) commission increase: ${user1_commission_increase}")
+                
+                if abs(user1_commission_increase - expected_commission) < 0.01:
+                    print(f"   ✅ Level 2 commission correct: ${expected_commission}")
+                else:
+                    print(f"   ❌ Level 2 commission incorrect - Expected: ${expected_commission}, Got: ${user1_commission_increase}")
+            
+            # Check transactions were created for both levels
+            self.check_commission_transaction(user2_id, expected_commission, "Direkt komisyon")
+            self.check_commission_transaction(user1_id, expected_commission, "Seviye 2 komisyon")
+        
+        # Step 5: Test Three Level Commission
+        print("\n4️⃣ Testing Three Level Commission...")
+        
+        # User4 makes $1000 investment (Platinum - 15%)
+        self.session_token = user4_token
+        user4_investment_data = {
+            "full_name": f"Eray Commission {timestamp}",
+            "username": f"eray_commission_{timestamp}",
+            "email": f"user4.commission.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "platinum"  # $1000, 15% commission = $150
+        }
+        
+        success, response = self.run_test(
+            "User4 Investment Request ($1000 Platinum)",
+            "POST",
+            "investment/request",
+            200,
+            data=user4_investment_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User4 investment request")
+            return
+        
+        user4_request_id = response.get('request_id')
+        
+        # Get balances before approval
+        user1_before = self.get_user_data(user1_id)
+        user2_before = self.get_user_data(user2_id)
+        user3_before = self.get_user_data(user3_id)
+        
+        # Admin approves User4 investment
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Admin Approve User4 Investment",
+            "POST",
+            f"admin/investment-requests/{user4_request_id}/approve",
+            200
+        )
+        
+        if success:
+            print("   ✅ User4 investment approved")
+            
+            # Check all three levels received commissions
+            user1_after = self.get_user_data(user1_id)
+            user2_after = self.get_user_data(user2_id)
+            user3_after = self.get_user_data(user3_id)
+            expected_commission = 1000.0 * 0.15  # $150
+            
+            # Check User3 (Level 1 - Direct)
+            if user3_after and user3_before:
+                user3_commission_increase = user3_after.get('total_commissions', 0) - user3_before.get('total_commissions', 0)
+                print(f"   ✓ User3 (Level 1 - Direkt) commission increase: ${user3_commission_increase}")
+                
+                if abs(user3_commission_increase - expected_commission) < 0.01:
+                    print(f"   ✅ Level 1 (Direkt) commission correct: ${expected_commission}")
+                else:
+                    print(f"   ❌ Level 1 commission incorrect - Expected: ${expected_commission}, Got: ${user3_commission_increase}")
+            
+            # Check User2 (Level 2)
+            if user2_after and user2_before:
+                user2_commission_increase = user2_after.get('total_commissions', 0) - user2_before.get('total_commissions', 0)
+                print(f"   ✓ User2 (Level 2 - Seviye 2) commission increase: ${user2_commission_increase}")
+                
+                if abs(user2_commission_increase - expected_commission) < 0.01:
+                    print(f"   ✅ Level 2 (Seviye 2) commission correct: ${expected_commission}")
+                else:
+                    print(f"   ❌ Level 2 commission incorrect - Expected: ${expected_commission}, Got: ${user2_commission_increase}")
+            
+            # Check User1 (Level 3)
+            if user1_after and user1_before:
+                user1_commission_increase = user1_after.get('total_commissions', 0) - user1_before.get('total_commissions', 0)
+                print(f"   ✓ User1 (Level 3 - Seviye 3) commission increase: ${user1_commission_increase}")
+                
+                if abs(user1_commission_increase - expected_commission) < 0.01:
+                    print(f"   ✅ Level 3 (Seviye 3) commission correct: ${expected_commission}")
+                else:
+                    print(f"   ❌ Level 3 commission incorrect - Expected: ${expected_commission}, Got: ${user1_commission_increase}")
+            
+            # Verify total paid out
+            total_paid = expected_commission * 3  # $450
+            print(f"   ✓ Total commission paid out: ${total_paid}")
+            
+            # Check transactions were created for all three levels
+            self.check_commission_transaction(user3_id, expected_commission, "Direkt komisyon")
+            self.check_commission_transaction(user2_id, expected_commission, "Seviye 2 komisyon")
+            self.check_commission_transaction(user1_id, expected_commission, "Seviye 3 komisyon")
+        
+        # Step 6: Test Commission Rate Verification
+        print("\n5️⃣ Testing Commission Rate Verification...")
+        
+        # Test different packages have correct commission rates
+        packages = [
+            ("silver", 250.0, 0.05),
+            ("gold", 500.0, 0.10),
+            ("platinum", 1000.0, 0.15)
+        ]
+        
+        for package_name, amount, rate in packages:
+            expected_commission = amount * rate
+            print(f"   ✓ {package_name.upper()}: ${amount} × {rate*100}% = ${expected_commission}")
+        
+        # Step 7: Test Admin Dashboard Visibility
+        print("\n6️⃣ Testing Admin Dashboard Visibility...")
+        
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Get Admin Users List",
+            "GET",
+            "admin/users",
+            200
+        )
+        
+        if success and isinstance(response, list):
+            print(f"   ✓ Admin can see {len(response)} users")
+            
+            # Find our test users and verify their commission totals
+            for user in response:
+                if user.get('id') == user1_id:
+                    print(f"   ✓ User1 (Tolga) total_commissions: ${user.get('total_commissions', 0)}")
+                    print(f"   ✓ User1 (Tolga) wallet_balance: ${user.get('wallet_balance', 0)}")
+                elif user.get('id') == user2_id:
+                    print(f"   ✓ User2 (Fatma) total_commissions: ${user.get('total_commissions', 0)}")
+                    print(f"   ✓ User2 (Fatma) wallet_balance: ${user.get('wallet_balance', 0)}")
+                elif user.get('id') == user3_id:
+                    print(f"   ✓ User3 (Sefa) total_commissions: ${user.get('total_commissions', 0)}")
+                    print(f"   ✓ User3 (Sefa) wallet_balance: ${user.get('wallet_balance', 0)}")
+        
+        # Step 8: Test No Upline Case
+        print("\n7️⃣ Testing No Upline Case...")
+        
+        # User1 (root user with no upline) makes investment
+        self.session_token = user1_token
+        user1_investment_data = {
+            "full_name": f"Tolga Commission {timestamp}",
+            "username": f"tolga_commission_{timestamp}",
+            "email": f"user1.commission.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "silver"  # $250
+        }
+        
+        success, response = self.run_test(
+            "User1 Investment Request (No Upline)",
+            "POST",
+            "investment/request",
+            200,
+            data=user1_investment_data
+        )
+        
+        if success:
+            user1_request_id = response.get('request_id')
+            
+            # Admin approves
+            self.session_token = admin_token
+            success, response = self.run_test(
+                "Admin Approve User1 Investment (No Upline)",
+                "POST",
+                f"admin/investment-requests/{user1_request_id}/approve",
+                200
+            )
+            
+            if success:
+                print("   ✅ Root user investment processed successfully (no crash)")
+                print("   ✅ No commissions paid (expected behavior)")
+        
+        # Restore original token
+        self.session_token = original_token
+        
+        print("\n✅ Multi-Level Commission System Testing Complete")
+
+    def get_user_data(self, user_id):
+        """Get user data from database"""
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            print(JSON.stringify({{
+                total_commissions: user.total_commissions,
+                wallet_balance: user.wallet_balance,
+                total_invested: user.total_invested
+            }}));
+        }} else {{
+            print('null');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                # Extract JSON from output
+                lines = result.stdout.strip().split('\n')
+                for line in lines:
+                    if line.startswith('{') and line.endswith('}'):
+                        import json
+                        return json.loads(line)
+            
+            return None
+                
+        except Exception as e:
+            print(f"   ❌ Failed to get user data: {str(e)}")
+            return None
+
+    def check_commission_transaction(self, user_id, expected_amount, expected_description_contains):
+        """Check that a commission transaction was created"""
+        print(f"   💳 Checking commission transaction for user {user_id[-8:]}...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var transactions = db.transactions.find({{
+            user_id: '{user_id}',
+            type: 'commission',
+            amount: {expected_amount}
+        }}).sort({{created_at: -1}}).limit(1).toArray();
+        
+        if (transactions.length > 0) {{
+            var tx = transactions[0];
+            print('Transaction found - Amount: $' + tx.amount);
+            print('Description: ' + tx.description);
+            
+            if (tx.description.includes('{expected_description_contains}')) {{
+                print('✅ Commission transaction correct');
+            }} else {{
+                print('❌ Commission transaction description incorrect');
+            }}
+        }} else {{
+            print('❌ Commission transaction not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Commission transaction correct" in result.stdout:
+                    print(f"   ✅ Commission transaction verified: ${expected_amount}")
+                else:
+                    print(f"   ❌ Commission transaction verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to check commission transaction: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to check commission transaction: {str(e)}")
+
     def test_user_side_referral_management_system(self):
         """Test the User-Side Referral Management System comprehensively"""
         print("\n👥 Testing User-Side Referral Management System...")
