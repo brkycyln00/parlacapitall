@@ -4061,6 +4061,688 @@ class ParlaCapitalAPITester:
         except Exception as e:
             print(f"   ❌ Failed to create expired code: {str(e)}")
 
+    def test_join_network_with_referral_code(self):
+        """Test the join network with referral code feature comprehensively"""
+        print("\n🔗 Testing Join Network with Referral Code Feature...")
+        print("=" * 60)
+        
+        # Step 1: Create users for testing
+        print("\n1️⃣ Setting up test users...")
+        
+        # Create Fatma (sponsor) - will generate referral codes
+        timestamp = str(int(time.time()))
+        fatma_data = {
+            "email": f"fatma.sponsor.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Fatma Sponsor {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register Fatma (Sponsor)",
+            "POST",
+            "auth/register",
+            200,
+            data=fatma_data
+        )
+        
+        if not success:
+            print("❌ Failed to create sponsor user")
+            return
+        
+        fatma_id = response['user']['id']
+        fatma_token = response.get('token')
+        print(f"   ✓ Fatma (sponsor) created: {fatma_id}")
+        
+        # Create Ali (user without upline) - will join network
+        ali_data = {
+            "email": f"ali.joiner.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Ali Joiner {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register Ali (No Upline)",
+            "POST",
+            "auth/register",
+            200,
+            data=ali_data
+        )
+        
+        if not success:
+            print("❌ Failed to create joiner user")
+            return
+        
+        ali_id = response['user']['id']
+        ali_token = response.get('token')
+        print(f"   ✓ Ali (joiner) created: {ali_id}")
+        
+        # Create Ahmet (another sponsor) for testing multiple codes
+        ahmet_data = {
+            "email": f"ahmet.sponsor2.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Ahmet Sponsor2 {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register Ahmet (Second Sponsor)",
+            "POST",
+            "auth/register",
+            200,
+            data=ahmet_data
+        )
+        
+        if not success:
+            print("❌ Failed to create second sponsor")
+            return
+        
+        ahmet_id = response['user']['id']
+        ahmet_token = response.get('token')
+        print(f"   ✓ Ahmet (second sponsor) created: {ahmet_id}")
+        
+        # Step 2: Generate referral codes
+        print("\n2️⃣ Generating referral codes...")
+        
+        # Fatma generates a referral code
+        original_token = self.session_token
+        self.session_token = fatma_token
+        
+        success, response = self.run_test(
+            "Fatma Generates Referral Code",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate Fatma's referral code")
+            return
+        
+        fatma_code = response.get('code')
+        print(f"   ✓ Fatma's referral code: {fatma_code}")
+        
+        # Ahmet generates a referral code
+        self.session_token = ahmet_token
+        
+        success, response = self.run_test(
+            "Ahmet Generates Referral Code",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate Ahmet's referral code")
+            return
+        
+        ahmet_code = response.get('code')
+        print(f"   ✓ Ahmet's referral code: {ahmet_code}")
+        
+        # Step 3: Test Scenario 1 - User Without Upline Joins Network
+        print("\n3️⃣ Testing Scenario 1: User Without Upline Joins Network...")
+        
+        self.session_token = ali_token
+        
+        join_data = {
+            "referral_code": fatma_code
+        }
+        
+        success, response = self.run_test(
+            "Ali Joins Fatma's Network",
+            "POST",
+            "referral/join-network",
+            200,
+            data=join_data
+        )
+        
+        if success and isinstance(response, dict):
+            expected_message = f"Başarılı! {fatma_data['name']} ağına katıldınız."
+            if expected_message in response.get('message', ''):
+                print("   ✅ Success message correct")
+            else:
+                print(f"   ❌ Success message incorrect: {response.get('message')}")
+            
+            if response.get('sponsor_name') == fatma_data['name']:
+                print("   ✅ Sponsor name correct")
+            else:
+                print(f"   ❌ Sponsor name incorrect: {response.get('sponsor_name')}")
+        
+        # Verify Ali's upline_id is set to Fatma's ID and position is None
+        self.verify_user_upline_and_position(ali_id, fatma_id, None)
+        
+        # Verify referral code is marked as used
+        self.verify_referral_code_used(fatma_code, ali_id)
+        
+        # Step 4: Test Scenario 2 - User Appears in Sponsor's Unplaced List
+        print("\n4️⃣ Testing Scenario 2: User Appears in Sponsor's Unplaced List...")
+        
+        self.session_token = fatma_token
+        
+        success, response = self.run_test(
+            "Get Fatma's Referrals",
+            "GET",
+            "users/my-referrals",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            unplaced = response.get('unplaced', [])
+            placed = response.get('placed', [])
+            
+            # Ali should be in unplaced list
+            ali_in_unplaced = any(user['id'] == ali_id for user in unplaced)
+            if ali_in_unplaced:
+                print("   ✅ Ali appears in Fatma's unplaced referrals")
+            else:
+                print("   ❌ Ali not found in unplaced referrals")
+            
+            # Ali should NOT be in placed list
+            ali_in_placed = any(user['id'] == ali_id for user in placed)
+            if not ali_in_placed:
+                print("   ✅ Ali correctly not in placed referrals")
+            else:
+                print("   ❌ Ali incorrectly found in placed referrals")
+        
+        # Step 5: Test Scenario 3 - One-Time Only Rule
+        print("\n5️⃣ Testing Scenario 3: One-Time Only Rule...")
+        
+        self.session_token = ali_token
+        
+        # Ali tries to use Ahmet's code (should fail)
+        join_data_2 = {
+            "referral_code": ahmet_code
+        }
+        
+        success, response = self.run_test(
+            "Ali Tries to Join Another Network",
+            "POST",
+            "referral/join-network",
+            400,
+            data=join_data_2
+        )
+        
+        if success and isinstance(response, dict):
+            expected_error = "Zaten bir sponsor ağına katılmışsınız. Sadece bir kez referans kodu girebilirsiniz."
+            if expected_error in response.get('detail', ''):
+                print("   ✅ One-time only rule enforced with correct Turkish message")
+            else:
+                print(f"   ❌ One-time only error message incorrect: {response.get('detail')}")
+        
+        # Step 6: Test Scenario 4 - Cannot Use Own Code
+        print("\n6️⃣ Testing Scenario 4: Cannot Use Own Code...")
+        
+        self.session_token = fatma_token
+        
+        # Fatma tries to use her own code
+        join_data_own = {
+            "referral_code": fatma_code
+        }
+        
+        success, response = self.run_test(
+            "Fatma Tries to Use Own Code",
+            "POST",
+            "referral/join-network",
+            400,
+            data=join_data_own
+        )
+        
+        if success and isinstance(response, dict):
+            expected_error = "Kendi referans kodunuzu kullanamazsınız."
+            if expected_error in response.get('detail', ''):
+                print("   ✅ Self-referral prevented with correct Turkish message")
+            else:
+                print(f"   ❌ Self-referral error message incorrect: {response.get('detail')}")
+        
+        # Step 7: Test Scenario 5 - Expired Code
+        print("\n7️⃣ Testing Scenario 5: Expired Code...")
+        
+        # Generate a new code and manually expire it
+        success, response = self.run_test(
+            "Generate Code to Expire",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if success:
+            expired_code = response.get('code')
+            print(f"   ✓ Generated code to expire: {expired_code}")
+            
+            # Manually expire the code
+            self.expire_referral_code(expired_code)
+            
+            # Create a new user to test expired code
+            new_user_data = {
+                "email": f"newuser.expired.{timestamp}@example.com",
+                "password": "SecurePass123!",
+                "name": f"New User Expired {timestamp}"
+            }
+            
+            success, response = self.run_test(
+                "Register User for Expired Code Test",
+                "POST",
+                "auth/register",
+                200,
+                data=new_user_data
+            )
+            
+            if success:
+                new_user_token = response.get('token')
+                self.session_token = new_user_token
+                
+                # Try to use expired code
+                join_expired_data = {
+                    "referral_code": expired_code
+                }
+                
+                success, response = self.run_test(
+                    "Try to Use Expired Code",
+                    "POST",
+                    "referral/join-network",
+                    400,
+                    data=join_expired_data
+                )
+                
+                if success and isinstance(response, dict):
+                    expected_error = "Bu referans kodunun süresi dolmuş. Lütfen yeni bir kod isteyin."
+                    if expected_error in response.get('detail', ''):
+                        print("   ✅ Expired code rejected with correct Turkish message")
+                    else:
+                        print(f"   ❌ Expired code error message incorrect: {response.get('detail')}")
+        
+        # Step 8: Test Scenario 6 - Already Used Code
+        print("\n8️⃣ Testing Scenario 6: Already Used Code...")
+        
+        # Create another new user to test already used code
+        another_user_data = {
+            "email": f"anotheruser.used.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Another User Used {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register User for Used Code Test",
+            "POST",
+            "auth/register",
+            200,
+            data=another_user_data
+        )
+        
+        if success:
+            another_user_token = response.get('token')
+            self.session_token = another_user_token
+            
+            # Try to use Fatma's already used code
+            join_used_data = {
+                "referral_code": fatma_code
+            }
+            
+            success, response = self.run_test(
+                "Try to Use Already Used Code",
+                "POST",
+                "referral/join-network",
+                400,
+                data=join_used_data
+            )
+            
+            if success and isinstance(response, dict):
+                expected_error = "Bu referans kodu daha önce kullanılmış. Her kod sadece bir kez kullanılabilir."
+                if expected_error in response.get('detail', ''):
+                    print("   ✅ Used code rejected with correct Turkish message")
+                else:
+                    print(f"   ❌ Used code error message incorrect: {response.get('detail')}")
+        
+        # Step 9: Test Scenario 7 - Invalid Code
+        print("\n9️⃣ Testing Scenario 7: Invalid Code...")
+        
+        # Try to use non-existent code
+        join_invalid_data = {
+            "referral_code": "INVALID999"
+        }
+        
+        success, response = self.run_test(
+            "Try to Use Invalid Code",
+            "POST",
+            "referral/join-network",
+            400,
+            data=join_invalid_data
+        )
+        
+        if success and isinstance(response, dict):
+            expected_error = "Geçersiz referans kodu."
+            if expected_error in response.get('detail', ''):
+                print("   ✅ Invalid code rejected with correct Turkish message")
+            else:
+                print(f"   ❌ Invalid code error message incorrect: {response.get('detail')}")
+        
+        # Step 10: Test Scenario 8 - Multi-Level Commission Works
+        print("\n🔟 Testing Scenario 8: Multi-Level Commission Works...")
+        
+        # Ali makes an investment and admin approves it
+        self.session_token = ali_token
+        
+        ali_investment_data = {
+            "full_name": f"Ali Joiner {timestamp}",
+            "username": f"ali_joiner_{timestamp}",
+            "email": f"ali.joiner.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"  # $500
+        }
+        
+        success, response = self.run_test(
+            "Ali Investment Request",
+            "POST",
+            "investment/request",
+            200,
+            data=ali_investment_data
+        )
+        
+        if success:
+            ali_request_id = response.get('request_id')
+            print(f"   ✓ Ali investment request created: {ali_request_id}")
+            
+            # Create admin and approve investment
+            admin_token = self.create_admin_user_and_login()
+            if admin_token:
+                self.session_token = admin_token
+                
+                success, response = self.run_test(
+                    "Admin Approve Ali Investment",
+                    "POST",
+                    f"admin/investment-requests/{ali_request_id}/approve",
+                    200
+                )
+                
+                if success:
+                    print("   ✅ Ali investment approved")
+                    
+                    # Verify Fatma received commission
+                    self.verify_commission_received(fatma_id, "gold")
+        
+        # Step 11: Test Scenario 9 - Manual Placement After Join
+        print("\n1️⃣1️⃣ Testing Scenario 9: Manual Placement After Join...")
+        
+        # Fatma places Ali in LEFT position
+        self.session_token = fatma_token
+        
+        placement_data = {
+            "user_id": ali_id,
+            "upline_id": fatma_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Fatma Places Ali in Left Position",
+            "POST",
+            "users/place-referral",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ Ali placed in left position")
+            
+            # Verify Ali's position is now "left"
+            self.verify_user_upline_and_position(ali_id, fatma_id, "left")
+            
+            # Verify Fatma's left_child_id is Ali's ID
+            self.verify_upline_child_id(fatma_id, ali_id, "left")
+            
+            # Verify Ali appears in placed array and removed from unplaced
+            success, response = self.run_test(
+                "Get Fatma's Referrals After Placement",
+                "GET",
+                "users/my-referrals",
+                200
+            )
+            
+            if success and isinstance(response, dict):
+                placed = response.get('placed', [])
+                unplaced = response.get('unplaced', [])
+                
+                ali_in_placed = any(user['id'] == ali_id for user in placed)
+                ali_in_unplaced = any(user['id'] == ali_id for user in unplaced)
+                
+                if ali_in_placed and not ali_in_unplaced:
+                    print("   ✅ Ali moved from unplaced to placed array")
+                else:
+                    print("   ❌ Ali placement in arrays incorrect")
+        
+        # Step 12: Test Scenario 10 - Referral Code Stats
+        print("\n1️⃣2️⃣ Testing Scenario 10: Referral Code Stats...")
+        
+        # Get Fatma's used codes
+        success, response = self.run_test(
+            "Get Fatma's Used Referral Codes",
+            "GET",
+            "referral/my-codes",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            codes = response.get('codes', [])
+            total = response.get('total', 0)
+            
+            print(f"   ✓ Fatma has {total} used codes")
+            
+            # Find the code used by Ali
+            ali_code_found = False
+            for code_info in codes:
+                if code_info.get('code') == fatma_code:
+                    referred_user = code_info.get('referred_user', {})
+                    if referred_user.get('name') == ali_data['name']:
+                        ali_code_found = True
+                        print(f"   ✅ Code {fatma_code} shows Ali as referral")
+                        print(f"   ✅ Used at timestamp: {code_info.get('used_at')}")
+                        break
+            
+            if not ali_code_found:
+                print("   ❌ Ali's referral not found in used codes")
+        
+        # Restore original token
+        self.session_token = original_token
+        
+        print("\n✅ Join Network with Referral Code Feature Testing Complete")
+
+    def verify_user_upline_and_position(self, user_id, expected_upline_id, expected_position):
+        """Verify user's upline_id and position in database"""
+        print(f"   🔍 Verifying user upline and position...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            print('User upline_id: ' + user.upline_id);
+            print('User position: ' + user.position);
+            
+            var uplineMatch = user.upline_id === '{expected_upline_id}';
+            var positionMatch = user.position === {f"'{expected_position}'" if expected_position else 'null'};
+            
+            if (uplineMatch && positionMatch) {{
+                print('✅ User upline and position correct');
+            }} else {{
+                print('❌ User upline or position incorrect');
+                print('Expected upline: {expected_upline_id}, Got: ' + user.upline_id);
+                print('Expected position: {expected_position}, Got: ' + user.position);
+            }}
+        }} else {{
+            print('❌ User not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ User upline and position correct" in result.stdout:
+                    print("   ✅ User upline and position verified")
+                else:
+                    print("   ❌ User upline and position verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to verify user upline: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify user upline: {str(e)}")
+
+    def verify_referral_code_used(self, code, used_by_id):
+        """Verify referral code is marked as used by specific user"""
+        print(f"   🔍 Verifying referral code usage...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var codeDoc = db.referral_codes.findOne({{code: '{code}'}});
+        
+        if (codeDoc) {{
+            print('Code is_used: ' + codeDoc.is_used);
+            print('Code used_by: ' + codeDoc.used_by);
+            print('Code used_at: ' + codeDoc.used_at);
+            
+            if (codeDoc.is_used === true && codeDoc.used_by === '{used_by_id}' && codeDoc.used_at) {{
+                print('✅ Referral code correctly marked as used');
+            }} else {{
+                print('❌ Referral code usage incorrect');
+            }}
+        }} else {{
+            print('❌ Referral code not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Referral code correctly marked as used" in result.stdout:
+                    print("   ✅ Referral code usage verified")
+                else:
+                    print("   ❌ Referral code usage verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to verify referral code usage: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify referral code usage: {str(e)}")
+
+    def verify_commission_received(self, user_id, package):
+        """Verify user received commission for the package"""
+        print(f"   💰 Verifying commission received...")
+        
+        # Get expected commission rate
+        commission_rates = {
+            "silver": 0.05,   # 5%
+            "gold": 0.10,     # 10%
+            "platinum": 0.15  # 15%
+        }
+        
+        package_amounts = {
+            "silver": 250.0,
+            "gold": 500.0,
+            "platinum": 1000.0
+        }
+        
+        expected_commission = package_amounts[package] * commission_rates[package]
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            print('User total_commissions: $' + user.total_commissions);
+            print('User wallet_balance: $' + user.wallet_balance);
+            
+            if (user.total_commissions >= {expected_commission}) {{
+                print('✅ Commission received (at least ${expected_commission})');
+            }} else {{
+                print('❌ Commission not received or incorrect amount');
+            }}
+        }} else {{
+            print('❌ User not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Commission received" in result.stdout:
+                    print(f"   ✅ Commission verified: ${expected_commission}")
+                else:
+                    print("   ❌ Commission verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to verify commission: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify commission: {str(e)}")
+
+    def verify_upline_child_id(self, upline_id, child_id, position):
+        """Verify upline's child_id is set correctly"""
+        print(f"   🔍 Verifying upline child_id...")
+        
+        field_name = f"{position}_child_id"
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var upline = db.users.findOne({{id: '{upline_id}'}});
+        
+        if (upline) {{
+            print('Upline {field_name}: ' + upline.{field_name});
+            
+            if (upline.{field_name} === '{child_id}') {{
+                print('✅ Upline {field_name} correct');
+            }} else {{
+                print('❌ Upline {field_name} incorrect');
+                print('Expected: {child_id}, Got: ' + upline.{field_name});
+            }}
+        }} else {{
+            print('❌ Upline not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if f"✅ Upline {field_name} correct" in result.stdout:
+                    print(f"   ✅ Upline {field_name} verified")
+                else:
+                    print(f"   ❌ Upline {field_name} verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to verify upline child_id: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify upline child_id: {str(e)}")
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting ParlaCapital API Tests")
