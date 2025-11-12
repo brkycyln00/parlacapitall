@@ -274,17 +274,21 @@ export default function Dashboard() {
                 <p className="text-gray-400 mt-1 text-sm lg:text-base hidden sm:block">İşte yatırım performansınızın özeti</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
-                <Download size={18} className="mr-2" />
-                Rapor İndir
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <Button 
+                onClick={() => setWithdrawalOpen(true)}
+                variant="outline" 
+                className="border-green-600 text-green-400 hover:bg-green-600/10 text-sm md:text-base"
+              >
+                <Download size={18} className="mr-0 md:mr-2" />
+                <span className="hidden md:inline">Çekim Yap</span>
               </Button>
               <Button 
                 onClick={() => navigate('/packages')}
-                className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold"
+                className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold text-sm md:text-base"
               >
-                <Plus size={18} className="mr-2" />
-                Yeni Yatırım
+                <Plus size={18} className="mr-0 md:mr-2" />
+                <span className="hidden md:inline">Yeni Yatırım</span>
               </Button>
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
