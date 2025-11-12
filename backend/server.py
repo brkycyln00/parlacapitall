@@ -353,7 +353,14 @@ async def login(req: LoginRequest):
 @api_router.get("/auth/validate-referral/{referral_code}")
 async def validate_referral_code(referral_code: str):
     """Validate if a referral code exists and is valid"""
-    referral_doc = await db.referral_codes.find_one({"code": referral_code}, {"_id": 0})
+    # Clean the code (trim whitespace)
+    clean_code = referral_code.strip()
+    
+    # Search for code (case-insensitive using regex)
+    import re
+    referral_doc = await db.referral_codes.find_one({
+        "code": {"$regex": f"^{re.escape(clean_code)}$", "$options": "i"}
+    }, {"_id": 0})
     
     if not referral_doc:
         return {
