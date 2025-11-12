@@ -306,6 +306,7 @@ export default function AdminPanel() {
           <TabsList className="bg-slate-800 border border-amber-500/30">
             <TabsTrigger value="investments" className="data-[state=active]:bg-amber-500">Yatırım Talepleri</TabsTrigger>
             <TabsTrigger value="withdrawals" className="data-[state=active]:bg-amber-500">Çekim Talepleri</TabsTrigger>
+            <TabsTrigger value="placement" className="data-[state=active]:bg-amber-500">Kullanıcı Yerleştirme</TabsTrigger>
             <TabsTrigger data-testid="transactions-tab" value="transactions" className="data-[state=active]:bg-amber-500">İşlemler</TabsTrigger>
             <TabsTrigger data-testid="users-tab" value="users" className="data-[state=active]:bg-amber-500">Kullanıcılar</TabsTrigger>
           </TabsList>
