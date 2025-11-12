@@ -555,6 +555,165 @@ export default function AdminPanel() {
             </Card>
           </TabsContent>
 
+          {/* User Placement Tab */}
+          <TabsContent value="placement">
+            <div className="grid gap-6">
+              {/* Placement Form */}
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="text-white">Kullanıcı Yerleştirme</CardTitle>
+                  <p className="text-sm text-gray-400">Kullanıcıları manuel olarak binary ağaça yerleştirin</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-4 mb-6">
+                    {/* Select User to Place */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Yerleştirilecek Kullanıcı
+                      </label>
+                      <select
+                        value={selectedUser}
+                        onChange={(e) => setSelectedUser(e.target.value)}
+                        className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500"
+                      >
+                        <option value="">Seçin...</option>
+                        {users.filter(u => !u.is_admin).map(u => (
+                          <option key={u.id} value={u.id}>
+                            {u.name} - {u.email}
+                            {u.upline_id ? ` (${u.position === 'left' ? 'Sol' : 'Sağ'} kolda)` : ' (Yerleşmemiş)'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Select Upline */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Üst Sponsor (Upline)
+                      </label>
+                      <select
+                        value={selectedUpline}
+                        onChange={(e) => setSelectedUpline(e.target.value)}
+                        className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500"
+                      >
+                        <option value="">Seçin...</option>
+                        {users.map(u => (
+                          <option key={u.id} value={u.id}>
+                            {u.name} - {u.email}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Select Position */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Pozisyon
+                      </label>
+                      <div className="flex gap-4 mt-3">
+                        <label className="flex items-center text-white cursor-pointer">
+                          <input
+                            type="radio"
+                            value="left"
+                            checked={selectedPosition === 'left'}
+                            onChange={(e) => setSelectedPosition(e.target.value)}
+                            className="mr-2"
+                          />
+                          Sol Kol
+                        </label>
+                        <label className="flex items-center text-white cursor-pointer">
+                          <input
+                            type="radio"
+                            value="right"
+                            checked={selectedPosition === 'right'}
+                            onChange={(e) => setSelectedPosition(e.target.value)}
+                            className="mr-2"
+                          />
+                          Sağ Kol
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handlePlaceUser}
+                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                  >
+                    Kullanıcıyı Yerleştir
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Placement History */}
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="text-white">Yerleştirme Geçmişi</CardTitle>
+                  <p className="text-sm text-gray-400">Son 100 yerleştirme kaydı</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-700">
+                          <th className="text-left text-gray-400 pb-3">Tarih</th>
+                          <th className="text-left text-gray-400 pb-3">Kullanıcı</th>
+                          <th className="text-left text-gray-400 pb-3">Yeni Upline</th>
+                          <th className="text-left text-gray-400 pb-3">Pozisyon</th>
+                          <th className="text-left text-gray-400 pb-3">İşlem</th>
+                          <th className="text-left text-gray-400 pb-3">Admin</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {placementHistory.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="text-center text-gray-400 py-8">
+                              Henüz yerleştirme geçmişi yok
+                            </td>
+                          </tr>
+                        ) : (
+                          placementHistory.map((record) => (
+                            <tr key={record.id} className="border-b border-slate-800">
+                              <td className="py-3 text-white">
+                                {new Date(record.created_at).toLocaleDateString('tr-TR', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </td>
+                              <td className="py-3 text-white">{record.user_name || 'N/A'}</td>
+                              <td className="py-3 text-white">{record.new_upline_name || 'N/A'}</td>
+                              <td className="py-3">
+                                <span className={`px-2 py-1 rounded text-xs ${
+                                  record.new_position === 'left' 
+                                    ? 'bg-blue-500/20 text-blue-300' 
+                                    : 'bg-purple-500/20 text-purple-300'
+                                }`}>
+                                  {record.new_position === 'left' ? 'Sol Kol' : 'Sağ Kol'}
+                                </span>
+                              </td>
+                              <td className="py-3">
+                                <span className={`px-2 py-1 rounded text-xs ${
+                                  record.action_type === 'initial_placement'
+                                    ? 'bg-green-500/20 text-green-300'
+                                    : 'bg-orange-500/20 text-orange-300'
+                                }`}>
+                                  {record.action_type === 'initial_placement' ? 'İlk Yerleşim' : 'Yeniden Yerleşim'}
+                                </span>
+                              </td>
+                              <td className="py-3 text-gray-400">{record.admin_name}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Users Tab */}
           <TabsContent value="users">
             <Card className="glass-card">
