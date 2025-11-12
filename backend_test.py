@@ -92,18 +92,276 @@ class ParlaCapitalAPITester:
             print(f"   Found {len(response)} packages")
             for pkg in response:
                 print(f"   - {pkg.get('name', 'Unknown')}: ${pkg.get('amount', 0)}")
+
+    def test_referral_validation_system(self):
+        """Test referral code validation system comprehensively"""
+        print("\n🔗 Testing Referral Code Validation System...")
         
-        # Test referral validation with invalid code
+        # First create a seed user to use as upline
+        seed_user_id, seed_referral_code = self.create_seed_user()
+        if not seed_user_id:
+            print("❌ Cannot test referral system - seed user creation failed")
+            return
+        
+        print(f"   ✓ Seed user created with referral code: {seed_referral_code}")
+        
+        # Test 1: Validate valid referral code
         success, response = self.run_test(
-            "Validate Invalid Referral",
+            "Validate Valid Referral Code",
             "GET",
-            "validate-referral/invalid123",
+            f"auth/validate-referral/{seed_referral_code}",
             200
         )
         
         if success and isinstance(response, dict):
-            if not response.get('valid', True):
-                print("   ✓ Invalid referral correctly rejected")
+            if response.get('valid') == True and response.get('upline_name'):
+                print(f"   ✓ Valid referral code accepted - Upline: {response.get('upline_name')}")
+            else:
+                print(f"   ❌ Valid referral code response incorrect: {response}")
+        
+        # Test 2: Validate invalid referral code
+        success, response = self.run_test(
+            "Validate Invalid Referral Code",
+            "GET",
+            "auth/validate-referral/INVALID123",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            if response.get('valid') == False and response.get('message') == "Yanlış referans kodu girdiniz!":
+                print("   ✓ Invalid referral code correctly rejected with Turkish message")
+            else:
+                print(f"   ❌ Invalid referral code response incorrect: {response}")
+        
+        # Test 3: Validate empty referral code
+        success, response = self.run_test(
+            "Validate Empty Referral Code",
+            "GET",
+            "auth/validate-referral/",
+            404  # Should return 404 for empty path
+        )
+        
+        # Test 4: Validate referral code with special characters
+        success, response = self.run_test(
+            "Validate Special Characters Referral Code",
+            "GET",
+            "auth/validate-referral/@#$%^&*()",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            if response.get('valid') == False:
+                print("   ✓ Special characters referral code correctly rejected")
+        
+        # Test 5: Registration with valid referral code
+        timestamp = str(int(time.time()))
+        registration_data = {
+            "email": f"newuser.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"New User {timestamp}",
+            "referral_code": seed_referral_code
+        }
+        
+        success, response = self.run_test(
+            "Register with Valid Referral Code",
+            "POST",
+            "auth/register",
+            200,
+            data=registration_data
+        )
+        
+        new_user_id = None
+        if success and isinstance(response, dict):
+            if response.get('token') and response.get('user'):
+                new_user_id = response['user']['id']
+                print(f"   ✓ Registration successful with valid referral code")
+                print(f"   ✓ New user placed under: {response['user']['upline']['name']}")
+            else:
+                print(f"   ❌ Registration response incorrect: {response}")
+        
+        # Test 6: Registration with invalid referral code
+        invalid_registration_data = {
+            "email": f"invaliduser.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Invalid User {timestamp}",
+            "referral_code": "INVALID123"
+        }
+        
+        success, response = self.run_test(
+            "Register with Invalid Referral Code",
+            "POST",
+            "auth/register",
+            400,
+            data=invalid_registration_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Geçersiz referans kodu" in response.get('detail', ''):
+                print("   ✓ Registration correctly rejected with Turkish error message")
+            else:
+                print(f"   ❌ Registration error message incorrect: {response}")
+        
+        # Test 7: Registration without referral code
+        no_referral_data = {
+            "email": f"noreferral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"No Referral User {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register without Referral Code",
+            "POST",
+            "auth/register",
+            400,
+            data=no_referral_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Referans kodu zorunludur" in response.get('detail', ''):
+                print("   ✓ Registration correctly rejected - referral code required")
+            else:
+                print(f"   ❌ Registration error message incorrect: {response}")
+        
+        # Test 8: Binary tree placement - Register second child
+        if new_user_id:
+            second_child_data = {
+                "email": f"secondchild.{timestamp}@example.com",
+                "password": "SecurePass123!",
+                "name": f"Second Child {timestamp}",
+                "referral_code": seed_referral_code
+            }
+            
+            success, response = self.run_test(
+                "Register Second Child (Binary Tree)",
+                "POST",
+                "auth/register",
+                200,
+                data=second_child_data
+            )
+            
+            if success:
+                print("   ✓ Second child registered successfully")
+                
+                # Verify binary tree structure
+                self.verify_binary_tree_placement(seed_user_id, new_user_id, response['user']['id'])
+        
+        return seed_user_id, seed_referral_code
+
+    def create_seed_user(self):
+        """Create a seed user to act as upline for referral testing"""
+        timestamp = str(int(time.time()))
+        seed_user_id = f"seed-user-{timestamp}"
+        seed_referral_code = f"SEED{timestamp[-6:]}"
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        // Create seed user
+        db.users.insertOne({{
+            id: '{seed_user_id}',
+            email: 'seed.user.{timestamp}@example.com',
+            name: 'Seed User {timestamp}',
+            picture: 'https://via.placeholder.com/150',
+            referral_code: '{seed_referral_code}',
+            upline_id: null,
+            package: 'silver',
+            package_amount: 250.0,
+            investment_date: new Date().toISOString(),
+            total_invested: 250.0,
+            weekly_earnings: 0.0,
+            total_commissions: 0.0,
+            left_child_id: null,
+            right_child_id: null,
+            position: null,
+            left_volume: 0.0,
+            right_volume: 0.0,
+            binary_earnings: 0.0,
+            career_level: 'None',
+            career_points: 0.0,
+            career_rewards: 0.0,
+            wallet_balance: 100.0,
+            is_admin: false,
+            created_at: new Date().toISOString()
+        }});
+        
+        print('Seed user created with ID: {seed_user_id}');
+        print('Referral code: {seed_referral_code}');
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                return seed_user_id, seed_referral_code
+            else:
+                print(f"❌ Seed user creation failed: {result.stderr}")
+                return None, None
+                
+        except Exception as e:
+            print(f"❌ Failed to create seed user: {str(e)}")
+            return None, None
+
+    def verify_binary_tree_placement(self, upline_id, first_child_id, second_child_id):
+        """Verify that users are correctly placed in binary tree"""
+        print("   🌳 Verifying binary tree placement...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        // Get upline user
+        var upline = db.users.findOne({{id: '{upline_id}'}});
+        
+        // Get first child
+        var firstChild = db.users.findOne({{id: '{first_child_id}'}});
+        
+        // Get second child  
+        var secondChild = db.users.findOne({{id: '{second_child_id}'}});
+        
+        print('Upline left_child_id: ' + upline.left_child_id);
+        print('Upline right_child_id: ' + upline.right_child_id);
+        print('First child position: ' + firstChild.position);
+        print('Second child position: ' + secondChild.position);
+        
+        // Verify placement
+        if (upline.left_child_id && upline.right_child_id) {{
+            print('✓ Both positions filled in upline');
+        }}
+        
+        if (firstChild.position === 'left' && secondChild.position === 'right') {{
+            print('✓ Children correctly positioned');
+        }} else if (firstChild.position === 'right' && secondChild.position === 'left') {{
+            print('✓ Children correctly positioned (reverse order)');
+        }} else {{
+            print('❌ Children positioning incorrect');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                print("   ✓ Binary tree verification completed")
+                if "✓ Both positions filled" in result.stdout and "✓ Children correctly positioned" in result.stdout:
+                    print("   ✅ Binary tree placement is correct")
+                else:
+                    print("   ⚠️ Binary tree placement may have issues")
+            else:
+                print(f"   ❌ Binary tree verification failed: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify binary tree: {str(e)}")
 
     def create_test_user_session(self):
         """Create test user and session in MongoDB for testing"""
