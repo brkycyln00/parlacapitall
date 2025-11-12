@@ -684,6 +684,303 @@ class ParlaCapitalAPITester:
         except Exception as e:
             print(f"⚠️ Cleanup failed: {str(e)}")
 
+    def test_multi_use_referral_system(self):
+        """Test the new multi-use referral code system comprehensively"""
+        print("\n🔗 Testing Multi-Use Referral Code System...")
+        
+        # Create test user and session for authenticated tests
+        if not self.create_test_user_session():
+            print("❌ Cannot test referral system - user creation failed")
+            return
+        
+        # Test 1: Code Generation - POST /api/referral/generate
+        print("\n1️⃣ Testing Code Generation...")
+        
+        # Generate first referral code
+        success1, response1 = self.run_test(
+            "Generate First Referral Code",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        first_code = None
+        if success1 and isinstance(response1, dict):
+            first_code = response1.get('code')
+            expires_at = response1.get('expires_at')
+            print(f"   ✓ First code generated: {first_code}")
+            print(f"   ✓ Expires at: {expires_at}")
+            
+            # Verify response structure
+            if response1.get('success') and first_code and expires_at:
+                print("   ✅ Code generation response structure correct")
+            else:
+                print(f"   ❌ Code generation response incorrect: {response1}")
+        
+        # Generate second referral code (test unlimited generation)
+        success2, response2 = self.run_test(
+            "Generate Second Referral Code",
+            "POST", 
+            "referral/generate",
+            200
+        )
+        
+        second_code = None
+        if success2 and isinstance(response2, dict):
+            second_code = response2.get('code')
+            print(f"   ✓ Second code generated: {second_code}")
+            
+            # Verify codes are unique
+            if first_code and second_code and first_code != second_code:
+                print("   ✅ Generated codes are unique")
+            else:
+                print("   ❌ Generated codes are not unique")
+        
+        # Test 2: Code Expiry Validation
+        print("\n2️⃣ Testing Code Expiry Validation...")
+        
+        if first_code:
+            # Test immediate validation (should be valid)
+            success, response = self.run_test(
+                "Validate Fresh Code",
+                "GET",
+                f"auth/validate-referral/{first_code}",
+                200
+            )
+            
+            if success and isinstance(response, dict):
+                if response.get('valid') == True:
+                    print("   ✅ Fresh code is valid")
+                else:
+                    print(f"   ❌ Fresh code validation failed: {response}")
+            
+            # Manually expire the code in database and test
+            print("   🕒 Manually expiring code in database...")
+            self.expire_referral_code(first_code)
+            
+            # Test validation of expired code
+            success, response = self.run_test(
+                "Validate Expired Code",
+                "GET",
+                f"auth/validate-referral/{first_code}",
+                200
+            )
+            
+            if success and isinstance(response, dict):
+                if response.get('valid') == False and response.get('message') == "Bu kodun süresi dolmuş!":
+                    print("   ✅ Expired code correctly rejected with Turkish message")
+                else:
+                    print(f"   ❌ Expired code validation incorrect: {response}")
+        
+        # Test 3: Single-Use Validation
+        print("\n3️⃣ Testing Single-Use Validation...")
+        
+        if second_code:
+            # Register first user with the code
+            timestamp = str(int(time.time()))
+            user_a_data = {
+                "email": f"usera.{timestamp}@example.com",
+                "password": "SecurePass123!",
+                "name": f"User A {timestamp}",
+                "referral_code": second_code
+            }
+            
+            success, response = self.run_test(
+                "Register User A with Code",
+                "POST",
+                "auth/register",
+                200,
+                data=user_a_data
+            )
+            
+            if success:
+                print("   ✅ User A registered successfully with code")
+                
+                # Try to register second user with same code (should fail)
+                user_b_data = {
+                    "email": f"userb.{timestamp}@example.com",
+                    "password": "SecurePass123!",
+                    "name": f"User B {timestamp}",
+                    "referral_code": second_code
+                }
+                
+                success, response = self.run_test(
+                    "Register User B with Same Code",
+                    "POST",
+                    "auth/register",
+                    400,
+                    data=user_b_data
+                )
+                
+                if success and isinstance(response, dict):
+                    if "Bu referans kodu daha önce kullanılmış" in response.get('detail', ''):
+                        print("   ✅ Used code correctly rejected with Turkish message")
+                    else:
+                        print(f"   ❌ Used code error message incorrect: {response}")
+                
+                # Verify code is marked as used in database
+                self.verify_code_usage(second_code)
+        
+        # Test 4: GET /api/referral/my-codes
+        print("\n4️⃣ Testing My Codes Endpoint...")
+        
+        success, response = self.run_test(
+            "Get My Referral Codes",
+            "GET",
+            "referral/my-codes",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            codes = response.get('codes', [])
+            total = response.get('total', 0)
+            print(f"   ✓ Found {total} used codes")
+            
+            if total > 0:
+                for code_info in codes:
+                    print(f"   ✓ Code: {code_info.get('code')} - Referred: {code_info.get('referred_user', {}).get('name', 'Unknown')}")
+                print("   ✅ Used codes displayed with referral details")
+            else:
+                print("   ✓ No used codes (expected for new user)")
+        
+        # Test 5: Dashboard Active Code
+        print("\n5️⃣ Testing Dashboard Active Code...")
+        
+        success, response = self.run_test(
+            "Get Dashboard with Active Code",
+            "GET",
+            "dashboard",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            active_code = response.get('active_referral_code')
+            if active_code:
+                print(f"   ✅ Dashboard returns active referral code: {active_code}")
+            else:
+                print("   ❌ Dashboard missing active_referral_code field")
+        
+        # Test 6: Mixed Case Codes
+        print("\n6️⃣ Testing Mixed Case Codes...")
+        
+        # Generate a new code for mixed case testing
+        success, response = self.run_test(
+            "Generate Code for Mixed Case Test",
+            "POST",
+            "referral/generate", 
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            mixed_case_code = response.get('code')
+            if mixed_case_code:
+                print(f"   ✓ Generated code for case test: {mixed_case_code}")
+                
+                # Test validation with exact case
+                success, response = self.run_test(
+                    "Validate Exact Case Code",
+                    "GET",
+                    f"auth/validate-referral/{mixed_case_code}",
+                    200
+                )
+                
+                if success and response.get('valid') == True:
+                    print("   ✅ Exact case validation works")
+                
+                # Test registration with exact case
+                case_test_data = {
+                    "email": f"casetest.{timestamp}@example.com",
+                    "password": "SecurePass123!",
+                    "name": f"Case Test User {timestamp}",
+                    "referral_code": mixed_case_code
+                }
+                
+                success, response = self.run_test(
+                    "Register with Exact Case Code",
+                    "POST",
+                    "auth/register",
+                    200,
+                    data=case_test_data
+                )
+                
+                if success:
+                    print("   ✅ Registration with exact case works")
+        
+        print("\n✅ Multi-Use Referral System Testing Complete")
+
+    def expire_referral_code(self, code):
+        """Manually expire a referral code in database for testing"""
+        mongo_commands = f"""
+        use('test_database');
+        
+        // Set expires_at to past time
+        var result = db.referral_codes.updateOne(
+            {{code: '{code}'}},
+            {{$set: {{expires_at: new Date(Date.now() - 60000).toISOString()}}}}
+        );
+        
+        print('Code expired: ' + result.modifiedCount);
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                print("   ✓ Code manually expired in database")
+            else:
+                print(f"   ❌ Failed to expire code: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to expire code: {str(e)}")
+
+    def verify_code_usage(self, code):
+        """Verify that a referral code is marked as used in database"""
+        mongo_commands = f"""
+        use('test_database');
+        
+        var codeDoc = db.referral_codes.findOne({{code: '{code}'}});
+        
+        if (codeDoc) {{
+            print('Code found - is_used: ' + codeDoc.is_used);
+            print('Used by: ' + codeDoc.used_by);
+            print('Used at: ' + codeDoc.used_at);
+            
+            if (codeDoc.is_used === true && codeDoc.used_by && codeDoc.used_at) {{
+                print('✅ Code correctly marked as used');
+            }} else {{
+                print('❌ Code usage not properly recorded');
+            }}
+        }} else {{
+            print('❌ Code not found in database');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Code correctly marked as used" in result.stdout:
+                    print("   ✅ Code usage properly recorded in database")
+                else:
+                    print("   ❌ Code usage not properly recorded")
+            else:
+                print(f"   ❌ Failed to verify code usage: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify code usage: {str(e)}")
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting ParlaCapital API Tests")
@@ -693,30 +990,29 @@ class ParlaCapitalAPITester:
         # Test public endpoints first
         self.test_public_endpoints()
         
-        # Test referral validation system (HIGH PRIORITY)
+        # Test NEW multi-use referral system (CRITICAL PRIORITY)
+        self.test_multi_use_referral_system()
+        
+        # Test old referral validation system for comparison
         self.test_referral_validation_system()
         
-        # Create test user and session
-        if not self.create_test_user_session():
-            print("❌ Cannot proceed with authenticated tests - user creation failed")
-            return self.get_results()
-        
-        # Test authenticated endpoints
-        self.test_auth_endpoints()
-        self.test_dashboard_endpoints()
-        self.test_investment_endpoints()
-        self.test_withdrawal_endpoints()
-        
-        # Test admin endpoints
-        self.test_admin_endpoints()
-        
-        # Test logout at the end
-        success, response = self.run_test(
-            "Logout",
-            "POST",
-            "auth/logout",
-            200
-        )
+        # Test other authenticated endpoints if we have session
+        if self.session_token:
+            self.test_auth_endpoints()
+            self.test_dashboard_endpoints()
+            self.test_investment_endpoints()
+            self.test_withdrawal_endpoints()
+            
+            # Test admin endpoints
+            self.test_admin_endpoints()
+            
+            # Test logout at the end
+            success, response = self.run_test(
+                "Logout",
+                "POST",
+                "auth/logout",
+                200
+            )
         
         # Cleanup
         self.cleanup_test_data()
