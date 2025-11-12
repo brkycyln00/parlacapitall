@@ -311,8 +311,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Frontend user placement interface in Admin Panel"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -326,6 +325,7 @@ test_plan:
     - "POST /api/admin/place-user endpoint ✅"
     - "Placement history tracking ✅"
     - "Volume recalculation after repositioning ✅"
+    - "Frontend user placement interface in Admin Panel ✅"
 
 agent_communication:
   - agent: "main"
