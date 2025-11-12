@@ -252,6 +252,7 @@ class ParlaCapitalAPITester:
         timestamp = str(int(time.time()))
         seed_user_id = f"seed-user-{timestamp}"
         seed_referral_code = f"SEED{timestamp[-6:]}"
+        referral_code_id = f"ref-code-{timestamp}"
         
         mongo_commands = f"""
         use('test_database');
@@ -284,8 +285,21 @@ class ParlaCapitalAPITester:
             created_at: new Date().toISOString()
         }});
         
+        // Create referral code in new referral_codes collection
+        db.referral_codes.insertOne({{
+            id: '{referral_code_id}',
+            code: '{seed_referral_code}',
+            user_id: '{seed_user_id}',
+            created_at: new Date().toISOString(),
+            expires_at: new Date(Date.now() + 10*60*1000).toISOString(), // 10 minutes from now
+            is_used: false,
+            used_by: null,
+            used_at: null
+        }});
+        
         print('Seed user created with ID: {seed_user_id}');
         print('Referral code: {seed_referral_code}');
+        print('Referral code document created in referral_codes collection');
         """
         
         try:
