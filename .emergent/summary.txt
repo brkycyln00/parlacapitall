@@ -1,0 +1,94 @@
+<analysis>
+My analysis of the trajectory indicates a complete, from-scratch build of a full-stack MLM crypto investment platform named ParlaCapital. The development process was highly iterative, following a cycle of scaffolding, user feedback, implementation, and testing.
+
+Initially, the AI engineer established the basic project structure with a FastAPI backend and a React frontend, creating numerous pages and a basic API. A significant portion of the early work involved UI refinements based on user requests, such as implementing a custom logo and creating a persistent, stylish navigation bar.
+
+The project then evolved with more complex features. A Crypto Market page was added, integrating with the CoinGecko API to display real-time data. A major effort was dedicated to implementing a robust authentication system, starting with Google Social Login and later adding a custom JWT-based email/password flow, complete with a registration/login modal.
+
+The most complex component is the user Dashboard. It was completely redesigned based on an example URL provided by the user, incorporating  for data visualization. Subsequent iterations added a detailed referral system display and fixed mobile responsiveness issues by implementing interactive modals for Commissions, Referral Network, and Settings.
+
+The most recent task involves enhancing the user registration process to require a referral code and correctly link new users within the binary tree structure. The AI has modified the frontend auth modal and is currently in the middle of updating the backend registration logic in  to validate the code and place the new user. The next logical step is to complete this backend logic and add frontend validation.
+</analysis>
+
+<product_requirements>
+The goal is to build ParlaCapital, a full-stack Multi-Level Marketing (MLM) crypto investment platform.
+
+**Core Business Logic:**
+-   **Investment & Profit:** Users invest in packages and receive a fixed 5% weekly profit.
+-   **Referral System:** Membership is by referral only. Users earn commissions from investments made by their referrals.
+    -   **Packages:** Silver (50, 5% commission), Gold (00, 10%), Platinum (000, 15%).
+-   **Binary Network:** A binary tree structure for referrals (left/right legs). Users earn a 00 bonus for every 000 in sales on both legs.
+-   **Career Levels:** Point-based progression system with rewards (e.g., Amethyst, Sapphire). 1 point =  sales value.
+
+**Application Features:**
+-   **Authentication:** Dual system supporting Google Social Login and a custom JWT-based email/password system. Registration requires a valid referral code.
+-   **User Dashboard:** A comprehensive, responsive panel showing user stats, investment details, weekly earnings, total commissions, a referral code generator, a visual representation of the referral network, and transaction history. It includes interactive modals for settings, commissions, and the referral network.
+-   **Admin Panel:** A dedicated interface for administrative tasks.
+-   **Public Pages:** Home, About Us, Packages, Earning Systems, FAQ, and Contact.
+-   **Crypto Market Page:** A dedicated page displaying real-time cryptocurrency data and charts, fetched from the CoinGecko API.
+-   **Payments:** Deposits and withdrawals via cryptocurrency (initially mocked).
+
+**Design & Language:**
+-   **Theme:** A modern, professional dark theme with a navy background and gold accents.
+-   **Language:** The entire user interface must be in Turkish.
+</product_requirements>
+
+<key_technical_concepts>
+- **Backend:** FastAPI, Pydantic for data modeling, python-jose for JWT.
+- **Frontend:** React, React Router, Axios for API calls, TailwindCSS for styling.
+- **Database:** MongoDB (managed via  async driver).
+- **Authentication:** JWT (JSON Web Tokens) for custom auth and a planned Google Social Login.
+- **API Integration:** Real-time data from the CoinGecko public API.
+- **Architecture:** RESTful API with a separate single-page application (SPA) frontend.
+</key_technical_concepts>
+
+<code_architecture>
+The application follows a standard monorepo structure with separate directories for the backend and frontend.
+
+**Directory Structure:**
+
+
+**Key Files:**
+
+-   ****
+    -   **Importance:** This is the core of the backend application. It defines all API endpoints, handles database interactions with MongoDB, and manages the entire business logic, including user registration, JWT-based authentication, referral processing, and data retrieval for the dashboard.
+    -   **Changes:** Heavily modified from a basic template to include: JWT token creation and user authentication endpoints (, ), a protected  endpoint, Pydantic models for all data structures (User, Investment, Transaction), and logic to handle the binary referral tree.
+
+-   ****
+    -   **Importance:** This is the main entry point for the React application. It sets up the client-side routing using  and manages the global authentication state through a React Context ().
+    -   **Changes:** Modified to include routes for all new pages (like ). It now contains the  logic to manage user state, login/logout functions, and an Axios interceptor that automatically attaches the JWT token to outgoing API requests.
+
+-   ****
+    -   **Importance:** The most complex and feature-rich frontend component. It serves as the main user panel after login.
+    -   **Changes:** This file was completely rewritten to match a sophisticated design. It now features a responsive sidebar, multiple data cards, -based graphs for financial data, and a detailed referral management section. It also includes state management and handlers for multiple modals (Commissions, Referral Network, Settings, Withdrawal), making it highly interactive.
+
+-   ****
+    -   **Importance:** A reusable component that handles both user registration and login.
+    -   **Changes:** Created from scratch to provide a tabbed interface for Giriş Yap (Login) and Kayıt Ol (Register). It includes form inputs for email/password, a button for Google login, and logic to handle form submission. It was recently updated to make the referral code a more prominent and required field during registration.
+    
+
+-   ****
+    -   **Importance:** A shared navigation component used across all public-facing pages to ensure a consistent look and feel.
+    -   **Changes:** Created to centralize navigation logic. It includes the site logo, links to all main pages, and a Giriş Yap button that triggers the . It has been styled to have a distinct background and bold, interactive links with hover effects.
+</code_architecture>
+
+<pending_tasks>
+- **Implement Binary Earnings:** The logic for calculating and awarding the 00 for 000+000 binary earnings bonus has been specified but not yet implemented or tested in the backend.
+- **Implement Live Payments:** The payment system is currently using mock data. A real integration with a crypto payment gateway for USDT, BTC, and ETH is required.
+- **Dashboard Auth Flow:** An earlier issue caused logged-in users to be redirected from  to the homepage. While subsequent tests seemed to work by manually setting cookies, the root cause of this redirection should be verified and fixed to ensure a seamless login experience.
+</pending_tasks>
+
+<current_work>
+The AI engineer is currently implementing the user's request to make the referral code mandatory during registration and ensure the new user is correctly placed in the referrer's binary network.
+
+The work so far involves two parts:
+1.  **Frontend:** The  component was updated. The Referral Code input field in the registration tab was made more prominent and is now a required field in the form.
+
+2.  **Backend:** The focus has shifted to . The engineer is in the process of enhancing the  endpoint. The goal is to add robust validation to check if the provided  is valid and belongs to an existing user. Following validation, the logic will determine the correct placement (left or right leg) for the new user in the referrer's binary tree and update the database accordingly. The last action was editing this endpoint to add the new referral logic. The code below shows the section of the backend that is being modified.
+
+
+</current_work>
+
+<optional_next_step>
+Now, add frontend validation in  to provide real-time feedback to the user if the entered referral code is invalid before they submit the registration form.
+</optional_next_step>
