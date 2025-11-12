@@ -385,12 +385,20 @@ export default function AdminPanel() {
                       <div className="text-gray-500 text-xs mb-4">
                         Talep Tarihi: {new Date(req.created_at).toLocaleString('tr-TR')}
                       </div>
-                      <Button
-                        onClick={() => handleApproveWithdrawal(req.id)}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold"
-                      >
-                        Çekimi Onayla
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleApproveWithdrawal(req.id)}
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold"
+                        >
+                          Çekimi Onayla
+                        </Button>
+                        <Button
+                          onClick={() => handleRejectWithdrawal(req.id)}
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                        >
+                          Reddet
+                        </Button>
+                      </div>
                     </div>
                   ))}
                   {withdrawalRequests.filter(req => req.status === 'pending').length === 0 && (
