@@ -92,7 +92,7 @@ export default function Packages() {
         },
         { withCredentials: true }
       );
-      toast.success('Yatırım talebiniz alındı! Admin onayından sonra hesabınıza yansıyacaktır.');
+      toast.success('Yatırım talebiniz alınmıştır, en kısa sürede sizinle irtibata geçiş yapacağız.', { duration: 5000 });
       setInvestDialogOpen(false);
       // Reset form
       setFullName('');
