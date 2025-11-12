@@ -673,7 +673,7 @@ export default function Dashboard() {
 
       {/* Commissions Dialog */}
       <Dialog open={commissionsOpen} onOpenChange={setCommissionsOpen}>
-        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-4xl">
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-white text-2xl">Komisyonlarınız</DialogTitle>
           </DialogHeader>
