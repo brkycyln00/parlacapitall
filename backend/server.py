@@ -1448,7 +1448,6 @@ async def recalculate_volumes_after_removal(upline_id: str, amount: float):
     
     # Find which position the removed user was in
     if current_upline.left_child_id:
-        child = await db.users.find_one({"id": current_upline.left_child_id}, {"_id": 0})
         # Subtract from left volume
         await db.users.update_one(
             {"id": upline_id},
