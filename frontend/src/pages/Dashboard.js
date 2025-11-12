@@ -1414,6 +1414,112 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* Placement Selection Dialog */}
+      <Dialog open={placementModalOpen} onOpenChange={setPlacementModalOpen}>
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">
+              {selectedReferral?.name} - Yerleştirme
+            </DialogTitle>
+            <p className="text-gray-400">Binary ağacınızda nereye yerleştirmek istiyorsunuz?</p>
+          </DialogHeader>
+          
+          <div className="space-y-6 mt-4">
+            {/* Select Upline */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Hangi üyenin altına yerleştirilsin?
+              </label>
+              <select
+                value={selectedUpline}
+                onChange={(e) => setSelectedUpline(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-amber-500"
+              >
+                <option value={user?.id}>🔹 Kendi Altıma (Benim direkt referansım olsun)</option>
+                {myReferrals.placed.map((ref) => (
+                  <option key={ref.id} value={ref.id}>
+                    {ref.current_position === 'left' ? '👈' : '👉'} {ref.name} - {ref.email}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-2">
+                💡 İpucu: Referansınızı kendi altınıza veya ağınızdaki herhangi bir üyenin altına yerleştirebilirsiniz
+              </p>
+            </div>
+
+            {/* Select Position */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-3">
+                Pozisyon Seçin
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setPlacementPosition('left')}
+                  className={`p-6 rounded-lg border-2 transition-all ${
+                    placementPosition === 'left'
+                      ? 'border-blue-500 bg-blue-500/20'
+                      : 'border-slate-600 bg-slate-700/50 hover:border-blue-400'
+                  }`}
+                >
+                  <div className="text-4xl mb-2">👈</div>
+                  <div className="text-white font-semibold">Sol Kol</div>
+                  <div className="text-xs text-gray-400 mt-1">Left Branch</div>
+                </button>
+                <button
+                  onClick={() => setPlacementPosition('right')}
+                  className={`p-6 rounded-lg border-2 transition-all ${
+                    placementPosition === 'right'
+                      ? 'border-purple-500 bg-purple-500/20'
+                      : 'border-slate-600 bg-slate-700/50 hover:border-purple-400'
+                  }`}
+                >
+                  <div className="text-4xl mb-2">👉</div>
+                  <div className="text-white font-semibold">Sağ Kol</div>
+                  <div className="text-xs text-gray-400 mt-1">Right Branch</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Info Box */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-blue-400 text-sm">
+                ℹ️ <strong>Bilgi:</strong> Seçtiğiniz üyenin {placementPosition === 'left' ? 'sol' : 'sağ'} kolu boş olmalıdır. 
+                Eğer dolu ise, önce o kişiyi başka bir yere taşıyın.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+                onClick={() => {
+                  setPlacementModalOpen(false);
+                  setSelectedReferral(null);
+                }}
+              >
+                İptal
+              </Button>
+              <Button
+                className={`flex-1 text-white ${
+                  placementPosition === 'left'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+                    : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
+                }`}
+                onClick={() => {
+                  if (selectedReferral && selectedUpline) {
+                    handlePlaceReferral(selectedReferral.id, selectedUpline, placementPosition);
+                    setPlacementModalOpen(false);
+                  }
+                }}
+              >
+                {placementPosition === 'left' ? '👈' : '👉'} Yerleştir
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl max-h-[90vh] overflow-y-auto">
