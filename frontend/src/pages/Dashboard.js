@@ -636,14 +636,35 @@ export default function Dashboard() {
                 <div className="bg-slate-800/80 rounded-xl p-6 border border-amber-500/20">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-sm text-gray-400">Aktif Referans Kodunuz</p>
-                    <Button
-                      onClick={generateNewCode}
-                      disabled={generatingCode}
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      {generatingCode ? 'Oluşturuluyor...' : '+ Yeni Kod'}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => generateNewCode('left')}
+                        disabled={generatingCode}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        title="Sol kol için kod"
+                      >
+                        {generatingCode ? '...' : '← Sol'}
+                      </Button>
+                      <Button
+                        onClick={() => generateNewCode('right')}
+                        disabled={generatingCode}
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        title="Sağ kol için kod"
+                      >
+                        {generatingCode ? '...' : 'Sağ →'}
+                      </Button>
+                      <Button
+                        onClick={() => generateNewCode('auto')}
+                        disabled={generatingCode}
+                        size="sm"
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        title="Otomatik yerleştirme"
+                      >
+                        {generatingCode ? '...' : 'Auto'}
+                      </Button>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2 mb-4">
                     <div className="flex-1 bg-slate-900 rounded-lg px-4 py-3 border border-amber-500/30">
