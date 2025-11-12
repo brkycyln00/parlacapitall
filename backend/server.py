@@ -769,6 +769,9 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
             description=f"Referans komisyonu - {target_user.name} ({request.package.upper()} paketi)"
         )
         await db.transactions.insert_one(commission_transaction.model_dump())
+        
+        # Update volumes up the binary tree and check for binary earnings
+        await update_volumes_upline(target_user.id, request.amount)
     
     # Mark request as approved
     await db.investment_requests.update_one(
