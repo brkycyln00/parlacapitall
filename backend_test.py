@@ -649,9 +649,9 @@ class ParlaCapitalAPITester:
         var result15 = db.user_sessions.deleteMany({session_token: /admin_session/});
         
         // Remove test referral codes
-        var result15 = db.referral_codes.deleteMany({user_id: /test-user-/});
-        var result16 = db.referral_codes.deleteMany({user_id: /admin-user-/});
-        var result17 = db.referral_codes.deleteMany({user_id: /seed-user-/});
+        var result16 = db.referral_codes.deleteMany({user_id: /test-user-/});
+        var result17 = db.referral_codes.deleteMany({user_id: /admin-user-/});
+        var result18 = db.referral_codes.deleteMany({user_id: /seed-user-/});
         
         // Remove test investments and investment requests
         var result18 = db.investments.deleteMany({user_id: /test-user-/});
