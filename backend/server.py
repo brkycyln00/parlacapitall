@@ -1339,6 +1339,213 @@ async def make_user_admin(user_id: str, admin: User = Depends(require_admin)):
     await db.users.update_one({"id": user_id}, {"$set": {"is_admin": True}})
     return {"message": "User is now an admin"}
 
+@api_router.post("/users/place-referral")
+async def user_place_referral(req: PlaceUserRequest, current_user: User = Depends(require_auth)):
+    """
+    Users can place their own referrals in their binary tree.
+    Only allows placing users who were referred by them.
+    """
+    # Validate position
+    if req.position not in ["left", "right"]:
+        raise HTTPException(status_code=400, detail="Pozisyon 'left' veya 'right' olmalıdır")
+    
+    # Get target user
+    target_user_doc = await db.users.find_one({"id": req.user_id}, {"_id": 0})
+    if not target_user_doc:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+    target_user = User(**target_user_doc)
+    
+    # Get upline user (must be current user)
+    upline_doc = await db.users.find_one({"id": req.upline_id}, {"_id": 0})
+    if not upline_doc:
+        raise HTTPException(status_code=404, detail="Üst sponsor bulunamadı")
+    upline = User(**upline_doc)
+    
+    # Security: User can only place under themselves or their downline
+    if req.upline_id != current_user.id:
+        # Check if upline is in current user's downline
+        is_in_downline = await check_if_in_downline(current_user.id, req.upline_id)
+        if not is_in_downline:
+            raise HTTPException(status_code=403, detail="Bu kullanıcıyı sadece kendi ağınızdaki üyelerin altına yerleştirebilirsiniz")
+    
+    # Check if target user is a referral of current user (directly or indirectly)
+    # For now, we allow any placement within their network
+    
+    # Check if position is available
+    if req.position == "left" and upline.left_child_id and upline.left_child_id != req.user_id:
+        raise HTTPException(status_code=400, detail="Sol kol dolu. Lütfen önce o kullanıcıyı taşıyın.")
+    if req.position == "right" and upline.right_child_id and upline.right_child_id != req.user_id:
+        raise HTTPException(status_code=400, detail="Sağ kol dolu. Lütfen önce o kullanıcıyı taşıyın.")
+    
+    # Store old placement info
+    old_upline_id = target_user.upline_id
+    old_position = target_user.position
+    action_type = "repositioning" if old_upline_id else "initial_placement"
+    
+    # Remove from old position if exists
+    if old_upline_id:
+        old_upline_doc = await db.users.find_one({"id": old_upline_id}, {"_id": 0})
+        if old_upline_doc:
+            if old_position == "left":
+                await db.users.update_one(
+                    {"id": old_upline_id},
+                    {"$set": {"left_child_id": None}}
+                )
+            elif old_position == "right":
+                await db.users.update_one(
+                    {"id": old_upline_id},
+                    {"$set": {"right_child_id": None}}
+                )
+    
+    # Place in new position
+    if req.position == "left":
+        await db.users.update_one(
+            {"id": req.upline_id},
+            {"$set": {"left_child_id": req.user_id}}
+        )
+    else:
+        await db.users.update_one(
+            {"id": req.upline_id},
+            {"$set": {"right_child_id": req.user_id}}
+        )
+    
+    # Update target user
+    await db.users.update_one(
+        {"id": req.user_id},
+        {"$set": {
+            "upline_id": req.upline_id,
+            "position": req.position
+        }}
+    )
+    
+    # Record placement history
+    history = PlacementHistory(
+        user_id=req.user_id,
+        old_upline_id=old_upline_id,
+        new_upline_id=req.upline_id,
+        old_position=old_position,
+        new_position=req.position,
+        admin_id=current_user.id,
+        admin_name=current_user.name,
+        action_type=action_type
+    )
+    await db.placement_history.insert_one(history.model_dump())
+    
+    # If user has investments, recalculate volumes
+    if target_user.total_invested > 0:
+        # Remove volumes from old upline tree
+        if old_upline_id:
+            await recalculate_volumes_after_removal(old_upline_id, target_user.total_invested)
+        
+        # Add volumes to new upline tree
+        await update_volumes_upline(req.user_id, target_user.total_invested)
+    
+    return {
+        "message": "Kullanıcı başarıyla yerleştirildi",
+        "action": action_type,
+        "user_name": target_user.name,
+        "upline_name": upline.name,
+        "position": req.position
+    }
+
+async def check_if_in_downline(root_user_id: str, target_user_id: str, max_depth: int = 20) -> bool:
+    """Check if target_user is in the downline of root_user"""
+    if root_user_id == target_user_id:
+        return True
+    
+    visited = set()
+    queue = [root_user_id]
+    depth = 0
+    
+    while queue and depth < max_depth:
+        current_level_size = len(queue)
+        for _ in range(current_level_size):
+            current_id = queue.pop(0)
+            if current_id in visited:
+                continue
+            visited.add(current_id)
+            
+            if current_id == target_user_id:
+                return True
+            
+            user_doc = await db.users.find_one({"id": current_id}, {"_id": 0, "left_child_id": 1, "right_child_id": 1})
+            if user_doc:
+                if user_doc.get("left_child_id"):
+                    queue.append(user_doc["left_child_id"])
+                if user_doc.get("right_child_id"):
+                    queue.append(user_doc["right_child_id"])
+        depth += 1
+    
+    return False
+
+@api_router.get("/users/my-referrals")
+async def get_my_referrals(current_user: User = Depends(require_auth)):
+    """Get all users in current user's network"""
+    all_referrals = []
+    
+    async def collect_referrals(user_id: str, depth: int = 0, max_depth: int = 20):
+        if depth >= max_depth:
+            return
+        
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user_doc:
+            return
+        
+        user = User(**user_doc)
+        
+        # Add left child
+        if user.left_child_id:
+            child_doc = await db.users.find_one({"id": user.left_child_id}, {"_id": 0})
+            if child_doc:
+                all_referrals.append({
+                    **child_doc,
+                    "depth": depth + 1,
+                    "parent_id": user_id,
+                    "current_position": "left"
+                })
+                await collect_referrals(user.left_child_id, depth + 1, max_depth)
+        
+        # Add right child
+        if user.right_child_id:
+            child_doc = await db.users.find_one({"id": user.right_child_id}, {"_id": 0})
+            if child_doc:
+                all_referrals.append({
+                    **child_doc,
+                    "depth": depth + 1,
+                    "parent_id": user_id,
+                    "current_position": "right"
+                })
+                await collect_referrals(user.right_child_id, depth + 1, max_depth)
+    
+    await collect_referrals(current_user.id)
+    
+    # Also get unplaced referrals (users who used current user's referral codes but not yet placed)
+    referral_codes = await db.referral_codes.find(
+        {"user_id": current_user.id, "is_used": True},
+        {"_id": 0, "used_by": 1}
+    ).to_list(1000)
+    
+    used_by_ids = [rc.get("used_by") for rc in referral_codes if rc.get("used_by")]
+    placed_ids = [ref["id"] for ref in all_referrals]
+    
+    unplaced_referrals = []
+    for user_id in used_by_ids:
+        if user_id not in placed_ids:
+            user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+            if user_doc:
+                unplaced_referrals.append({
+                    **user_doc,
+                    "depth": 0,
+                    "parent_id": None,
+                    "current_position": "unplaced"
+                })
+    
+    return {
+        "placed": all_referrals,
+        "unplaced": unplaced_referrals,
+        "total": len(all_referrals) + len(unplaced_referrals)
+    }
+
 @api_router.post("/admin/place-user")
 async def admin_place_user(req: PlaceUserRequest, admin: User = Depends(require_admin)):
     """
