@@ -294,11 +294,20 @@ export default function Dashboard() {
                 <Wallet className="h-4 w-4 text-amber-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-white">₺{(user?.wallet_balance || 0).toLocaleString('tr-TR')}</div>
-                <p className="text-xs text-green-500 mt-2 flex items-center">
-                  <TrendingUp size={14} className="mr-1" />
-                  +12.5% Toplam aktif yatırım
-                </p>
+                {user?.package || user?.total_invested > 0 ? (
+                  <>
+                    <div className="text-3xl font-bold text-white">₺{(user?.wallet_balance || 0).toLocaleString('tr-TR')}</div>
+                    <p className="text-xs text-green-500 mt-2 flex items-center">
+                      <TrendingUp size={14} className="mr-1" />
+                      +12.5% Toplam aktif yatırım
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold text-gray-500">₺0</div>
+                    <p className="text-xs text-gray-500 mt-2">Henüz yatırım yok</p>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -308,8 +317,17 @@ export default function Dashboard() {
                 <TrendingUp className="h-4 w-4 text-cyan-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-white">₺{(user?.weekly_earnings || 0).toLocaleString('tr-TR')}</div>
-                <p className="text-xs text-green-500 mt-2">+8.2% Bu hafta</p>
+                {user?.package || user?.total_invested > 0 ? (
+                  <>
+                    <div className="text-3xl font-bold text-white">₺{(user?.weekly_earnings || 0).toLocaleString('tr-TR')}</div>
+                    <p className="text-xs text-green-500 mt-2">+8.2% Bu hafta</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold text-gray-500">₺0</div>
+                    <p className="text-xs text-gray-500 mt-2">Henüz kazanç yok</p>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -320,7 +338,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-white">₺{(user?.total_commissions || 0).toLocaleString('tr-TR')}</div>
-                <p className="text-xs text-green-500 mt-2">+15.3% Tüm zamanlar</p>
+                <p className="text-xs text-green-500 mt-2">Referans kazançları</p>
               </CardContent>
             </Card>
 
@@ -331,7 +349,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-white">{dashboard?.referrals?.length || 0}</div>
-                <p className="text-xs text-green-500 mt-2">+5 Aktif üyeler</p>
+                <p className="text-xs text-green-500 mt-2">Aktif üyeler</p>
               </CardContent>
             </Card>
           </div>
