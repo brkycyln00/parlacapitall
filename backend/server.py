@@ -57,6 +57,18 @@ class User(BaseModel):
     is_admin: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+
+class ReferralCode(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    code: str = Field(default_factory=lambda: secrets.token_urlsafe(8))
+    user_id: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    expires_at: str = Field(default_factory=lambda: (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat())
+    is_used: bool = False
+    used_by: Optional[str] = None
+    used_at: Optional[str] = None
+
 class UserSession(BaseModel):
     model_config = ConfigDict(extra="ignore")
     user_id: str
