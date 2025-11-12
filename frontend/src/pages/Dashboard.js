@@ -59,6 +59,9 @@ export default function Dashboard() {
       
       // Fetch pending withdrawals
       fetchPendingWithdrawals();
+      
+      // Fetch my referrals for management
+      fetchMyReferrals();
     } catch (error) {
       console.error('Dashboard error:', error);
       console.error('Error response:', error.response?.data);
