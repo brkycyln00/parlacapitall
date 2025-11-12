@@ -962,9 +962,74 @@ export default function Dashboard() {
                     <p className="text-sm text-gray-400">Sağ Kol</p>
                   </div>
                 </div>
-                <Button className="w-full mt-6 bg-slate-700 hover:bg-slate-600 text-white">
+                <Button 
+                  className="w-full mt-6 bg-slate-700 hover:bg-slate-600 text-white"
+                  onClick={() => setNetworkOpen(true)}
+                >
                   Tam Ağı Görüntüle
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Referral Management */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Referans Yönetimi</CardTitle>
+                <p className="text-sm text-gray-400">Referanslarınızı yerleştirin ve yönetin</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="bg-slate-700/50 p-3 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-amber-400">{myReferrals.unplaced.length}</p>
+                      <p className="text-xs text-gray-400">Yerleşmemiş</p>
+                    </div>
+                    <div className="bg-slate-700/50 p-3 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-blue-400">{myReferrals.placed.filter(r => r.current_position === 'left').length}</p>
+                      <p className="text-xs text-gray-400">Sol Kol</p>
+                    </div>
+                    <div className="bg-slate-700/50 p-3 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-purple-400">{myReferrals.placed.filter(r => r.current_position === 'right').length}</p>
+                      <p className="text-xs text-gray-400">Sağ Kol</p>
+                    </div>
+                  </div>
+
+                  {/* Unplaced Referrals */}
+                  {myReferrals.unplaced.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-amber-400">⏳ Yerleştirilmesi Gerekenler</p>
+                      {myReferrals.unplaced.slice(0, 3).map((referral) => (
+                        <div key={referral.id} className="flex items-center justify-between bg-slate-700/30 p-2 rounded">
+                          <div>
+                            <p className="text-white text-sm">{referral.name}</p>
+                            <p className="text-xs text-gray-400">{referral.email}</p>
+                          </div>
+                          <Button 
+                            size="sm"
+                            className="bg-amber-500 hover:bg-amber-600 text-white text-xs"
+                            onClick={() => {
+                              setSelectedReferral(referral);
+                              setManagementOpen(true);
+                            }}
+                          >
+                            Yerleştir
+                          </Button>
+                        </div>
+                      ))}
+                      {myReferrals.unplaced.length > 3 && (
+                        <p className="text-xs text-gray-400 text-center">+{myReferrals.unplaced.length - 3} daha...</p>
+                      )}
+                    </div>
+                  )}
+
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                    onClick={() => setManagementOpen(true)}
+                  >
+                    Tüm Referansları Yönet
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
