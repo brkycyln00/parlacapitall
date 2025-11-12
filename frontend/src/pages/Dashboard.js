@@ -850,7 +850,7 @@ export default function Dashboard() {
 
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl">
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-white text-2xl">Ayarlar</DialogTitle>
           </DialogHeader>
