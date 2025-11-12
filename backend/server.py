@@ -64,6 +64,7 @@ class ReferralCode(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     code: str = Field(default_factory=lambda: secrets.token_urlsafe(8))
     user_id: str
+    position: str = "auto"  # "left", "right", or "auto"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     expires_at: str = Field(default_factory=lambda: (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat())
     is_used: bool = False
