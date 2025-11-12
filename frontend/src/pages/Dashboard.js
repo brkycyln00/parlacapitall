@@ -89,12 +89,16 @@ export default function Dashboard() {
     }
   };
   
-  const generateNewCode = async () => {
+  const generateNewCode = async (position = 'auto') => {
     setGeneratingCode(true);
     try {
-      const response = await axios.post(`${API}/referral/generate`, {}, { withCredentials: true });
+      const response = await axios.post(
+        `${API}/referral/generate?position=${position}`, 
+        {}, 
+        { withCredentials: true }
+      );
       setActiveReferralCode(response.data.code);
-      toast.success('Yeni referans kodu oluşturuldu! 10 dakika içinde kullanılmalıdır.');
+      toast.success(response.data.message || 'Yeni referans kodu oluşturuldu!');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kod oluşturulamadı');
     } finally {
