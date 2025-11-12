@@ -1057,12 +1057,23 @@ export default function Dashboard() {
                     </div>
                   )}
 
-                  <Button 
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-                    onClick={() => setManagementOpen(true)}
-                  >
-                    Tüm Referansları Yönet
-                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                      onClick={() => setManagementOpen(true)}
+                    >
+                      Tüm Referansları Yönet
+                    </Button>
+                    {!user?.upline_id && (
+                      <Button 
+                        variant="outline"
+                        className="border-amber-500 text-amber-400 hover:bg-amber-500 hover:text-white"
+                        onClick={() => setJoinNetworkOpen(true)}
+                      >
+                        📥 Kod Gir
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
