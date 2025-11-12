@@ -746,7 +746,7 @@ export default function Dashboard() {
           )}
 
           {/* Bottom Section */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {/* Referral Network */}
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader>
