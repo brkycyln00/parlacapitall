@@ -532,7 +532,7 @@ export default function AdminPanel() {
                         </div>
                       </div>
                       {!u.is_admin && (
-                        <div className="mt-3">
+                        <div className="mt-3 flex gap-2">
                           <Button
                             data-testid={`make-admin-${idx}`}
                             onClick={() => handleMakeAdmin(u.id)}
@@ -541,6 +541,14 @@ export default function AdminPanel() {
                             className="border-amber-500 text-amber-400 hover:bg-amber-500/10"
                           >
                             Admin Yap
+                          </Button>
+                          <Button
+                            onClick={() => handleDeleteUser(u.id, u.name)}
+                            size="sm"
+                            variant="outline"
+                            className="border-red-500 text-red-400 hover:bg-red-500/10"
+                          >
+                            Kullanıcıyı Sil
                           </Button>
                         </div>
                       )}
