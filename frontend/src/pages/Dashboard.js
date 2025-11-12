@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [referralCodes, setReferralCodes] = useState([]);
   const [activeReferralCode, setActiveReferralCode] = useState('');
   const [generatingCode, setGeneratingCode] = useState(false);
+  const [pendingInvestments, setPendingInvestments] = useState([]);
 
   useEffect(() => {
     fetchDashboard();
