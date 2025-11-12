@@ -232,66 +232,78 @@ async def register(req: RegisterRequest):
     if existing_user:
         raise HTTPException(status_code=400, detail="Bu e-posta adresi zaten kayıtlı")
     
-    # Validate referral code (required)
-    if not req.referral_code:
-        raise HTTPException(status_code=400, detail="Referans kodu zorunludur. Lütfen sizi davet eden kişinin kodunu girin.")
+    upline_user = None
     
-    # Clean the code
-    clean_code = req.referral_code.strip()
-    
-    # Find referral code in referral_codes collection (case-insensitive)
-    import re
-    referral_doc = await db.referral_codes.find_one({
-        "code": {"$regex": f"^{re.escape(clean_code)}$", "$options": "i"}
-    }, {"_id": 0})
-    if not referral_doc:
-        raise HTTPException(status_code=400, detail="Geçersiz referans kodu. Lütfen doğru kodu girdiğinizden emin olun.")
-    
-    referral = ReferralCode(**referral_doc)
-    
-    # Check if code is expired
-    expires_at = datetime.fromisoformat(referral.expires_at)
-    if expires_at < datetime.now(timezone.utc):
-        raise HTTPException(status_code=400, detail="Bu referans kodunun süresi dolmuş. Lütfen yeni bir kod isteyin.")
-    
-    # Check if code is already used
-    if referral.is_used:
-        raise HTTPException(status_code=400, detail="Bu referans kodu daha önce kullanılmış. Her kod sadece bir kez kullanılabilir.")
-    
-    # Find upline user
-    upline = await db.users.find_one({"id": referral.user_id}, {"_id": 0})
-    if not upline:
-        raise HTTPException(status_code=400, detail="Geçersiz referans kodu.")
-    
-    upline_user = User(**upline)
+    # Validate referral code (OPTIONAL)
+    if req.referral_code:
+        # Clean the code
+        clean_code = req.referral_code.strip()
+        
+        # Find referral code in referral_codes collection (case-insensitive)
+        import re
+        referral_doc = await db.referral_codes.find_one({
+            "code": {"$regex": f"^{re.escape(clean_code)}$", "$options": "i"}
+        }, {"_id": 0})
+        
+        if not referral_doc:
+            raise HTTPException(status_code=400, detail="Geçersiz referans kodu. Lütfen doğru kodu girdiğinizden emin olun.")
+        
+        referral = ReferralCode(**referral_doc)
+        
+        # Check if code is expired
+        expires_at = datetime.fromisoformat(referral.expires_at)
+        if expires_at < datetime.now(timezone.utc):
+            raise HTTPException(status_code=400, detail="Bu referans kodunun süresi dolmuş. Lütfen yeni bir kod isteyin.")
+        
+        # Check if code is already used
+        if referral.is_used:
+            raise HTTPException(status_code=400, detail="Bu referans kodu daha önce kullanılmış. Her kod sadece bir kez kullanılabilir.")
+        
+        # Find upline user
+        upline = await db.users.find_one({"id": referral.user_id}, {"_id": 0})
+        if not upline:
+            raise HTTPException(status_code=400, detail="Geçersiz referans kodu.")
+        
+        upline_user = User(**upline)
     
     # Create new user
     user = User(
         email=req.email,
         name=req.name,
         password_hash=hash_password(req.password),
-        upline_id=upline_user.id
+        upline_id=upline_user.id if upline_user else None
     )
     
-    # Place user in binary tree
-    if not upline_user.left_child_id:
-        # Place on left
-        await db.users.update_one(
-            {"id": upline_user.id},
-            {"$set": {"left_child_id": user.id}}
+    # Place user in binary tree (only if has upline)
+    if upline_user:
+        if not upline_user.left_child_id:
+            # Place on left
+            await db.users.update_one(
+                {"id": upline_user.id},
+                {"$set": {"left_child_id": user.id}}
+            )
+            user.position = "left"
+        elif not upline_user.right_child_id:
+            # Place on right
+            await db.users.update_one(
+                {"id": upline_user.id},
+                {"$set": {"right_child_id": user.id}}
+            )
+            user.position = "right"
+        else:
+            # Both positions filled, find next available spot in the tree
+            # For simplicity, place on left (you can implement more complex logic)
+            user.position = "left"
+        
+        # Mark referral code as used
+        await db.referral_codes.update_one(
+            {"id": referral.id},
+            {"$set": {
+                "is_used": True,
+                "used_by": user.id,
+                "used_at": datetime.now(timezone.utc).isoformat()
+            }}
         )
-        user.position = "left"
-    elif not upline_user.right_child_id:
-        # Place on right
-        await db.users.update_one(
-            {"id": upline_user.id},
-            {"$set": {"right_child_id": user.id}}
-        )
-        user.position = "right"
-    else:
-        # Both positions filled, find next available spot in the tree
-        # For simplicity, place on left (you can implement more complex logic)
-        user.position = "left"
     
     user_dict = user.model_dump()
     await db.users.insert_one(user_dict)
