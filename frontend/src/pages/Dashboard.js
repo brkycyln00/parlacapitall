@@ -198,11 +198,22 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         {/* Header */}
-        <header className="bg-slate-800 border-b border-slate-700 px-8 py-4">
+        <header className="bg-slate-800 border-b border-slate-700 px-4 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Hoş Geldiniz, {user?.name}!</h1>
-              <p className="text-gray-400 mt-1">İşte yatırım performansınızın özeti</p>
+            <div className="flex items-center space-x-4">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden text-white p-2 hover:bg-slate-700 rounded-lg"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <div>
+                <h1 className="text-xl lg:text-3xl font-bold text-white">Hoş Geldiniz, {user?.name}!</h1>
+                <p className="text-gray-400 mt-1 text-sm lg:text-base hidden sm:block">İşte yatırım performansınızın özeti</p>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
