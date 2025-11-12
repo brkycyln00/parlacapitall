@@ -337,6 +337,9 @@ test_plan:
     - "Wallet balance and total_commissions updates for all uplines ✅"
     - "Admin dashboard visibility of commission totals ✅"
     - "No upline case handling (root user investments) ✅"
+    - "Real-time referral code validation ✅"
+    - "Frontend form validation with referral check ✅"
+    - "Unlimited referrals registration (no auto-placement) feature ✅"
 
 agent_communication:
   - agent: "main"
