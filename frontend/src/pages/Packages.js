@@ -100,6 +100,10 @@ export default function Packages() {
       setEmail('');
       setWhatsapp('');
       setPlatform('');
+      // Redirect to dashboard
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Yatırım talebi gönderilemedi');
     } finally {
