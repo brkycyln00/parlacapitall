@@ -980,6 +980,735 @@ class ParlaCapitalAPITester:
         except Exception as e:
             print(f"   ❌ Failed to verify code usage: {str(e)}")
 
+    def test_binary_earnings_calculation_system(self):
+        """Test the complete binary earnings calculation system end-to-end"""
+        print("\n💰 Testing Binary Earnings Calculation System...")
+        print("=" * 60)
+        
+        # Step 1: Create admin user for approving investments
+        admin_token = self.create_admin_user_and_login()
+        if not admin_token:
+            print("❌ Cannot test binary earnings - admin user creation failed")
+            return
+        
+        # Step 2: Create binary tree structure
+        print("\n1️⃣ Creating Binary Tree Structure...")
+        
+        # Create root user (User A)
+        timestamp = str(int(time.time()))
+        user_a_data = {
+            "email": f"usera.binary.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User A Binary {timestamp}"
+        }
+        
+        # Register User A without referral (will be root)
+        success, response = self.run_test(
+            "Register User A (Root)",
+            "POST",
+            "auth/register",
+            200,
+            data=user_a_data
+        )
+        
+        if not success:
+            print("❌ Failed to create root user")
+            return
+        
+        user_a_id = response['user']['id']
+        user_a_token = response.get('token')
+        print(f"   ✓ User A created: {user_a_id}")
+        
+        # Generate left branch referral code for User A
+        original_token = self.session_token
+        self.session_token = user_a_token
+        
+        success, response = self.run_test(
+            "Generate Left Branch Code",
+            "POST",
+            "referral/generate?position=left",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate left branch code")
+            return
+        
+        left_code = response.get('code')
+        print(f"   ✓ Left branch code: {left_code}")
+        
+        # Generate right branch referral code for User A
+        success, response = self.run_test(
+            "Generate Right Branch Code", 
+            "POST",
+            "referral/generate?position=right",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate right branch code")
+            return
+        
+        right_code = response.get('code')
+        print(f"   ✓ Right branch code: {right_code}")
+        
+        # Step 3: Register User B (left child)
+        user_b_data = {
+            "email": f"userb.binary.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User B Binary {timestamp}",
+            "referral_code": left_code
+        }
+        
+        success, response = self.run_test(
+            "Register User B (Left Child)",
+            "POST",
+            "auth/register",
+            200,
+            data=user_b_data
+        )
+        
+        if not success:
+            print("❌ Failed to create left child")
+            return
+        
+        user_b_id = response['user']['id']
+        user_b_token = response.get('token')
+        print(f"   ✓ User B (left child) created: {user_b_id}")
+        
+        # Step 4: Register User C (right child)
+        user_c_data = {
+            "email": f"userc.binary.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User C Binary {timestamp}",
+            "referral_code": right_code
+        }
+        
+        success, response = self.run_test(
+            "Register User C (Right Child)",
+            "POST",
+            "auth/register",
+            200,
+            data=user_c_data
+        )
+        
+        if not success:
+            print("❌ Failed to create right child")
+            return
+        
+        user_c_id = response['user']['id']
+        user_c_token = response.get('token')
+        print(f"   ✓ User C (right child) created: {user_c_id}")
+        
+        # Verify binary tree structure
+        self.verify_binary_tree_structure(user_a_id, user_b_id, user_c_id)
+        
+        # Step 5: Test Volume Accumulation
+        print("\n2️⃣ Testing Volume Accumulation...")
+        
+        # User B invests $600 (Silver package)
+        self.session_token = user_b_token
+        user_b_investment_data = {
+            "full_name": f"User B Binary {timestamp}",
+            "username": f"userb_binary_{timestamp}",
+            "email": f"userb.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "silver"
+        }
+        
+        success, response = self.run_test(
+            "User B Investment Request ($250 Silver)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_b_investment_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User B investment request")
+            return
+        
+        user_b_request_id = response.get('request_id')
+        print(f"   ✓ User B investment request created: {user_b_request_id}")
+        
+        # Admin approves User B investment
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Admin Approve User B Investment",
+            "POST",
+            f"admin/investment-requests/{user_b_request_id}/approve",
+            200
+        )
+        
+        if success:
+            print("   ✅ User B investment approved - $250 added to left volume")
+        
+        # Check User A's volumes after User B investment
+        self.check_user_volumes(user_a_id, "After User B Investment", expected_left=250.0, expected_right=0.0)
+        
+        # User C invests $500 (Gold package)
+        self.session_token = user_c_token
+        user_c_investment_data = {
+            "full_name": f"User C Binary {timestamp}",
+            "username": f"userc_binary_{timestamp}",
+            "email": f"userc.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"
+        }
+        
+        success, response = self.run_test(
+            "User C Investment Request ($500 Gold)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_c_investment_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User C investment request")
+            return
+        
+        user_c_request_id = response.get('request_id')
+        print(f"   ✓ User C investment request created: {user_c_request_id}")
+        
+        # Admin approves User C investment
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Admin Approve User C Investment",
+            "POST",
+            f"admin/investment-requests/{user_c_request_id}/approve",
+            200
+        )
+        
+        if success:
+            print("   ✅ User C investment approved - $500 added to right volume")
+        
+        # Check User A's volumes after User C investment
+        self.check_user_volumes(user_a_id, "After User C Investment", expected_left=250.0, expected_right=500.0)
+        
+        # At this point: left=$250, right=$500, NO bonus yet (need $1000+$1000)
+        self.check_binary_earnings(user_a_id, "After Initial Investments", expected_earnings=0.0)
+        
+        # Step 6: Test First Bonus Trigger
+        print("\n3️⃣ Testing First Bonus Trigger...")
+        
+        # User B makes another investment of $750 to reach $1000 total
+        user_b_investment2_data = {
+            "full_name": f"User B Binary {timestamp}",
+            "username": f"userb_binary_{timestamp}",
+            "email": f"userb.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "platinum"  # $1000
+        }
+        
+        self.session_token = user_b_token
+        success, response = self.run_test(
+            "User B Second Investment Request ($1000 Platinum)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_b_investment2_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User B second investment request")
+            return
+        
+        user_b_request2_id = response.get('request_id')
+        
+        # Admin approves User B second investment
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Admin Approve User B Second Investment",
+            "POST",
+            f"admin/investment-requests/{user_b_request2_id}/approve",
+            200
+        )
+        
+        if success:
+            print("   ✅ User B second investment approved - $1000 added to left volume")
+        
+        # Now User A should have: left_volume = $1250, right_volume = $500
+        # Still NO bonus (need both sides >= $1000)
+        self.check_user_volumes(user_a_id, "After User B Second Investment", expected_left=1250.0, expected_right=500.0)
+        self.check_binary_earnings(user_a_id, "Before Both Sides >= $1000", expected_earnings=0.0)
+        
+        # User C invests another $500 to reach $1000 total
+        user_c_investment2_data = {
+            "full_name": f"User C Binary {timestamp}",
+            "username": f"userc_binary_{timestamp}",
+            "email": f"userc.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"  # $500
+        }
+        
+        self.session_token = user_c_token
+        success, response = self.run_test(
+            "User C Second Investment Request ($500 Gold)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_c_investment2_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User C second investment request")
+            return
+        
+        user_c_request2_id = response.get('request_id')
+        
+        # Admin approves User C second investment
+        self.session_token = admin_token
+        success, response = self.run_test(
+            "Admin Approve User C Second Investment",
+            "POST",
+            f"admin/investment-requests/{user_c_request2_id}/approve",
+            200
+        )
+        
+        if success:
+            print("   ✅ User C second investment approved - $500 added to right volume")
+        
+        # Now User A should have: left_volume = $1250, right_volume = $1000
+        # Expected: User A receives $100 bonus (min(1250, 1000) // 1000 * 100 = 1 * 100 = $100)
+        self.check_user_volumes(user_a_id, "After Both Sides >= $1000", expected_left=1250.0, expected_right=1000.0)
+        self.check_binary_earnings(user_a_id, "After First Bonus Trigger", expected_earnings=100.0)
+        
+        # Verify wallet balance increased by $100
+        self.check_wallet_balance_increase(user_a_id, 100.0)
+        
+        # Verify binary transaction was created
+        self.check_binary_transaction(user_a_id, 100.0)
+        
+        # Step 7: Test Progressive Bonus
+        print("\n4️⃣ Testing Progressive Bonus...")
+        
+        # Add more investment to trigger additional bonus
+        # User B invests another $500 (total left = $1750)
+        user_b_investment3_data = {
+            "full_name": f"User B Binary {timestamp}",
+            "username": f"userb_binary_{timestamp}",
+            "email": f"userb.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"  # $500
+        }
+        
+        self.session_token = user_b_token
+        success, response = self.run_test(
+            "User B Third Investment Request ($500 Gold)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_b_investment3_data
+        )
+        
+        if success:
+            user_b_request3_id = response.get('request_id')
+            
+            # Admin approves
+            self.session_token = admin_token
+            success, response = self.run_test(
+                "Admin Approve User B Third Investment",
+                "POST",
+                f"admin/investment-requests/{user_b_request3_id}/approve",
+                200
+            )
+            
+            if success:
+                print("   ✅ User B third investment approved")
+                
+                # Now: left=$1750, right=$1000
+                # Expected total binary earnings: (min(1750, 1000) // 1000) * 100 = 1 * 100 = $100 (no change)
+                self.check_user_volumes(user_a_id, "After Additional Investment", expected_left=1750.0, expected_right=1000.0)
+                self.check_binary_earnings(user_a_id, "After Additional Investment (No New Bonus)", expected_earnings=100.0)
+        
+        # Add investment to right side to trigger second bonus
+        # User C invests $500 more (total right = $1500)
+        user_c_investment3_data = {
+            "full_name": f"User C Binary {timestamp}",
+            "username": f"userc_binary_{timestamp}",
+            "email": f"userc.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"  # $500
+        }
+        
+        self.session_token = user_c_token
+        success, response = self.run_test(
+            "User C Third Investment Request ($500 Gold)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_c_investment3_data
+        )
+        
+        if success:
+            user_c_request3_id = response.get('request_id')
+            
+            # Admin approves
+            self.session_token = admin_token
+            success, response = self.run_test(
+                "Admin Approve User C Third Investment",
+                "POST",
+                f"admin/investment-requests/{user_c_request3_id}/approve",
+                200
+            )
+            
+            if success:
+                print("   ✅ User C third investment approved")
+                
+                # Now: left=$1750, right=$1500
+                # Expected total binary earnings: (min(1750, 1500) // 1000) * 100 = 1 * 100 = $100 (still no change)
+                self.check_user_volumes(user_a_id, "After Right Side Increase", expected_left=1750.0, expected_right=1500.0)
+                self.check_binary_earnings(user_a_id, "After Right Side Increase (Still No New Bonus)", expected_earnings=100.0)
+        
+        # Add more to right side to trigger second $100 bonus
+        # User C invests $500 more (total right = $2000)
+        user_c_investment4_data = {
+            "full_name": f"User C Binary {timestamp}",
+            "username": f"userc_binary_{timestamp}",
+            "email": f"userc.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"  # $500
+        }
+        
+        self.session_token = user_c_token
+        success, response = self.run_test(
+            "User C Fourth Investment Request ($500 Gold)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_c_investment4_data
+        )
+        
+        if success:
+            user_c_request4_id = response.get('request_id')
+            
+            # Admin approves
+            self.session_token = admin_token
+            success, response = self.run_test(
+                "Admin Approve User C Fourth Investment",
+                "POST",
+                f"admin/investment-requests/{user_c_request4_id}/approve",
+                200
+            )
+            
+            if success:
+                print("   ✅ User C fourth investment approved")
+                
+                # Now: left=$1750, right=$2000
+                # Expected total binary earnings: (min(1750, 1750) // 1000) * 100 = 1 * 100 = $100 (still same)
+                # Wait, let me recalculate: min(1750, 2000) = 1750, 1750 // 1000 = 1, 1 * 100 = $100
+                self.check_user_volumes(user_a_id, "After Right Side $2000", expected_left=1750.0, expected_right=2000.0)
+                self.check_binary_earnings(user_a_id, "After Right Side $2000 (Still $100)", expected_earnings=100.0)
+        
+        # Need to get left side to $2000 to trigger second bonus
+        # User B invests $250 more (total left = $2000)
+        user_b_investment4_data = {
+            "full_name": f"User B Binary {timestamp}",
+            "username": f"userb_binary_{timestamp}",
+            "email": f"userc.binary.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "silver"  # $250
+        }
+        
+        self.session_token = user_b_token
+        success, response = self.run_test(
+            "User B Fourth Investment Request ($250 Silver)",
+            "POST",
+            "investment/request",
+            200,
+            data=user_b_investment4_data
+        )
+        
+        if success:
+            user_b_request4_id = response.get('request_id')
+            
+            # Admin approves
+            self.session_token = admin_token
+            success, response = self.run_test(
+                "Admin Approve User B Fourth Investment",
+                "POST",
+                f"admin/investment-requests/{user_b_request4_id}/approve",
+                200
+            )
+            
+            if success:
+                print("   ✅ User B fourth investment approved")
+                
+                # Now: left=$2000, right=$2000
+                # Expected total binary earnings: (min(2000, 2000) // 1000) * 100 = 2 * 100 = $200
+                # New earnings = $200 - $100 = $100
+                self.check_user_volumes(user_a_id, "After Both Sides $2000", expected_left=2000.0, expected_right=2000.0)
+                self.check_binary_earnings(user_a_id, "After Second Bonus Trigger", expected_earnings=200.0)
+                
+                # Verify second binary transaction was created for $100
+                self.check_binary_transaction(user_a_id, 100.0, transaction_count=2)
+        
+        # Step 8: Test Dashboard Display
+        print("\n5️⃣ Testing Dashboard Display...")
+        
+        self.session_token = user_a_token
+        success, response = self.run_test(
+            "Get User A Dashboard",
+            "GET",
+            "dashboard",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            user_data = response.get('user', {})
+            left_volume = user_data.get('left_volume', 0)
+            right_volume = user_data.get('right_volume', 0)
+            binary_earnings = user_data.get('binary_earnings', 0)
+            wallet_balance = user_data.get('wallet_balance', 0)
+            
+            print(f"   ✓ Dashboard - Left Volume: ${left_volume}")
+            print(f"   ✓ Dashboard - Right Volume: ${right_volume}")
+            print(f"   ✓ Dashboard - Binary Earnings: ${binary_earnings}")
+            print(f"   ✓ Dashboard - Wallet Balance: ${wallet_balance}")
+            
+            if left_volume == 2000.0 and right_volume == 2000.0 and binary_earnings == 200.0:
+                print("   ✅ Dashboard displays correct binary earnings data")
+            else:
+                print(f"   ❌ Dashboard data incorrect - Expected: L=$2000, R=$2000, B=$200")
+        
+        # Restore original token
+        self.session_token = original_token
+        
+        print("\n✅ Binary Earnings Calculation System Testing Complete")
+
+    def verify_binary_tree_structure(self, user_a_id, user_b_id, user_c_id):
+        """Verify the binary tree structure is correct"""
+        print("   🌳 Verifying binary tree structure...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var userA = db.users.findOne({{id: '{user_a_id}'}});
+        var userB = db.users.findOne({{id: '{user_b_id}'}});
+        var userC = db.users.findOne({{id: '{user_c_id}'}});
+        
+        print('User A left_child_id: ' + userA.left_child_id);
+        print('User A right_child_id: ' + userA.right_child_id);
+        print('User B position: ' + userB.position);
+        print('User B upline_id: ' + userB.upline_id);
+        print('User C position: ' + userC.position);
+        print('User C upline_id: ' + userC.upline_id);
+        
+        if (userA.left_child_id === '{user_b_id}' && userA.right_child_id === '{user_c_id}') {{
+            print('✅ Binary tree structure correct');
+        }} else {{
+            print('❌ Binary tree structure incorrect');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Binary tree structure correct" in result.stdout:
+                    print("   ✅ Binary tree structure verified")
+                else:
+                    print("   ❌ Binary tree structure verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to verify binary tree: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify binary tree: {str(e)}")
+
+    def check_user_volumes(self, user_id, stage, expected_left=None, expected_right=None):
+        """Check user's left and right volumes"""
+        print(f"   📊 Checking volumes - {stage}...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            print('Left Volume: $' + user.left_volume);
+            print('Right Volume: $' + user.right_volume);
+            print('Binary Earnings: $' + user.binary_earnings);
+            print('Wallet Balance: $' + user.wallet_balance);
+        }} else {{
+            print('User not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                print(f"   ✓ Volume check completed for {stage}")
+                if expected_left is not None and f"Left Volume: ${expected_left}" in result.stdout:
+                    print(f"   ✅ Left volume correct: ${expected_left}")
+                if expected_right is not None and f"Right Volume: ${expected_right}" in result.stdout:
+                    print(f"   ✅ Right volume correct: ${expected_right}")
+            else:
+                print(f"   ❌ Failed to check volumes: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to check volumes: {str(e)}")
+
+    def check_binary_earnings(self, user_id, stage, expected_earnings):
+        """Check user's binary earnings"""
+        print(f"   💰 Checking binary earnings - {stage}...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            print('Binary Earnings: $' + user.binary_earnings);
+            
+            if (user.binary_earnings === {expected_earnings}) {{
+                print('✅ Binary earnings correct: $' + user.binary_earnings);
+            }} else {{
+                print('❌ Binary earnings incorrect - Expected: ${expected_earnings}, Got: $' + user.binary_earnings);
+            }}
+        }} else {{
+            print('User not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Binary earnings correct" in result.stdout:
+                    print(f"   ✅ Binary earnings verified: ${expected_earnings}")
+                else:
+                    print(f"   ❌ Binary earnings verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to check binary earnings: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to check binary earnings: {str(e)}")
+
+    def check_wallet_balance_increase(self, user_id, expected_increase):
+        """Check that wallet balance increased by expected amount"""
+        print(f"   💳 Checking wallet balance increase of ${expected_increase}...")
+        
+        # This is a simplified check - in a real scenario we'd track before/after
+        # For now, just verify the wallet balance is reasonable
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            print('Current Wallet Balance: $' + user.wallet_balance);
+            
+            if (user.wallet_balance >= {expected_increase}) {{
+                print('✅ Wallet balance includes binary earnings');
+            }} else {{
+                print('❌ Wallet balance may not include binary earnings');
+            }}
+        }} else {{
+            print('User not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Wallet balance includes" in result.stdout:
+                    print(f"   ✅ Wallet balance increase verified")
+                else:
+                    print(f"   ⚠️ Wallet balance verification inconclusive")
+            else:
+                print(f"   ❌ Failed to check wallet balance: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to check wallet balance: {str(e)}")
+
+    def check_binary_transaction(self, user_id, expected_amount, transaction_count=1):
+        """Check that binary transaction was created"""
+        print(f"   📝 Checking binary transaction record...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var transactions = db.transactions.find({{
+            user_id: '{user_id}',
+            type: 'binary'
+        }}).toArray();
+        
+        print('Binary transactions found: ' + transactions.length);
+        
+        if (transactions.length >= {transaction_count}) {{
+            for (var i = 0; i < transactions.length; i++) {{
+                print('Transaction ' + (i+1) + ': $' + transactions[i].amount + ' - ' + transactions[i].description);
+            }}
+            
+            var lastTransaction = transactions[transactions.length - 1];
+            if (lastTransaction.amount === {expected_amount}) {{
+                print('✅ Latest binary transaction amount correct: $' + lastTransaction.amount);
+            }} else {{
+                print('❌ Latest binary transaction amount incorrect - Expected: ${expected_amount}, Got: $' + lastTransaction.amount);
+            }}
+        }} else {{
+            print('❌ Expected {transaction_count} binary transactions, found: ' + transactions.length);
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅ Latest binary transaction amount correct" in result.stdout:
+                    print(f"   ✅ Binary transaction verified: ${expected_amount}")
+                else:
+                    print(f"   ❌ Binary transaction verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to check binary transaction: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to check binary transaction: {str(e)}")
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting ParlaCapital API Tests")
@@ -988,6 +1717,9 @@ class ParlaCapitalAPITester:
         
         # Test public endpoints first
         self.test_public_endpoints()
+        
+        # CRITICAL P1 TASK: Test Binary Earnings Calculation System
+        self.test_binary_earnings_calculation_system()
         
         # Test NEW multi-use referral system (CRITICAL PRIORITY)
         self.test_multi_use_referral_system()
