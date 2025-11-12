@@ -296,10 +296,9 @@ export default function Dashboard() {
               <CardContent>
                 {user?.package || user?.total_invested > 0 ? (
                   <>
-                    <div className="text-3xl font-bold text-white">₺{(user?.wallet_balance || 0).toLocaleString('tr-TR')}</div>
-                    <p className="text-xs text-green-500 mt-2 flex items-center">
-                      <TrendingUp size={14} className="mr-1" />
-                      +12.5% Toplam aktif yatırım
+                    <div className="text-3xl font-bold text-white">₺{(user?.package_amount || user?.total_invested || 0).toLocaleString('tr-TR')}</div>
+                    <p className="text-xs text-amber-400 mt-2 flex items-center">
+                      {user?.package?.toUpperCase() || 'PAKET'} - Toplam Yatırım
                     </p>
                   </>
                 ) : (
