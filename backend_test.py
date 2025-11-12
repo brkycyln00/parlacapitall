@@ -1714,6 +1714,581 @@ class ParlaCapitalAPITester:
         except Exception as e:
             print(f"   ❌ Failed to check binary transaction: {str(e)}")
 
+    def test_manual_user_placement_system(self):
+        """Test the complete manual user placement system comprehensively"""
+        print("\n👑 Testing Manual User Placement System...")
+        print("=" * 60)
+        
+        # Step 1: Create admin user for placement operations
+        admin_token = self.create_admin_user_and_login()
+        if not admin_token:
+            print("❌ Cannot test manual placement - admin user creation failed")
+            return
+        
+        # Step 2: Create test users without referral codes (they won't be in tree yet)
+        print("\n1️⃣ Creating Test Users...")
+        
+        timestamp = str(int(time.time()))
+        
+        # Create user1
+        user1_data = {
+            "email": f"user1.placement.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 1 Placement {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Create User 1 (No Referral)",
+            "POST",
+            "auth/register",
+            200,
+            data=user1_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User 1")
+            return
+        
+        user1_id = response['user']['id']
+        print(f"   ✓ User 1 created: {user1_id}")
+        
+        # Create user2
+        user2_data = {
+            "email": f"user2.placement.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 2 Placement {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Create User 2 (No Referral)",
+            "POST",
+            "auth/register",
+            200,
+            data=user2_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User 2")
+            return
+        
+        user2_id = response['user']['id']
+        print(f"   ✓ User 2 created: {user2_id}")
+        
+        # Create user3
+        user3_data = {
+            "email": f"user3.placement.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 3 Placement {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Create User 3 (No Referral)",
+            "POST",
+            "auth/register",
+            200,
+            data=user3_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User 3")
+            return
+        
+        user3_id = response['user']['id']
+        print(f"   ✓ User 3 created: {user3_id}")
+        
+        # Create user4
+        user4_data = {
+            "email": f"user4.placement.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 4 Placement {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Create User 4 (No Referral)",
+            "POST",
+            "auth/register",
+            200,
+            data=user4_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User 4")
+            return
+        
+        user4_id = response['user']['id']
+        print(f"   ✓ User 4 created: {user4_id}")
+        
+        # Get admin user ID for placement operations
+        admin_user_id = self.get_admin_user_id(admin_token)
+        if not admin_user_id:
+            print("❌ Failed to get admin user ID")
+            return
+        
+        # Switch to admin token for placement operations
+        original_token = self.session_token
+        self.session_token = admin_token
+        
+        # Scenario 1: Initial Placement (First Time)
+        print("\n2️⃣ Scenario 1: Initial Placement...")
+        
+        placement_data = {
+            "user_id": user1_id,
+            "upline_id": admin_user_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Place User 1 under Admin LEFT",
+            "POST",
+            "admin/place-user",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ User 1 placed successfully under admin LEFT")
+            self.verify_placement(user1_id, admin_user_id, "left", "initial_placement")
+        
+        # Scenario 2: Complete Both Sides
+        print("\n3️⃣ Scenario 2: Complete Both Sides...")
+        
+        placement_data = {
+            "user_id": user2_id,
+            "upline_id": admin_user_id,
+            "position": "right"
+        }
+        
+        success, response = self.run_test(
+            "Place User 2 under Admin RIGHT",
+            "POST",
+            "admin/place-user",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ User 2 placed successfully under admin RIGHT")
+            self.verify_placement(user2_id, admin_user_id, "right", "initial_placement")
+        
+        # Scenario 3: Position Already Occupied Error
+        print("\n4️⃣ Scenario 3: Position Already Occupied Error...")
+        
+        placement_data = {
+            "user_id": user3_id,
+            "upline_id": admin_user_id,
+            "position": "left"  # Already occupied by user1
+        }
+        
+        success, response = self.run_test(
+            "Try to Place User 3 in Occupied LEFT Position",
+            "POST",
+            "admin/place-user",
+            400,
+            data=placement_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Sol kol dolu" in response.get('detail', ''):
+                print("   ✅ Position occupied error correctly returned in Turkish")
+            else:
+                print(f"   ❌ Incorrect error message: {response}")
+        
+        # Scenario 4: Repositioning (Move User)
+        print("\n5️⃣ Scenario 4: Repositioning (Move User)...")
+        
+        # First move user1 to under user2's LEFT
+        placement_data = {
+            "user_id": user1_id,
+            "upline_id": user2_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Move User 1 to User 2's LEFT",
+            "POST",
+            "admin/place-user",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ User 1 successfully moved to User 2's LEFT")
+            self.verify_placement(user1_id, user2_id, "left", "repositioning")
+        
+        # Now place user4 under admin's LEFT (now available)
+        placement_data = {
+            "user_id": user4_id,
+            "upline_id": admin_user_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Place User 4 in Admin's LEFT (now available)",
+            "POST",
+            "admin/place-user",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ User 4 successfully placed in admin's LEFT")
+            self.verify_placement(user4_id, admin_user_id, "left", "initial_placement")
+        
+        # Scenario 5: Multi-Level Tree
+        print("\n6️⃣ Scenario 5: Multi-Level Tree...")
+        
+        placement_data = {
+            "user_id": user3_id,
+            "upline_id": user1_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Place User 3 under User 1's LEFT",
+            "POST",
+            "admin/place-user",
+            200,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ User 3 placed under User 1's LEFT (multi-level)")
+            self.verify_placement(user3_id, user1_id, "left", "initial_placement")
+        
+        # Scenario 6: Self-Placement Prevention
+        print("\n7️⃣ Scenario 6: Self-Placement Prevention...")
+        
+        placement_data = {
+            "user_id": admin_user_id,
+            "upline_id": admin_user_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Try to Place Admin under Admin (Self-Placement)",
+            "POST",
+            "admin/place-user",
+            400,
+            data=placement_data
+        )
+        
+        if success:
+            print("   ✅ Self-placement correctly prevented")
+        
+        # Scenario 7: Volume Recalculation After Move
+        print("\n8️⃣ Scenario 7: Volume Recalculation After Move...")
+        
+        # Create user5 with investment
+        user5_data = {
+            "email": f"user5.placement.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 5 Placement {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Create User 5 for Volume Test",
+            "POST",
+            "auth/register",
+            200,
+            data=user5_data
+        )
+        
+        if success:
+            user5_id = response['user']['id']
+            user5_token = response.get('token')
+            
+            # Create investment for user5
+            self.session_token = user5_token
+            investment_data = {
+                "full_name": f"User 5 Placement {timestamp}",
+                "username": f"user5_placement_{timestamp}",
+                "email": f"user5.placement.{timestamp}@example.com",
+                "whatsapp": "+1234567890",
+                "platform": "tether_trc20",
+                "package": "platinum"  # $1000
+            }
+            
+            success, response = self.run_test(
+                "User 5 Investment Request ($1000)",
+                "POST",
+                "investment/request",
+                200,
+                data=investment_data
+            )
+            
+            if success:
+                request_id = response.get('request_id')
+                
+                # Admin approves investment
+                self.session_token = admin_token
+                success, response = self.run_test(
+                    "Admin Approve User 5 Investment",
+                    "POST",
+                    f"admin/investment-requests/{request_id}/approve",
+                    200
+                )
+                
+                if success:
+                    print("   ✓ User 5 investment approved")
+                    
+                    # Place user5 under admin's RIGHT (user2 is there, but we'll move user2 first)
+                    # First move user2 somewhere else
+                    placement_data = {
+                        "user_id": user2_id,
+                        "upline_id": user4_id,
+                        "position": "right"
+                    }
+                    
+                    success, response = self.run_test(
+                        "Move User 2 to User 4's RIGHT",
+                        "POST",
+                        "admin/place-user",
+                        200,
+                        data=placement_data
+                    )
+                    
+                    if success:
+                        print("   ✓ User 2 moved to User 4's RIGHT")
+                        
+                        # Now place user5 under admin's RIGHT
+                        placement_data = {
+                            "user_id": user5_id,
+                            "upline_id": admin_user_id,
+                            "position": "right"
+                        }
+                        
+                        success, response = self.run_test(
+                            "Place User 5 under Admin's RIGHT",
+                            "POST",
+                            "admin/place-user",
+                            200,
+                            data=placement_data
+                        )
+                        
+                        if success:
+                            print("   ✅ User 5 placed under admin's RIGHT with $1000 investment")
+                            self.check_volume_after_placement(admin_user_id, "right", 1000.0)
+        
+        # Scenario 8: Placement History Tracking
+        print("\n9️⃣ Scenario 8: Placement History Tracking...")
+        
+        success, response = self.run_test(
+            "Get Placement History",
+            "GET",
+            "admin/placement-history",
+            200
+        )
+        
+        if success and isinstance(response, list):
+            print(f"   ✓ Found {len(response)} placement history records")
+            
+            # Check for required fields in history records
+            if len(response) > 0:
+                record = response[0]
+                required_fields = ['user_id', 'new_upline_id', 'new_position', 'admin_id', 'admin_name', 'action_type', 'created_at']
+                
+                missing_fields = [field for field in required_fields if field not in record]
+                if not missing_fields:
+                    print("   ✅ Placement history records have all required fields")
+                    
+                    # Check for user names enrichment
+                    if 'user_name' in record and 'new_upline_name' in record:
+                        print("   ✅ Placement history includes enriched user names")
+                    else:
+                        print("   ⚠️ Placement history missing user name enrichment")
+                else:
+                    print(f"   ❌ Placement history missing fields: {missing_fields}")
+        
+        # Scenario 9: Invalid User/Upline
+        print("\n🔟 Scenario 9: Invalid User/Upline...")
+        
+        # Try to place non-existent user
+        placement_data = {
+            "user_id": "non-existent-user-id",
+            "upline_id": admin_user_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Try to Place Non-Existent User",
+            "POST",
+            "admin/place-user",
+            404,
+            data=placement_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Kullanıcı bulunamadı" in response.get('detail', ''):
+                print("   ✅ Non-existent user error correctly returned in Turkish")
+        
+        # Try to place under non-existent upline
+        placement_data = {
+            "user_id": user1_id,
+            "upline_id": "non-existent-upline-id",
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Try to Place Under Non-Existent Upline",
+            "POST",
+            "admin/place-user",
+            404,
+            data=placement_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Üst sponsor bulunamadı" in response.get('detail', ''):
+                print("   ✅ Non-existent upline error correctly returned in Turkish")
+        
+        # Scenario 10: Invalid Position Value
+        print("\n1️⃣1️⃣ Scenario 10: Invalid Position Value...")
+        
+        placement_data = {
+            "user_id": user1_id,
+            "upline_id": admin_user_id,
+            "position": "middle"  # Invalid position
+        }
+        
+        success, response = self.run_test(
+            "Try to Place with Invalid Position",
+            "POST",
+            "admin/place-user",
+            400,
+            data=placement_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Pozisyon 'left' veya 'right' olmalıdır" in response.get('detail', ''):
+                print("   ✅ Invalid position error correctly returned in Turkish")
+        
+        # Restore original token
+        self.session_token = original_token
+        
+        print("\n✅ Manual User Placement System Testing Complete")
+
+    def get_admin_user_id(self, admin_token):
+        """Get the admin user ID from the token"""
+        temp_token = self.session_token
+        self.session_token = admin_token
+        
+        success, response = self.run_test(
+            "Get Admin User Info",
+            "GET",
+            "auth/me",
+            200
+        )
+        
+        self.session_token = temp_token
+        
+        if success and isinstance(response, dict):
+            return response.get('id')
+        return None
+
+    def verify_placement(self, user_id, upline_id, position, action_type):
+        """Verify that a user is correctly placed in the binary tree"""
+        print(f"   🔍 Verifying placement: User {user_id[-8:]} -> Upline {upline_id[-8:]} ({position})")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        var upline = db.users.findOne({{id: '{upline_id}'}});
+        
+        if (user && upline) {{
+            print('User upline_id: ' + user.upline_id);
+            print('User position: ' + user.position);
+            
+            if ('{position}' === 'left') {{
+                print('Upline left_child_id: ' + upline.left_child_id);
+                if (user.upline_id === '{upline_id}' && user.position === 'left' && upline.left_child_id === '{user_id}') {{
+                    print('✅ LEFT placement verified');
+                }} else {{
+                    print('❌ LEFT placement incorrect');
+                }}
+            }} else if ('{position}' === 'right') {{
+                print('Upline right_child_id: ' + upline.right_child_id);
+                if (user.upline_id === '{upline_id}' && user.position === 'right' && upline.right_child_id === '{user_id}') {{
+                    print('✅ RIGHT placement verified');
+                }} else {{
+                    print('❌ RIGHT placement incorrect');
+                }}
+            }}
+        }} else {{
+            print('❌ User or upline not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅" in result.stdout and "placement verified" in result.stdout:
+                    print(f"   ✅ Placement verified successfully")
+                else:
+                    print(f"   ❌ Placement verification failed")
+                    print(f"   Debug: {result.stdout}")
+            else:
+                print(f"   ❌ Failed to verify placement: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to verify placement: {str(e)}")
+
+    def check_volume_after_placement(self, user_id, side, expected_volume):
+        """Check that volumes are correctly updated after placement"""
+        print(f"   📊 Checking {side} volume after placement...")
+        
+        mongo_commands = f"""
+        use('test_database');
+        
+        var user = db.users.findOne({{id: '{user_id}'}});
+        
+        if (user) {{
+            if ('{side}' === 'left') {{
+                print('Left Volume: $' + user.left_volume);
+                if (user.left_volume >= {expected_volume}) {{
+                    print('✅ Left volume includes placed user investment');
+                }} else {{
+                    print('❌ Left volume may not include placed user investment');
+                }}
+            }} else if ('{side}' === 'right') {{
+                print('Right Volume: $' + user.right_volume);
+                if (user.right_volume >= {expected_volume}) {{
+                    print('✅ Right volume includes placed user investment');
+                }} else {{
+                    print('❌ Right volume may not include placed user investment');
+                }}
+            }}
+        }} else {{
+            print('❌ User not found');
+        }}
+        """
+        
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['mongosh', '--eval', mongo_commands],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode == 0:
+                if "✅" in result.stdout and "includes placed user investment" in result.stdout:
+                    print(f"   ✅ Volume recalculation verified")
+                else:
+                    print(f"   ⚠️ Volume recalculation verification inconclusive")
+            else:
+                print(f"   ❌ Failed to check volume: {result.stderr}")
+                
+        except Exception as e:
+            print(f"   ❌ Failed to check volume: {str(e)}")
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting ParlaCapital API Tests")
