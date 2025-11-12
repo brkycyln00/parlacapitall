@@ -82,19 +82,32 @@ export default function AuthModal({ open, onClose, onSuccess }) {
       return;
     }
 
+    if (!referralCode) {
+      toast.error('Referans kodu zorunludur. Lütfen davet eden kişinin kodunu girin.');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post(`${API}/auth/register`, {
         email: registerEmail,
         password: registerPassword,
         name: registerName,
-        referral_code: referralCode || null
+        referral_code: referralCode
       });
 
       // Store token in localStorage
       localStorage.setItem('auth_token', response.data.token);
       
-      toast.success('Kayıt başarılı!');
+      // Show success with upline info
+      if (response.data.user.upline) {
+        toast.success(
+          `Kayıt başarılı! ${response.data.user.upline.name} ağına eklendiniz.`,
+          { duration: 5000 }
+        );
+      } else {
+        toast.success('Kayıt başarılı!');
+      }
       
       if (onSuccess) {
         onSuccess(response.data.user);
@@ -103,7 +116,9 @@ export default function AuthModal({ open, onClose, onSuccess }) {
       onClose();
       
       // Redirect to packages page
-      window.location.href = '/packages';
+      setTimeout(() => {
+        window.location.href = '/packages';
+      }, 1500);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
     } finally {
