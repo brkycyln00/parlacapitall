@@ -296,14 +296,14 @@ export default function Dashboard() {
               <CardContent>
                 {user?.package || user?.total_invested > 0 ? (
                   <>
-                    <div className="text-3xl font-bold text-white">₺{(user?.package_amount || user?.total_invested || 0).toLocaleString('tr-TR')}</div>
+                    <div className="text-3xl font-bold text-white">${(user?.package_amount || user?.total_invested || 0).toLocaleString('tr-TR')}</div>
                     <p className="text-xs text-amber-400 mt-2 flex items-center">
                       {user?.package?.toUpperCase() || 'PAKET'} - Toplam Yatırım
                     </p>
                   </>
                 ) : (
                   <>
-                    <div className="text-3xl font-bold text-gray-500">₺0</div>
+                    <div className="text-3xl font-bold text-gray-500">$0</div>
                     <p className="text-xs text-gray-500 mt-2">Henüz yatırım yok</p>
                   </>
                 )}
@@ -318,12 +318,12 @@ export default function Dashboard() {
               <CardContent>
                 {user?.package || user?.total_invested > 0 ? (
                   <>
-                    <div className="text-3xl font-bold text-white">₺{(user?.weekly_earnings || 0).toLocaleString('tr-TR')}</div>
+                    <div className="text-3xl font-bold text-white">${(user?.weekly_earnings || 0).toLocaleString('tr-TR')}</div>
                     <p className="text-xs text-green-500 mt-2">+8.2% Bu hafta</p>
                   </>
                 ) : (
                   <>
-                    <div className="text-3xl font-bold text-gray-500">₺0</div>
+                    <div className="text-3xl font-bold text-gray-500">$0</div>
                     <p className="text-xs text-gray-500 mt-2">Henüz kazanç yok</p>
                   </>
                 )}
@@ -336,7 +336,7 @@ export default function Dashboard() {
                 <Award className="h-4 w-4 text-purple-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-white">₺{(user?.total_commissions || 0).toLocaleString('tr-TR')}</div>
+                <div className="text-3xl font-bold text-white">${(user?.total_commissions || 0).toLocaleString('tr-TR')}</div>
                 <p className="text-xs text-green-500 mt-2">Referans kazançları</p>
               </CardContent>
             </Card>
@@ -573,7 +573,7 @@ export default function Dashboard() {
                   <div className="mt-4 pt-4 border-t border-slate-700">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400 text-sm">Toplam Kazancınız</span>
-                      <span className="text-2xl font-bold text-green-400">₺{user?.total_commissions?.toLocaleString('tr-TR') || '0'}</span>
+                      <span className="text-2xl font-bold text-green-400">${user?.total_commissions?.toLocaleString('tr-TR') || '0'}</span>
                     </div>
                   </div>
                 </div>
@@ -638,11 +638,11 @@ export default function Dashboard() {
                             )}
                           </td>
                           <td className="py-4 px-4 text-right text-white font-semibold">
-                            ₺{ref.total_invested?.toLocaleString('tr-TR') || '0'}
+                            ${ref.total_invested?.toLocaleString('tr-TR') || '0'}
                           </td>
                           <td className="py-4 px-4 text-right">
                             <span className="text-green-400 font-bold">
-                              +₺{((ref.package_amount || 0) * (
+                              +${((ref.package_amount || 0) * (
                                 ref.package === 'platinum' ? 0.15 :
                                 ref.package === 'gold' ? 0.10 :
                                 ref.package === 'silver' ? 0.05 : 0
@@ -696,7 +696,7 @@ export default function Dashboard() {
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm text-gray-400">Sol Kol</span>
-                    <span className="text-sm text-white">₺{user?.left_volume?.toLocaleString('tr-TR') || '0'} / ₺50,000</span>
+                    <span className="text-sm text-white">${user?.left_volume?.toLocaleString('tr-TR') || '0'} / $50,000</span>
                   </div>
                   <div className="w-full bg-slate-700 rounded-full h-3">
                     <div 
@@ -708,7 +708,7 @@ export default function Dashboard() {
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm text-gray-400">Sağ Kol</span>
-                    <span className="text-sm text-white">₺{user?.right_volume?.toLocaleString('tr-TR') || '0'} / ₺50,000</span>
+                    <span className="text-sm text-white">${user?.right_volume?.toLocaleString('tr-TR') || '0'} / $50,000</span>
                   </div>
                   <div className="w-full bg-slate-700 rounded-full h-3">
                     <div 
@@ -719,8 +719,8 @@ export default function Dashboard() {
                 </div>
                 <div className="pt-4 border-t border-slate-700">
                   <p className="text-sm text-gray-400 mb-2">Bu Hafta Binary Kazanç</p>
-                  <p className="text-3xl font-bold text-amber-500">₺{user?.binary_earnings?.toLocaleString('tr-TR') || '0'}</p>
-                  <p className="text-xs text-gray-500 mt-2">Hedef: ₺10,000 • Kalan: ₺{(10000 - (user?.binary_earnings || 0)).toLocaleString('tr-TR')}</p>
+                  <p className="text-3xl font-bold text-amber-500">${user?.binary_earnings?.toLocaleString('tr-TR') || '0'}</p>
+                  <p className="text-xs text-gray-500 mt-2">Hedef: $10,000 • Kalan: ${(10000 - (user?.binary_earnings || 0)).toLocaleString('tr-TR')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -791,7 +791,7 @@ export default function Dashboard() {
                       <span className={`font-bold ${
                         tx.type === 'withdrawal' ? 'text-red-400' : 'text-green-400'
                       }`}>
-                        {tx.type === 'withdrawal' ? '-' : '+'}₺{tx.amount.toLocaleString('tr-TR')}
+                        {tx.type === 'withdrawal' ? '-' : '+'}${tx.amount.toLocaleString('tr-TR')}
                       </span>
                     </div>
                   ))}
@@ -865,19 +865,19 @@ export default function Dashboard() {
               <Card className="bg-slate-900 border-slate-700">
                 <CardContent className="pt-6">
                   <p className="text-gray-400 text-sm mb-2">Toplam Komisyon</p>
-                  <p className="text-3xl font-bold text-green-400">₺{user?.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
+                  <p className="text-3xl font-bold text-green-400">${user?.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
                 </CardContent>
               </Card>
               <Card className="bg-slate-900 border-slate-700">
                 <CardContent className="pt-6">
                   <p className="text-gray-400 text-sm mb-2">Bu Ay</p>
-                  <p className="text-3xl font-bold text-amber-400">₺{((user?.total_commissions || 0) * 0.3).toLocaleString('tr-TR')}</p>
+                  <p className="text-3xl font-bold text-amber-400">${((user?.total_commissions || 0) * 0.3).toLocaleString('tr-TR')}</p>
                 </CardContent>
               </Card>
               <Card className="bg-slate-900 border-slate-700">
                 <CardContent className="pt-6">
                   <p className="text-gray-400 text-sm mb-2">Bu Hafta</p>
-                  <p className="text-3xl font-bold text-blue-400">₺{((user?.total_commissions || 0) * 0.1).toLocaleString('tr-TR')}</p>
+                  <p className="text-3xl font-bold text-blue-400">${((user?.total_commissions || 0) * 0.1).toLocaleString('tr-TR')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -903,13 +903,13 @@ export default function Dashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-green-400 font-bold text-lg">
-                        +₺{((ref.package_amount || 0) * (
+                        +${((ref.package_amount || 0) * (
                           ref.package === 'platinum' ? 0.15 :
                           ref.package === 'gold' ? 0.10 :
                           ref.package === 'silver' ? 0.05 : 0
                         )).toLocaleString('tr-TR')}
                       </p>
-                      <p className="text-gray-500 text-xs">Yatırım: ₺{ref.package_amount?.toLocaleString('tr-TR') || '0'}</p>
+                      <p className="text-gray-500 text-xs">Yatırım: ${ref.package_amount?.toLocaleString('tr-TR') || '0'}</p>
                     </div>
                   </div>
                 ))}
@@ -985,7 +985,7 @@ export default function Dashboard() {
                       {dashboard?.network?.left?.name || 'Boş'}
                     </p>
                     <p className="text-blue-400 text-xs">Sol Kol</p>
-                    <p className="text-gray-500 text-xs mt-1">₺{user?.left_volume?.toLocaleString('tr-TR') || '0'}</p>
+                    <p className="text-gray-500 text-xs mt-1">${user?.left_volume?.toLocaleString('tr-TR') || '0'}</p>
                   </div>
 
                   {/* Right Child */}
@@ -1001,7 +1001,7 @@ export default function Dashboard() {
                       {dashboard?.network?.right?.name || 'Boş'}
                     </p>
                     <p className="text-green-400 text-xs">Sağ Kol</p>
-                    <p className="text-gray-500 text-xs mt-1">₺{user?.right_volume?.toLocaleString('tr-TR') || '0'}</p>
+                    <p className="text-gray-500 text-xs mt-1">${user?.right_volume?.toLocaleString('tr-TR') || '0'}</p>
                   </div>
                 </div>
               </div>
