@@ -707,6 +707,159 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
     return {"success": True, "message": "Investment approved"}
 
 
+
+# ==================== WITHDRAWAL ENDPOINTS ====================
+
+@api_router.post("/withdrawal/request")
+async def create_withdrawal_request(
+    full_name: str,
+    iban: str,
+    amount: float,
+    user: User = Depends(require_auth)
+):
+    # Calculate available balance (weekly_earnings + total_commissions)
+    available_balance = user.weekly_earnings + user.total_commissions
+    
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Çekim tutarı 0'dan büyük olmalıdır")
+    
+    if amount > available_balance:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Yetersiz bakiye. Kullanılabilir bakiye: ${available_balance:.2f}"
+        )
+    
+    # Create withdrawal request
+    withdrawal = WithdrawalRequest(
+        user_id=user.id,
+        full_name=full_name,
+        iban=iban,
+        amount=amount
+    )
+    
+    await db.withdrawal_requests.insert_one(withdrawal.model_dump())
+    
+    return {
+        "success": True,
+        "message": "Çekim talebiniz alınmıştır.",
+        "request_id": withdrawal.id
+    }
+
+@api_router.get("/withdrawal/my-requests")
+async def get_my_withdrawal_requests(user: User = Depends(require_auth)):
+    """Get current user's withdrawal requests"""
+    requests = await db.withdrawal_requests.find(
+        {"user_id": user.id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return {"requests": requests}
+
+@api_router.get("/admin/withdrawal-requests")
+async def get_withdrawal_requests(user: User = Depends(require_admin)):
+    """Get all withdrawal requests for admin"""
+    requests = await db.withdrawal_requests.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Get user info for each request
+    result = []
+    for req_doc in requests:
+        req = WithdrawalRequest(**req_doc)
+        user_doc = await db.users.find_one({"id": req.user_id}, {"_id": 0, "name": 1, "email": 1})
+        result.append({
+            **req_doc,
+            "user_name": user_doc.get("name") if user_doc else "Unknown",
+            "user_email": user_doc.get("email") if user_doc else ""
+        })
+    
+    return {"requests": result}
+
+@api_router.post("/admin/withdrawal-requests/{request_id}/approve")
+async def approve_withdrawal_request(request_id: str, user: User = Depends(require_admin)):
+    """Approve withdrawal request and deduct from user balance"""
+    request_doc = await db.withdrawal_requests.find_one({"id": request_id}, {"_id": 0})
+    if not request_doc:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    withdrawal = WithdrawalRequest(**request_doc)
+    
+    if withdrawal.status != "pending":
+        raise HTTPException(status_code=400, detail="Request already processed")
+    
+    # Get user
+    user_doc = await db.users.find_one({"id": withdrawal.user_id}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    target_user = User(**user_doc)
+    
+    # Check available balance
+    available_balance = target_user.weekly_earnings + target_user.total_commissions
+    
+    if withdrawal.amount > available_balance:
+        raise HTTPException(status_code=400, detail="User has insufficient balance")
+    
+    # Deduct from weekly_earnings first, then from commissions
+    remaining_amount = withdrawal.amount
+    new_weekly_earnings = target_user.weekly_earnings
+    new_commissions = target_user.total_commissions
+    
+    if remaining_amount <= new_weekly_earnings:
+        new_weekly_earnings -= remaining_amount
+    else:
+        remaining_amount -= new_weekly_earnings
+        new_weekly_earnings = 0
+        new_commissions -= remaining_amount
+    
+    # Update user balance
+    await db.users.update_one(
+        {"id": target_user.id},
+        {"$set": {
+            "weekly_earnings": new_weekly_earnings,
+            "total_commissions": new_commissions
+        }}
+    )
+    
+    # Mark request as approved
+    await db.withdrawal_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "approved"}}
+    )
+    
+    # Create transaction record
+    transaction = Transaction(
+        user_id=target_user.id,
+        type="withdrawal",
+        amount=withdrawal.amount,
+        status="completed",
+        description=f"IBAN: {withdrawal.iban}"
+    )
+    await db.transactions.insert_one(transaction.model_dump())
+    
+    return {"success": True, "message": "Withdrawal approved"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, admin: User = Depends(require_admin)):
+    """Delete a user (admin only)"""
+    # Don't allow deleting admin users
+    user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_doc.get("is_admin"):
+        raise HTTPException(status_code=400, detail="Cannot delete admin users")
+    
+    # Delete user
+    await db.users.delete_one({"id": user_id})
+    
+    # Delete related data
+    await db.investments.delete_many({"user_id": user_id})
+    await db.investment_requests.delete_many({"user_id": user_id})
+    await db.withdrawal_requests.delete_many({"user_id": user_id})
+    await db.transactions.delete_many({"user_id": user_id})
+    await db.referral_codes.delete_many({"user_id": user_id})
+    
+    return {"success": True, "message": "User deleted"}
+
+
 @api_router.post("/investments/create")
 async def create_investment(
     package: str,
