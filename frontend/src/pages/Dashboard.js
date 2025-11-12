@@ -127,31 +127,68 @@ export default function Dashboard() {
         </div>
 
         <nav className="flex-1 px-3">
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-amber-500 text-slate-900 font-semibold mb-2">
+          <button 
+            onClick={() => {
+              setActiveTab('dashboard');
+              setSidebarOpen(false);
+            }}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-semibold mb-2 ${
+              activeTab === 'dashboard' 
+                ? 'bg-amber-500 text-slate-900' 
+                : 'text-gray-300 hover:bg-slate-700'
+            }`}
+          >
             <TrendingUp size={20} />
             <span>Panel</span>
           </button>
           <button 
-            onClick={() => navigate('/packages')}
+            onClick={() => {
+              navigate('/packages');
+              setSidebarOpen(false);
+            }}
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
           >
             <Wallet size={20} />
             <span>Yatırımlar</span>
           </button>
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2">
+          <button 
+            onClick={() => {
+              setCommissionsOpen(true);
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
             <Award size={20} />
             <span>Komisyonlar</span>
           </button>
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2">
+          <button 
+            onClick={() => {
+              setNetworkOpen(true);
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
             <Users size={20} />
             <span>Referans Ağı</span>
           </button>
           <div className="border-t border-slate-700 my-4"></div>
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2">
+          <button 
+            onClick={() => {
+              setSettingsOpen(true);
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
             <span>⚙️</span>
             <span>Ayarlar</span>
           </button>
-          <button className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700">
+          <button 
+            onClick={() => {
+              navigate('/contact');
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700"
+          >
             <span>❓</span>
             <span>Destek</span>
           </button>
