@@ -719,18 +719,16 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
 
 @api_router.post("/withdrawal/request")
 async def create_withdrawal_request(
-    full_name: str,
-    iban: str,
-    amount: float,
+    req: WithdrawalRequestCreate,
     user: User = Depends(require_auth)
 ):
     # Calculate available balance (weekly_earnings + total_commissions)
     available_balance = user.weekly_earnings + user.total_commissions
     
-    if amount <= 0:
+    if req.amount <= 0:
         raise HTTPException(status_code=400, detail="Çekim tutarı 0'dan büyük olmalıdır")
     
-    if amount > available_balance:
+    if req.amount > available_balance:
         raise HTTPException(
             status_code=400, 
             detail=f"Yetersiz bakiye. Kullanılabilir bakiye: ${available_balance:.2f}"
@@ -739,9 +737,9 @@ async def create_withdrawal_request(
     # Create withdrawal request
     withdrawal = WithdrawalRequest(
         user_id=user.id,
-        full_name=full_name,
-        iban=iban,
-        amount=amount
+        full_name=req.full_name,
+        iban=req.iban,
+        amount=req.amount
     )
     
     await db.withdrawal_requests.insert_one(withdrawal.model_dump())
