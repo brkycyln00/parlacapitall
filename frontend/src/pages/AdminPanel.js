@@ -26,16 +26,18 @@ export default function AdminPanel() {
 
   const fetchAdminData = async () => {
     try {
-      const [usersRes, txRes, statsRes, investReqRes] = await Promise.all([
+      const [usersRes, txRes, statsRes, investReqRes, withdrawalReqRes] = await Promise.all([
         axios.get(`${API}/admin/users`, { withCredentials: true }),
         axios.get(`${API}/admin/transactions`, { withCredentials: true }),
         axios.get(`${API}/admin/stats`, { withCredentials: true }),
-        axios.get(`${API}/admin/investment-requests`, { withCredentials: true })
+        axios.get(`${API}/admin/investment-requests`, { withCredentials: true }),
+        axios.get(`${API}/admin/withdrawal-requests`, { withCredentials: true })
       ]);
       setUsers(usersRes.data);
       setTransactions(txRes.data);
       setStats(statsRes.data);
       setInvestmentRequests(investReqRes.data.requests || []);
+      setWithdrawalRequests(withdrawalReqRes.data.requests || []);
     } catch (error) {
       console.error('Admin data error:', error);
       toast.error('Veri yüklenirken hata oluştu');
