@@ -328,7 +328,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
                 )}
                 {referralCode.length < 3 && (
                   <p className="text-gray-400 text-xs mt-2">
-                    Davet eden kişinin referans kodunu girin. Kayıt için zorunludur.
+                    Referans kodu ile kayıt olursanız komisyon kazanabilirsiniz. (Opsiyonel)
                   </p>
                 )}
               </div>
