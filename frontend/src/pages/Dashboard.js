@@ -229,6 +229,9 @@ export default function Dashboard() {
             <Wallet size={20} />
             <span>Yatırımlar</span>
           </button>
+          )}
+          
+          {!user?.is_admin && (
           <button 
             onClick={() => {
               setCommissionsOpen(true);
