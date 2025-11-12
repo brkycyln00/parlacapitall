@@ -40,6 +40,8 @@ export default function Dashboard() {
   const [managementOpen, setManagementOpen] = useState(false);
   const [selectedReferral, setSelectedReferral] = useState(null);
   const [placementPosition, setPlacementPosition] = useState('left');
+  const [selectedUpline, setSelectedUpline] = useState('');
+  const [placementModalOpen, setPlacementModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
