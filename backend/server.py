@@ -236,8 +236,14 @@ async def register(req: RegisterRequest):
     if not req.referral_code:
         raise HTTPException(status_code=400, detail="Referans kodu zorunludur. Lütfen sizi davet eden kişinin kodunu girin.")
     
-    # Find referral code in referral_codes collection
-    referral_doc = await db.referral_codes.find_one({"code": req.referral_code}, {"_id": 0})
+    # Clean the code
+    clean_code = req.referral_code.strip()
+    
+    # Find referral code in referral_codes collection (case-insensitive)
+    import re
+    referral_doc = await db.referral_codes.find_one({
+        "code": {"$regex": f"^{re.escape(clean_code)}$", "$options": "i"}
+    }, {"_id": 0})
     if not referral_doc:
         raise HTTPException(status_code=400, detail="Geçersiz referans kodu. Lütfen doğru kodu girdiğinizden emin olun.")
     
