@@ -742,7 +742,7 @@ export default function Dashboard() {
 
       {/* Network Dialog */}
       <Dialog open={networkOpen} onOpenChange={setNetworkOpen}>
-        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-6xl">
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-white text-2xl">Referans Ağınız</DialogTitle>
           </DialogHeader>
