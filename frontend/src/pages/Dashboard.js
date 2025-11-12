@@ -75,7 +75,10 @@ export default function Dashboard() {
     try {
       const response = await axios.get(`${API}/investment/my-requests`, { withCredentials: true });
       setPendingInvestments(response.data.requests || []);
-
+    } catch (error) {
+      console.error('Pending investments error:', error);
+    }
+  };
   
   const fetchPendingWithdrawals = async () => {
     try {
@@ -83,11 +86,6 @@ export default function Dashboard() {
       setPendingWithdrawals(response.data.requests || []);
     } catch (error) {
       console.error('Pending withdrawals error:', error);
-    }
-  };
-
-    } catch (error) {
-      console.error('Pending investments error:', error);
     }
   };
   
