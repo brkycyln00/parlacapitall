@@ -195,20 +195,46 @@ async def register(req: RegisterRequest):
     # Check if user exists
     existing_user = await db.users.find_one({"email": req.email})
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Bu e-posta adresi zaten kayıtlı")
+    
+    # Validate referral code (required)
+    if not req.referral_code:
+        raise HTTPException(status_code=400, detail="Referans kodu zorunludur. Lütfen sizi davet eden kişinin kodunu girin.")
+    
+    # Find upline
+    upline = await db.users.find_one({"referral_code": req.referral_code}, {"_id": 0})
+    if not upline:
+        raise HTTPException(status_code=400, detail="Geçersiz referans kodu. Lütfen doğru kodu girdiğinizden emin olun.")
+    
+    upline_user = User(**upline)
     
     # Create new user
     user = User(
         email=req.email,
         name=req.name,
-        password_hash=hash_password(req.password)
+        password_hash=hash_password(req.password),
+        upline_id=upline_user.id
     )
     
-    # Handle referral if provided
-    if req.referral_code:
-        upline = await db.users.find_one({"referral_code": req.referral_code}, {"_id": 0})
-        if upline:
-            user.upline_id = upline["id"]
+    # Place user in binary tree
+    if not upline_user.left_child_id:
+        # Place on left
+        await db.users.update_one(
+            {"id": upline_user.id},
+            {"$set": {"left_child_id": user.id}}
+        )
+        user.position = "left"
+    elif not upline_user.right_child_id:
+        # Place on right
+        await db.users.update_one(
+            {"id": upline_user.id},
+            {"$set": {"right_child_id": user.id}}
+        )
+        user.position = "right"
+    else:
+        # Both positions filled, find next available spot in the tree
+        # For simplicity, place on left (you can implement more complex logic)
+        user.position = "left"
     
     user_dict = user.model_dump()
     await db.users.insert_one(user_dict)
@@ -217,13 +243,17 @@ async def register(req: RegisterRequest):
     token = create_jwt_token(user.id)
     
     return {
-        "message": "Registration successful",
+        "message": "Kayıt başarılı! " + upline_user.name + " ağına eklendi.",
         "token": token,
         "user": {
             "id": user.id,
             "email": user.email,
             "name": user.name,
-            "referral_code": user.referral_code
+            "referral_code": user.referral_code,
+            "upline": {
+                "name": upline_user.name,
+                "referral_code": upline_user.referral_code
+            }
         }
     }
 
