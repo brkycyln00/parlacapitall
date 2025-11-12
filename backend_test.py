@@ -642,22 +642,29 @@ class ParlaCapitalAPITester:
         // Remove test users
         var result1 = db.users.deleteMany({email: /test\.user\./});
         var result2 = db.users.deleteMany({email: /admin\./});
+        var result3 = db.users.deleteMany({email: /seed\.user\./});
+        var result4 = db.users.deleteMany({email: /newuser\./});
+        var result5 = db.users.deleteMany({email: /invaliduser\./});
+        var result6 = db.users.deleteMany({email: /noreferral\./});
+        var result7 = db.users.deleteMany({email: /secondchild\./});
         
         // Remove test sessions
-        var result3 = db.user_sessions.deleteMany({session_token: /test_session/});
-        var result4 = db.user_sessions.deleteMany({session_token: /admin_session/});
+        var result8 = db.user_sessions.deleteMany({session_token: /test_session/});
+        var result9 = db.user_sessions.deleteMany({session_token: /admin_session/});
         
         // Remove test investments
-        var result5 = db.investments.deleteMany({user_id: /test-user-/});
-        var result6 = db.investments.deleteMany({user_id: /admin-user-/});
+        var result10 = db.investments.deleteMany({user_id: /test-user-/});
+        var result11 = db.investments.deleteMany({user_id: /admin-user-/});
+        var result12 = db.investments.deleteMany({user_id: /seed-user-/});
         
         // Remove test transactions
-        var result7 = db.transactions.deleteMany({user_id: /test-user-/});
-        var result8 = db.transactions.deleteMany({user_id: /admin-user-/});
+        var result13 = db.transactions.deleteMany({user_id: /test-user-/});
+        var result14 = db.transactions.deleteMany({user_id: /admin-user-/});
+        var result15 = db.transactions.deleteMany({user_id: /seed-user-/});
         
         print('Cleanup completed');
-        print('Users deleted: ' + (result1.deletedCount + result2.deletedCount));
-        print('Sessions deleted: ' + (result3.deletedCount + result4.deletedCount));
+        print('Users deleted: ' + (result1.deletedCount + result2.deletedCount + result3.deletedCount + result4.deletedCount + result5.deletedCount + result6.deletedCount + result7.deletedCount));
+        print('Sessions deleted: ' + (result8.deletedCount + result9.deletedCount));
         """
         
         try:
