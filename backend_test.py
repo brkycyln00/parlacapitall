@@ -686,6 +686,9 @@ class ParlaCapitalAPITester:
         # Test public endpoints first
         self.test_public_endpoints()
         
+        # Test referral validation system (HIGH PRIORITY)
+        self.test_referral_validation_system()
+        
         # Create test user and session
         if not self.create_test_user_session():
             print("❌ Cannot proceed with authenticated tests - user creation failed")
