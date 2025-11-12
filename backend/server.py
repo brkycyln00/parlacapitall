@@ -674,7 +674,8 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
             "package": request.package,
             "package_amount": request.amount,
             "investment_date": investment.investment_date,
-            "total_invested": target_user.total_invested + request.amount
+            "total_invested": target_user.total_invested + request.amount,
+            "wallet_balance": target_user.wallet_balance + request.amount
         }}
     )
     
