@@ -93,34 +93,44 @@ export default function Dashboard() {
   };
 
   const handleWithdrawal = async () => {
-    if (!withdrawalAmount || !walletAddress) {
+    if (!withdrawalFullName || !withdrawalIban || !withdrawalAmount) {
       toast.error('Lütfen tüm alanları doldurun');
       return;
     }
 
     const amount = parseFloat(withdrawalAmount);
-    if (amount <= 0 || amount > user.wallet_balance) {
-      toast.error('Geçersiz miktar');
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Geçerli bir tutar girin');
       return;
     }
 
+    const availableBalance = (user?.weekly_earnings || 0) + (user?.total_commissions || 0);
+    if (amount > availableBalance) {
+      toast.error(`Yetersiz bakiye. Kullanılabilir: $${availableBalance.toFixed(2)}`);
+      return;
+    }
+
+    setWithdrawalLoading(true);
     try {
       await axios.post(
         `${API}/withdrawal/request`,
         {
-          amount,
-          crypto_type: cryptoType,
-          wallet_address: walletAddress
+          full_name: withdrawalFullName,
+          iban: withdrawalIban,
+          amount: amount
         },
         { withCredentials: true }
       );
-      toast.success('Çekim talebi gönderildi');
+      toast.success('Çekim talebiniz alınmıştır.');
       setWithdrawalOpen(false);
-      fetchDashboard();
+      setWithdrawalFullName('');
+      setWithdrawalIban('');
       setWithdrawalAmount('');
-      setWalletAddress('');
+      fetchDashboard();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Çekim talebi başarısız');
+    } finally {
+      setWithdrawalLoading(false);
     }
   };
 
