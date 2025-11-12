@@ -285,9 +285,9 @@ export default function Dashboard() {
         </header>
 
         {/* Dashboard Content */}
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           {/* Stats Cards */}
-          <div className="grid grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-400">Yatırım Bakiyesi</CardTitle>
