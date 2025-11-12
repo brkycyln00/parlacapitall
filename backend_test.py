@@ -2298,6 +2298,9 @@ class ParlaCapitalAPITester:
         # Test public endpoints first
         self.test_public_endpoints()
         
+        # CRITICAL CURRENT FOCUS: Test Manual User Placement System
+        self.test_manual_user_placement_system()
+        
         # CRITICAL P1 TASK: Test Binary Earnings Calculation System
         self.test_binary_earnings_calculation_system()
         
