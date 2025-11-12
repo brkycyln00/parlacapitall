@@ -371,6 +371,29 @@ async def validate_referral_code(referral_code: str):
 
 # ==================== REFERRAL CODE ENDPOINTS ====================
 
+async def ensure_user_has_referral_code(user_id: str) -> str:
+    """Ensure user has at least one active referral code, create one if needed"""
+    # Check if user has any active (unused and not expired) referral code
+    active_code = await db.referral_codes.find_one({
+        "user_id": user_id,
+        "is_used": False,
+        "expires_at": {"$gt": datetime.now(timezone.utc).isoformat()}
+    }, {"_id": 0})
+    
+    if active_code:
+        return active_code["code"]
+    
+    # Create new referral code
+    new_code = ReferralCode(
+        user_id=user_id,
+        code=secrets.token_urlsafe(8)
+    )
+    
+    code_dict = new_code.model_dump()
+    await db.referral_codes.insert_one(code_dict)
+    
+    return new_code.code
+
 @api_router.post("/referral/generate")
 async def generate_referral_code(request: Request):
     """Generate a new referral code for the authenticated user"""
