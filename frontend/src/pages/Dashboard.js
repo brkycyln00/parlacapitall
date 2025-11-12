@@ -619,6 +619,266 @@ export default function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Commissions Dialog */}
+      <Dialog open={commissionsOpen} onOpenChange={setCommissionsOpen}>
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">Komisyonlarınız</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 space-y-6">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-3 gap-4">
+              <Card className="bg-slate-900 border-slate-700">
+                <CardContent className="pt-6">
+                  <p className="text-gray-400 text-sm mb-2">Toplam Komisyon</p>
+                  <p className="text-3xl font-bold text-green-400">₺{user?.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-900 border-slate-700">
+                <CardContent className="pt-6">
+                  <p className="text-gray-400 text-sm mb-2">Bu Ay</p>
+                  <p className="text-3xl font-bold text-amber-400">₺{((user?.total_commissions || 0) * 0.3).toLocaleString('tr-TR')}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-900 border-slate-700">
+                <CardContent className="pt-6">
+                  <p className="text-gray-400 text-sm mb-2">Bu Hafta</p>
+                  <p className="text-3xl font-bold text-blue-400">₺{((user?.total_commissions || 0) * 0.1).toLocaleString('tr-TR')}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Commissions Table */}
+            <div className="bg-slate-900 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-4">Komisyon Detayları</h3>
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {dashboard?.referrals?.map((ref, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-slate-800 rounded-lg p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
+                        <span className="text-slate-900 font-bold">{ref.name?.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold">{ref.name}</p>
+                        <p className="text-gray-400 text-sm">{ref.package?.toUpperCase() || 'Paket Yok'} - {
+                          ref.package === 'platinum' ? '%15' :
+                          ref.package === 'gold' ? '%10' :
+                          ref.package === 'silver' ? '%5' : '0%'
+                        } Komisyon</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-green-400 font-bold text-lg">
+                        +₺{((ref.package_amount || 0) * (
+                          ref.package === 'platinum' ? 0.15 :
+                          ref.package === 'gold' ? 0.10 :
+                          ref.package === 'silver' ? 0.05 : 0
+                        )).toLocaleString('tr-TR')}
+                      </p>
+                      <p className="text-gray-500 text-xs">Yatırım: ₺{ref.package_amount?.toLocaleString('tr-TR') || '0'}</p>
+                    </div>
+                  </div>
+                ))}
+                {(!dashboard?.referrals || dashboard.referrals.length === 0) && (
+                  <p className="text-gray-500 text-center py-8">Henüz komisyon yok</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Network Dialog */}
+      <Dialog open={networkOpen} onOpenChange={setNetworkOpen}>
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-6xl">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">Referans Ağınız</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 space-y-6">
+            {/* Network Stats */}
+            <div className="grid grid-cols-4 gap-4">
+              <Card className="bg-slate-900 border-slate-700">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-gray-400 text-sm mb-2">Toplam Referans</p>
+                  <p className="text-4xl font-bold text-amber-400">{dashboard?.referrals?.length || 0}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-900 border-slate-700">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-gray-400 text-sm mb-2">Sol Kol</p>
+                  <p className="text-4xl font-bold text-blue-400">{dashboard?.referrals?.filter(r => r.position === 'left').length || 0}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-900 border-slate-700">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-gray-400 text-sm mb-2">Sağ Kol</p>
+                  <p className="text-4xl font-bold text-green-400">{dashboard?.referrals?.filter(r => r.position === 'right').length || 0}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-900 border-slate-700">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-gray-400 text-sm mb-2">Aktif Üyeler</p>
+                  <p className="text-4xl font-bold text-purple-400">{dashboard?.referrals?.filter(r => r.package).length || 0}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Binary Tree Visualization */}
+            <div className="bg-slate-900 rounded-lg p-6">
+              <h3 className="text-white font-semibold mb-6 text-center">Binary Ağaç Yapısı</h3>
+              <div className="flex flex-col items-center space-y-8">
+                {/* You */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-slate-900 font-bold text-xl">{user?.name?.charAt(0)}</span>
+                  </div>
+                  <p className="text-white font-semibold">{user?.name}</p>
+                  <p className="text-gray-400 text-sm">Siz</p>
+                </div>
+
+                {/* Children */}
+                <div className="grid grid-cols-2 gap-24">
+                  {/* Left Child */}
+                  <div className="text-center">
+                    <div className="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                      {dashboard?.network?.left ? (
+                        <span className="text-white font-bold">{dashboard.network.left.name?.charAt(0)}</span>
+                      ) : (
+                        <span className="text-white text-2xl">+</span>
+                      )}
+                    </div>
+                    <p className="text-white text-sm font-semibold">
+                      {dashboard?.network?.left?.name || 'Boş'}
+                    </p>
+                    <p className="text-blue-400 text-xs">Sol Kol</p>
+                    <p className="text-gray-500 text-xs mt-1">₺{user?.left_volume?.toLocaleString('tr-TR') || '0'}</p>
+                  </div>
+
+                  {/* Right Child */}
+                  <div className="text-center">
+                    <div className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                      {dashboard?.network?.right ? (
+                        <span className="text-white font-bold">{dashboard.network.right.name?.charAt(0)}</span>
+                      ) : (
+                        <span className="text-white text-2xl">+</span>
+                      )}
+                    </div>
+                    <p className="text-white text-sm font-semibold">
+                      {dashboard?.network?.right?.name || 'Boş'}
+                    </p>
+                    <p className="text-green-400 text-xs">Sağ Kol</p>
+                    <p className="text-gray-500 text-xs mt-1">₺{user?.right_volume?.toLocaleString('tr-TR') || '0'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* All Network Members */}
+            <div className="bg-slate-900 rounded-lg p-4">
+              <h3 className="text-white font-semibold mb-4">Tüm Ağ Üyeleri</h3>
+              <div className="grid grid-cols-2 gap-4 max-h-64 overflow-y-auto">
+                {dashboard?.referrals?.map((ref, idx) => (
+                  <div key={idx} className="bg-slate-800 rounded-lg p-3 flex items-center space-x-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      ref.position === 'left' ? 'bg-blue-500' : 'bg-green-500'
+                    }`}>
+                      <span className="text-white font-bold">{ref.name?.charAt(0)}</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white text-sm font-semibold">{ref.name}</p>
+                      <p className="text-gray-400 text-xs">{ref.position === 'left' ? 'Sol' : 'Sağ'} • {ref.package?.toUpperCase() || 'Paket Yok'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Dialog */}
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">Ayarlar</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 space-y-6">
+            {/* Profile Section */}
+            <div className="bg-slate-900 rounded-lg p-6">
+              <h3 className="text-white font-semibold mb-4">Profil Bilgileri</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-gray-400 text-sm">Ad Soyad</Label>
+                  <Input
+                    value={user?.name || ''}
+                    readOnly
+                    className="bg-slate-800 border-slate-700 text-white mt-2"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400 text-sm">E-posta</Label>
+                  <Input
+                    value={user?.email || ''}
+                    readOnly
+                    className="bg-slate-800 border-slate-700 text-white mt-2"
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400 text-sm">Referans Kodu</Label>
+                  <Input
+                    value={user?.referral_code || ''}
+                    readOnly
+                    className="bg-slate-800 border-slate-700 text-white mt-2 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Account Info */}
+            <div className="bg-slate-900 rounded-lg p-6">
+              <h3 className="text-white font-semibold mb-4">Hesap Bilgileri</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Paket</span>
+                  <span className="text-white font-semibold">{user?.package?.toUpperCase() || 'Yok'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Üyelik Tarihi</span>
+                  <span className="text-white">{new Date(user?.created_at).toLocaleDateString('tr-TR')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Kariyer Seviyesi</span>
+                  <span className="text-amber-400 font-semibold">{user?.career_level || 'None'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Admin</span>
+                  <span className={user?.is_admin ? 'text-green-400' : 'text-gray-500'}>
+                    {user?.is_admin ? 'Evet' : 'Hayır'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex space-x-4">
+              <Button 
+                onClick={() => navigate('/')}
+                variant="outline" 
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+              >
+                Ana Sayfa
+              </Button>
+              <Button 
+                onClick={logout}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Çıkış Yap
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
