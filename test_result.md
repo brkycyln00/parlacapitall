@@ -98,6 +98,12 @@
 
 
 
+
+
+agent_communication:
+  - agent: "main_fork"
+    timestamp: "2025-01-XX"
+    message: "NEW FORK SESSION STARTED. Testing binary tree position selection feature that was implemented but never tested. Feature allows users to generate referral codes with specific position (left/right branch). Need comprehensive E2E testing: 1) Generate left branch code 2) Register new user with that code 3) Approve investment 4) Verify user appears in correct branch in referral network. This is CRITICAL P0 feature requested by user."
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
