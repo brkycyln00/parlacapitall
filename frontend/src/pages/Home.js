@@ -46,7 +46,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto relative z-10 text-center">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Gelecek Artık Dijitalde Değil,<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">Dijitalin Ta Kendisi!</span>
+            Dijitalin Ta Kendisi!
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
             ParlaCapital ile kripto piyasasında güvenli yatırım yapın. Haftalık %5 sabit getiri, 
