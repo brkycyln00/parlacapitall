@@ -71,23 +71,37 @@ export default function Packages() {
       navigate('/');
       return;
     }
+    
+    // Validate form
+    if (!fullName || !username || !email || !whatsapp || !platform) {
+      toast.error('Lütfen tüm alanları doldurun');
+      return;
+    }
 
     setLoading(true);
     try {
       await axios.post(
-        `${API}/investments/create`,
+        `${API}/investment/request`,
         {
-          package: selectedPackage.name.toLowerCase(),
-          crypto_type: cryptoType,
-          referral_code: referralCode || null
+          full_name: fullName,
+          username: username,
+          email: email,
+          whatsapp: whatsapp,
+          platform: platform,
+          package: selectedPackage.name.toLowerCase()
         },
         { withCredentials: true }
       );
-      toast.success('Yatırım başarıyla oluşturuldu!');
+      toast.success('Yatırım talebiniz alındı! Admin onayından sonra hesabınıza yansıyacaktır.');
       setInvestDialogOpen(false);
-      navigate('/dashboard');
+      // Reset form
+      setFullName('');
+      setUsername('');
+      setEmail('');
+      setWhatsapp('');
+      setPlatform('');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Yatırım oluşturulamadı');
+      toast.error(error.response?.data?.detail || 'Yatırım talebi gönderilemedi');
     } finally {
       setLoading(false);
     }
