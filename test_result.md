@@ -563,6 +563,18 @@ backend:
         agent: "testing"
         comment: "✅ VOLUME RECALCULATION TESTING COMPLETE: Volume updates working correctly after repositioning. 1) User with $500 investment moved from LEFT to RIGHT ✅ 2) Left volume correctly decreased from $500 to $0 ✅ 3) Right volume correctly increased to $500 ✅ 4) recalculate_volumes_after_removal() and update_volumes_upline() functions work seamlessly ✅. Volume tracking is accurate and maintains binary tree integrity."
 
+  - task: "Unlimited referrals registration (no auto-placement)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "🎉 UNLIMITED REFERRALS FEATURE - COMPREHENSIVE TESTING COMPLETE! ✅ SUCCESS RATE: 100% (48/48 tests passed). ALL 10 CRITICAL SCENARIOS VERIFIED: 1) Register 1st Referral (Ali) ✅ - Registered with upline_id set, position=None (unplaced) 2) Register 2nd Referral (Veli) ✅ - Same sponsor, different code, unplaced 3) Register 3rd Referral (Ayşe) ✅ - CRITICAL SUCCESS: No 'Her iki kol da dolu' error! 4) Stress Test ✅ - 10 total referrals registered with same sponsor 5) Referral Code Usage ✅ - All codes marked is_used=True with correct used_by and used_at 6) GET /api/users/my-referrals ✅ - Shows 10 unplaced, 0 placed initially 7) Manual Placement ✅ - Ali placed left, Veli placed right, moved to placed array 8) Unlimited Depth ✅ - Ayşe placed under Ali, binary tree grows in depth 9) No Auto-Placement ✅ - Registration does NOT automatically update sponsor's left_child_id/right_child_id 10) Error Cases ✅ - Expired, used, and invalid codes properly rejected with Turkish messages. KEY ACHIEVEMENT: Users can register unlimited times with same sponsor without 'Her iki kol da dolu' errors. Feature is PRODUCTION-READY!"
+
   - task: "Referral code validation endpoint"
     implemented: true
     working: true
