@@ -141,6 +141,37 @@ export default function AdminPanel() {
       toast.error(error.response?.data?.detail || 'Silme başarısız');
     }
   };
+  const handlePlaceUser = async () => {
+    if (!selectedUser || !selectedUpline || !selectedPosition) {
+      toast.error('Lütfen tüm alanları doldurun');
+      return;
+    }
+
+    if (selectedUser === selectedUpline) {
+      toast.error('Kullanıcı kendi altına yerleştirilemez');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${API}/admin/place-user`,
+        {
+          user_id: selectedUser,
+          upline_id: selectedUpline,
+          position: selectedPosition
+        },
+        { withCredentials: true }
+      );
+      toast.success(response.data.message);
+      setSelectedUser('');
+      setSelectedUpline('');
+      setSelectedPosition('left');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Place user error:', error);
+      toast.error(error.response?.data?.detail || 'Yerleştirme başarısız');
+    }
+  };
 
 
   const handleRejectWithdrawal = async (requestId) => {
