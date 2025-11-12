@@ -572,28 +572,23 @@ async def get_packages():
 
 @api_router.post("/investment/request")
 async def create_investment_request(
-    full_name: str,
-    username: str,
-    email: str,
-    whatsapp: str,
-    platform: str,
-    package: str,
+    req: InvestmentRequestCreate,
     user: User = Depends(require_auth)
 ):
-    if package not in PACKAGES:
+    if req.package not in PACKAGES:
         raise HTTPException(status_code=400, detail="Invalid package")
     
-    package_info = PACKAGES[package]
+    package_info = PACKAGES[req.package]
     
     # Create investment request
     request = InvestmentRequest(
         user_id=user.id,
-        full_name=full_name,
-        username=username,
-        email=email,
-        whatsapp=whatsapp,
-        platform=platform,
-        package=package,
+        full_name=req.full_name,
+        username=req.username,
+        email=req.email,
+        whatsapp=req.whatsapp,
+        platform=req.platform,
+        package=req.package,
         amount=package_info.amount
     )
     
