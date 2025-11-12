@@ -88,6 +88,21 @@ export default function AdminPanel() {
     }
   };
 
+  const handleApproveInvestmentRequest = async (requestId) => {
+    try {
+      await axios.post(
+        `${API}/admin/investment-requests/${requestId}/approve`,
+        {},
+        { withCredentials: true }
+      );
+      toast.success('Yatırım talebi onaylandı');
+      fetchAdminData();
+    } catch (error) {
+      toast.error('Onaylama başarısız');
+    }
+  };
+
+
   const handleMakeAdmin = async (userId) => {
     if (!window.confirm('Bu kullanıcıyı admin yapmak istediğinizden emin misiniz?')) return;
     
