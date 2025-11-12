@@ -448,6 +448,69 @@ export default function Dashboard() {
             </Card>
           )}
 
+
+          {/* Pending Withdrawals Section */}
+          {pendingWithdrawals.filter(w => w.status === 'pending').length > 0 && (
+            <Card className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border-blue-500/30 mb-8">
+              <CardHeader>
+                <CardTitle className="text-white text-xl flex items-center gap-2">
+                  <svg className="w-6 h-6 text-blue-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Bekleyen Çekim Taleplerim
+                </CardTitle>
+                <p className="text-sm text-gray-400">Admin onayı bekleniyor</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pendingWithdrawals.filter(w => w.status === 'pending').map((withdrawal, idx) => (
+                    <div key={idx} className="bg-slate-800/80 rounded-xl p-4 border border-blue-500/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-white font-bold text-lg">Çekim Talebi</p>
+                              <p className="text-gray-400 text-sm">IBAN ile çekim</p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-3">
+                            <div>
+                              <p className="text-gray-500">İsim</p>
+                              <p className="text-white">{withdrawal.full_name}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Tutar</p>
+                              <p className="text-blue-400 font-bold">${withdrawal.amount.toFixed(2)}</p>
+                            </div>
+                            <div className="col-span-1 sm:col-span-2">
+                              <p className="text-gray-500">IBAN</p>
+                              <p className="text-white font-mono text-xs">{withdrawal.iban}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Talep Tarihi</p>
+                              <p className="text-white">{new Date(withdrawal.created_at).toLocaleDateString('tr-TR')}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <div className="bg-blue-500/20 border border-blue-500 rounded-lg px-4 py-2">
+                            <p className="text-blue-400 font-semibold text-sm">⏳ Onay Bekleniyor</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+
           {/* Active Investment Section */}
           {user?.package && (
             <Card className="bg-gradient-to-r from-green-500/10 to-green-600/10 border-green-500/30 mb-8">
