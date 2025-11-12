@@ -273,6 +273,17 @@ export default function Dashboard() {
           )}
           
           {user?.is_admin && (
+            <button 
+              onClick={() => {
+                navigate('/admin');
+                setSidebarOpen(false);
+              }}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-amber-500 text-slate-900 font-semibold mb-2"
+            >
+              <span>👑</span>
+              <span>Admin Panel</span>
+            </button>
+          )}
         </nav>
       </aside>
 
