@@ -477,74 +477,77 @@ class ParlaCapitalAPITester:
         if success:
             print("   ✓ Withdrawal request created")
 
-    def create_admin_user(self):
-        """Create an admin user for testing admin endpoints"""
+    def create_admin_user_and_login(self):
+        """Create admin user and login to get JWT token"""
         print("\n👑 Creating admin user...")
         
         timestamp = str(int(time.time()))
-        admin_user_id = f"admin-user-{timestamp}"
-        admin_session_token = f"admin_session_{timestamp}"
+        admin_email = f"admin.{timestamp}@example.com"
+        admin_password = "SecureAdminPass123!"
         
-        mongo_commands = f"""
-        use('test_database');
+        # First create a referral code for the admin user to use during registration
+        seed_user_id, seed_referral_code = self.create_seed_user()
+        if not seed_user_id:
+            print("❌ Cannot create admin user - seed user creation failed")
+            return None
         
-        // Create admin user
-        db.users.insertOne({{
-            id: '{admin_user_id}',
-            email: 'admin.{timestamp}@example.com',
-            name: 'Admin User {timestamp}',
-            picture: 'https://via.placeholder.com/150',
-            referral_code: 'ADMIN{timestamp[-6:]}',
-            upline_id: null,
-            package: null,
-            package_amount: 0.0,
-            investment_date: null,
-            total_invested: 0.0,
-            weekly_earnings: 0.0,
-            total_commissions: 0.0,
-            left_child_id: null,
-            right_child_id: null,
-            position: null,
-            left_volume: 0.0,
-            right_volume: 0.0,
-            binary_earnings: 0.0,
-            career_level: 'None',
-            career_points: 0.0,
-            career_rewards: 0.0,
-            wallet_balance: 1000.0,
-            is_admin: true,
-            created_at: new Date().toISOString()
-        }});
+        # Register the admin user
+        registration_data = {
+            "email": admin_email,
+            "password": admin_password,
+            "name": f"Admin User {timestamp}",
+            "referral_code": seed_referral_code
+        }
         
-        // Create admin session
-        db.user_sessions.insertOne({{
-            user_id: '{admin_user_id}',
-            session_token: '{admin_session_token}',
-            expires_at: new Date(Date.now() + 7*24*60*60*1000),
-            created_at: new Date()
-        }});
+        success, response = self.run_test(
+            "Register Admin User",
+            "POST",
+            "auth/register",
+            200,
+            data=registration_data
+        )
         
-        print('Admin user created with ID: {admin_user_id}');
-        """
-        
-        try:
-            import subprocess
-            result = subprocess.run(
-                ['mongosh', '--eval', mongo_commands],
-                capture_output=True,
-                text=True,
-                timeout=30
-            )
+        if success and isinstance(response, dict):
+            admin_user_id = response['user']['id']
+            jwt_token = response.get('token')
             
-            if result.returncode == 0:
-                print(f"✅ Admin user created: {admin_user_id}")
-                return admin_session_token
-            else:
-                print(f"❌ Admin user creation failed: {result.stderr}")
-                return None
+            if jwt_token and admin_user_id:
+                # Make the user admin in database
+                mongo_commands = f"""
+                use('test_database');
                 
-        except Exception as e:
-            print(f"❌ Failed to create admin user: {str(e)}")
+                db.users.updateOne(
+                    {{id: '{admin_user_id}'}},
+                    {{$set: {{is_admin: true, wallet_balance: 1000.0}}}}
+                );
+                
+                print('User made admin: {admin_user_id}');
+                """
+                
+                try:
+                    import subprocess
+                    result = subprocess.run(
+                        ['mongosh', '--eval', mongo_commands],
+                        capture_output=True,
+                        text=True,
+                        timeout=30
+                    )
+                    
+                    if result.returncode == 0:
+                        print(f"✅ Admin user created and promoted: {admin_user_id}")
+                        return jwt_token
+                    else:
+                        print(f"❌ Failed to promote user to admin: {result.stderr}")
+                        return None
+                        
+                except Exception as e:
+                    print(f"❌ Failed to promote user to admin: {str(e)}")
+                    return None
+            else:
+                print(f"❌ Admin registration successful but no token received: {response}")
+                return None
+        else:
+            print("❌ Admin user registration failed")
             return None
 
     def test_admin_endpoints(self):
