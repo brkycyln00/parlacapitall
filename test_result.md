@@ -343,6 +343,54 @@ agent_communication:
     message: "🏆 MANUAL USER PLACEMENT SYSTEM - COMPREHENSIVE TESTING COMPLETE! ✅ ALL 10 CRITICAL SCENARIOS PASSED: 1) Initial Placement ✅ - Users placed under admin in LEFT/RIGHT positions with correct upline_id, position, and child_id updates 2) Position Availability ✅ - Both left and right positions filled correctly 3) Position Occupied Error ✅ - 'Sol kol dolu. Lütfen önce o kullanıcıyı taşıyın.' error returned correctly 4) Repositioning ✅ - Users successfully moved from one position to another with proper cleanup 5) Multi-Level Tree ✅ - Hierarchical placement working (admin->user1->user3) 6) Self-Placement Prevention ✅ - Admin cannot be placed under admin 7) Volume Recalculation ✅ - $1000 investment correctly reflected in volumes after repositioning 8) Placement History ✅ - All 7 placement actions recorded with user names, action types (initial_placement/repositioning) 9) Error Handling ✅ - Non-existent users/uplines return Turkish errors 10) Invalid Position ✅ - 'Pozisyon left veya right olmalıdır' validation works. SUCCESS RATE: 96.1% (74/77 tests passed). The manual placement system is production-ready and fully functional!"
 
 backend:
+  - task: "POST /api/admin/place-user endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FULLY TESTED - Manual user placement endpoint working perfectly. Tested all 10 scenarios: 1) Initial placement (first time) ✅ 2) Complete both sides ✅ 3) Position occupied error with Turkish message ✅ 4) Repositioning (move users) ✅ 5) Multi-level tree structure ✅ 6) Self-placement prevention ✅ 7) Volume recalculation after move ✅ 8) Invalid user/upline errors ✅ 9) Invalid position validation ✅ 10) All edge cases handled correctly. Admin can place any user under any upline in left/right position with full validation."
+
+  - task: "Placement history tracking (placement_history collection)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FULLY TESTED - Placement history tracking working perfectly. GET /api/admin/placement-history returns all placement records with required fields: user_id, old_upline_id, new_upline_id, old_position, new_position, admin_id, admin_name, action_type (initial_placement/repositioning), created_at. User names are enriched in response. All 7 placement actions were correctly recorded during testing."
+
+  - task: "Volume recalculation after repositioning"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FULLY TESTED - Volume recalculation working correctly. When users with investments are moved, volumes are properly subtracted from old upline tree and added to new upline tree. Tested with User 5 ($1000 investment) - volumes correctly updated when moved from admin's left to admin's right. The recalculate_volumes_after_removal() and update_volumes_upline() functions work seamlessly together."
+
+  - task: "Manual placement validation and error handling"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FULLY TESTED - All validation and error handling working perfectly. Position validation (left/right only) ✅, User existence validation ✅, Upline existence validation ✅, Position availability check ✅, Self-placement prevention ✅. All error messages returned in Turkish as required: 'Kullanıcı bulunamadı', 'Üst sponsor bulunamadı', 'Sol kol dolu', 'Pozisyon left veya right olmalıdır'."
+
   - task: "Binary earnings calculation system (update_volumes_upline function)"
     implemented: true
     working: true
