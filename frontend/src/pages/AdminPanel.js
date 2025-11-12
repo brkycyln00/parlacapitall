@@ -14,6 +14,7 @@ export default function AdminPanel() {
   const [transactions, setTransactions] = useState([]);
   const [stats, setStats] = useState({});
   const [investmentRequests, setInvestmentRequests] = useState([]);
+  const [withdrawalRequests, setWithdrawalRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
