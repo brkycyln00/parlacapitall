@@ -22,6 +22,13 @@ export default function Packages() {
   const [referralCode, setReferralCode] = useState('');
   const [referralValid, setReferralValid] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // New form fields
+  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [platform, setPlatform] = useState('');
 
   useEffect(() => {
     fetchPackages();
