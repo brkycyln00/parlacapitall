@@ -673,8 +673,8 @@ class ParlaCapitalAPITester:
         """Test the new multi-use referral code system comprehensively"""
         print("\n🔗 Testing Multi-Use Referral Code System...")
         
-        # Create test user and session for authenticated tests
-        if not self.create_test_user_session():
+        # Create test user and login for authenticated tests
+        if not self.create_test_user_and_login():
             print("❌ Cannot test referral system - user creation failed")
             return
         
