@@ -447,7 +447,7 @@ export default function Dashboard() {
                           <p className="text-gray-400 text-sm">Yatırım Tutarı: ${user.package_amount?.toLocaleString('tr-TR') || 0}</p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4 mt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
                         <div className="bg-slate-900/50 rounded-lg p-3">
                           <p className="text-gray-500 text-xs">Haftalık Kar Oranı</p>
                           <p className="text-green-400 font-bold text-lg">%5</p>
@@ -861,7 +861,7 @@ export default function Dashboard() {
           </DialogHeader>
           <div className="mt-4 space-y-6">
             {/* Summary Cards */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Card className="bg-slate-900 border-slate-700">
                 <CardContent className="pt-6">
                   <p className="text-gray-400 text-sm mb-2">Toplam Komisyon</p>
