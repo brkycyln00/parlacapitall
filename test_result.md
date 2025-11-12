@@ -311,9 +311,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Real-time referral code validation"
-    - "Frontend form validation with referral check"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
