@@ -596,6 +596,16 @@ async def create_investment_request(
         "request_id": request.id
     }
 
+
+@api_router.get("/investment/my-requests")
+async def get_my_investment_requests(user: User = Depends(require_auth)):
+    """Get current user's investment requests"""
+    requests = await db.investment_requests.find(
+        {"user_id": user.id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return {"requests": requests}
+
 @api_router.get("/admin/investment-requests")
 async def get_investment_requests(user: User = Depends(require_admin)):
     requests = await db.investment_requests.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
