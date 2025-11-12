@@ -1051,6 +1051,69 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
+
+      {/* Withdrawal Dialog */}
+      <Dialog open={withdrawalOpen} onOpenChange={setWithdrawalOpen}>
+        <DialogContent className="bg-slate-800 border-green-500/30 max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">Çekim Yap</DialogTitle>
+            <p className="text-gray-400 text-sm mt-2">
+              Kullanılabilir Bakiye: ${((user?.weekly_earnings || 0) + (user?.total_commissions || 0)).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </p>
+          </DialogHeader>
+          <div className="mt-4 space-y-4">
+            <div>
+              <Label className="text-gray-300">İsim Soyisim</Label>
+              <Input
+                value={withdrawalFullName}
+                onChange={(e) => setWithdrawalFullName(e.target.value)}
+                placeholder="Adınız Soyadınız"
+                className="bg-slate-700 border-slate-600 text-white mt-2"
+              />
+            </div>
+            
+            <div>
+              <Label className="text-gray-300">IBAN</Label>
+              <Input
+                value={withdrawalIban}
+                onChange={(e) => setWithdrawalIban(e.target.value)}
+                placeholder="TR00 0000 0000 0000 0000 0000 00"
+                className="bg-slate-700 border-slate-600 text-white mt-2 font-mono"
+                maxLength={32}
+              />
+            </div>
+            
+            <div>
+              <Label className="text-gray-300">Çekim Tutarı ($)</Label>
+              <Input
+                type="number"
+                value={withdrawalAmount}
+                onChange={(e) => setWithdrawalAmount(e.target.value)}
+                placeholder="0.00"
+                className="bg-slate-700 border-slate-600 text-white mt-2"
+                step="0.01"
+                min="0"
+              />
+            </div>
+            
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-blue-400 text-sm">
+                ℹ️ Çekim talebiniz admin onayından sonra hesabınıza yansıyacaktır. 
+                Ana bakiyeniz haftalık kazancınız ve komisyonlarınızın toplamıdır.
+              </p>
+            </div>
+            
+            <Button
+              onClick={handleWithdrawal}
+              disabled={withdrawalLoading}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-6 text-lg font-bold"
+            >
+              {withdrawalLoading ? 'İşleniyor...' : 'Çekim Yap'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl max-h-[90vh] overflow-y-auto">
