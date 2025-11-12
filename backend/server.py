@@ -313,51 +313,12 @@ async def register(req: RegisterRequest):
         upline_id=upline_user.id if upline_user else None
     )
     
-    # Place user in binary tree (only if has upline)
+    # NOTE: We do NOT automatically place user in binary tree during registration
+    # User will be in "unplaced" state until sponsor manually places them
+    # This allows unlimited referrals per sponsor
+    
+    # Mark referral code as used (if upline exists)
     if upline_user:
-        desired_position = referral.position if referral else "auto"
-        
-        if desired_position == "left":
-            # User wants to place on left
-            if not upline_user.left_child_id:
-                await db.users.update_one(
-                    {"id": upline_user.id},
-                    {"$set": {"left_child_id": user.id}}
-                )
-                user.position = "left"
-            else:
-                raise HTTPException(status_code=400, detail="Sol kol dolu. Lütfen yeni bir kod isteyin.")
-        elif desired_position == "right":
-            # User wants to place on right
-            if not upline_user.right_child_id:
-                await db.users.update_one(
-                    {"id": upline_user.id},
-                    {"$set": {"right_child_id": user.id}}
-                )
-                user.position = "right"
-            else:
-                raise HTTPException(status_code=400, detail="Sağ kol dolu. Lütfen yeni bir kod isteyin.")
-        else:
-            # Auto placement (existing logic)
-            if not upline_user.left_child_id:
-                # Place on left
-                await db.users.update_one(
-                    {"id": upline_user.id},
-                    {"$set": {"left_child_id": user.id}}
-                )
-                user.position = "left"
-            elif not upline_user.right_child_id:
-                # Place on right
-                await db.users.update_one(
-                    {"id": upline_user.id},
-                    {"$set": {"right_child_id": user.id}}
-                )
-                user.position = "right"
-            else:
-                # Both positions filled
-                raise HTTPException(status_code=400, detail="Her iki kol da dolu. Lütfen sponsor ile iletişime geçin.")
-        
-        # Mark referral code as used
         await db.referral_codes.update_one(
             {"id": referral.id},
             {"$set": {
