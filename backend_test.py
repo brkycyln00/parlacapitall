@@ -4070,6 +4070,9 @@ class ParlaCapitalAPITester:
         # Test public endpoints first
         self.test_public_endpoints()
         
+        # PRIORITY: Test Unlimited Referrals Registration (No Auto-Placement)
+        self.test_unlimited_referrals_no_auto_placement()
+        
         # CRITICAL FOCUS: Test Multi-Level Commission System
         self.test_multi_level_commission_system()
         
