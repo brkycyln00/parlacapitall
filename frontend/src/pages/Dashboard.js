@@ -1384,28 +1384,18 @@ export default function Dashboard() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          {referral.current_position === 'right' && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white"
-                              onClick={() => handlePlaceReferral(referral.id, user.id, 'left')}
-                            >
-                              Sol Kola Taşı
-                            </Button>
-                          )}
-                          {referral.current_position === 'left' && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white"
-                              onClick={() => handlePlaceReferral(referral.id, user.id, 'right')}
-                            >
-                              Sağ Kola Taşı
-                            </Button>
-                          )}
-                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full border-amber-500 text-amber-400 hover:bg-amber-500 hover:text-white"
+                          onClick={() => {
+                            setSelectedReferral(referral);
+                            setSelectedUpline(referral.parent_id || user.id);
+                            setPlacementModalOpen(true);
+                          }}
+                        >
+                          🔄 Yeniden Yerleştir
+                        </Button>
                       </CardContent>
                     </Card>
                   ))
