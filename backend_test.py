@@ -645,8 +645,8 @@ class ParlaCapitalAPITester:
         var result13 = db.users.deleteMany({email: /\.placement\./});
         
         // Remove test sessions
-        var result13 = db.user_sessions.deleteMany({session_token: /test_session/});
-        var result14 = db.user_sessions.deleteMany({session_token: /admin_session/});
+        var result14 = db.user_sessions.deleteMany({session_token: /test_session/});
+        var result15 = db.user_sessions.deleteMany({session_token: /admin_session/});
         
         // Remove test referral codes
         var result15 = db.referral_codes.deleteMany({user_id: /test-user-/});
