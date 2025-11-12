@@ -383,7 +383,7 @@ export default function AdminPanel() {
                               <span className="bg-amber-500 text-slate-900 text-xs px-2 py-1 rounded font-bold">ADMIN</span>
                             )}
                           </div>
-                          <div className="grid md:grid-cols-2 gap-2 text-sm">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                             <div>
                               <p className="text-gray-500">E-posta</p>
                               <p className="text-gray-300">{u.email}</p>
