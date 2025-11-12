@@ -336,6 +336,64 @@ export default function Dashboard() {
             </Card>
           </div>
 
+
+          {/* Pending Investments Section */}
+          {pendingInvestments.filter(inv => inv.status === 'pending').length > 0 && (
+            <Card className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 border-orange-500/30 mb-8">
+              <CardHeader>
+                <CardTitle className="text-white text-xl flex items-center gap-2">
+                  <svg className="w-6 h-6 text-orange-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Bekleyen Yatırımlarım
+                </CardTitle>
+                <p className="text-sm text-gray-400">Admin onayı bekleniyor</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pendingInvestments.filter(inv => inv.status === 'pending').map((inv, idx) => (
+                    <div key={idx} className="bg-slate-800/80 rounded-xl p-4 border border-orange-500/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-white font-bold text-lg">{inv.package.toUpperCase()} Paketi</p>
+                              <p className="text-gray-400 text-sm">
+                                {inv.platform === 'tether_trc20' ? 'Tether (TRC20)' : 
+                                 inv.platform === 'ethereum_erc20' ? 'Ethereum (ERC20)' : 
+                                 'IBAN Transferi'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-sm mt-3">
+                            <div>
+                              <p className="text-gray-500">Tutar</p>
+                              <p className="text-amber-400 font-bold">${inv.amount}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500">Talep Tarihi</p>
+                              <p className="text-white">{new Date(inv.created_at).toLocaleDateString('tr-TR')}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          <div className="bg-orange-500/20 border border-orange-500 rounded-lg px-4 py-2">
+                            <p className="text-orange-400 font-semibold text-sm">⏳ Onay Bekleniyor</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Referral Section */}
           <Card className="bg-gradient-to-r from-amber-500/10 to-amber-600/10 border-amber-500/30 mb-8">
             <CardHeader>
