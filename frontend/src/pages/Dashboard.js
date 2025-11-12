@@ -26,6 +26,9 @@ export default function Dashboard() {
   const [commissionsOpen, setCommissionsOpen] = useState(false);
   const [networkOpen, setNetworkOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [referralCodes, setReferralCodes] = useState([]);
+  const [activeReferralCode, setActiveReferralCode] = useState('');
+  const [generatingCode, setGeneratingCode] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
