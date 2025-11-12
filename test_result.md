@@ -102,7 +102,162 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implement mandatory referral code validation during user registration with real-time feedback. The system should validate referral codes as users type, show appropriate error messages in Turkish (Yanlış referans kodu girdiniz!), and correctly place new users in the binary tree structure under their referrer."
+user_problem_statement: "Implement multi-use referral code system: 1) Remove auto-uppercase conversion in registration 2) Allow users to generate unlimited referral codes 3) Each code is single-use and expires in 10 minutes 4) Show only used codes in dashboard with referral details 5) Display active code with 'Generate New Code' button"
+
+backend:
+  - task: "ReferralCode model and collection"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created new ReferralCode model with fields: id, code, user_id, created_at, expires_at (10 min), is_used, used_by, used_at. This replaces the single referral_code field in User model."
+
+  - task: "POST /api/referral/generate endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "New endpoint allows authenticated users to generate unlimited referral codes. Each code expires in 10 minutes and is single-use."
+
+  - task: "GET /api/referral/my-codes endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fetches all USED referral codes for authenticated user with referred user details (name, email, joined date)."
+
+  - task: "Updated registration with new referral system"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Registration now checks referral_codes collection instead of users table. Validates: 1) Code exists 2) Not expired 3) Not already used. Marks code as used after successful registration."
+
+  - task: "Updated validation endpoint for new system"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/auth/validate-referral/{code} now checks referral_codes collection and returns specific errors for expired codes and used codes."
+
+  - task: "Helper function ensure_user_has_referral_code"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Auto-creates first referral code for users if they don't have an active one. Used in dashboard endpoint."
+
+  - task: "Dashboard endpoint includes active_referral_code"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Dashboard API now returns active_referral_code field using ensure_user_has_referral_code helper."
+
+frontend:
+  - task: "Remove toUpperCase from referral code input"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/AuthModal.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Removed .toUpperCase() from onChange handler in referral code input. Users can now enter mixed case codes."
+
+  - task: "Dashboard referral code section redesign"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Completely redesigned referral section: 1) Left card shows active code with 'Yeni Kod' button and 10-min expiry warning 2) Right card shows list of used codes with referral details 3) Added state management for activeReferralCode and referralCodes array."
+
+  - task: "Generate new code functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added generateNewCode function that calls POST /api/referral/generate and updates activeReferralCode state. Shows success toast with expiry reminder."
+
+  - task: "Fetch and display used codes"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Dashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added fetchReferralCodes function that calls GET /api/referral/my-codes. Displays used codes with referred user name and date. Shows 'Henüz kullanılan kod yok' message when empty."
+
+metadata:
+  created_by: "main_agent"
+  version: "2.0"
+  test_sequence: 3
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "POST /api/referral/generate endpoint"
+    - "GET /api/referral/my-codes endpoint"
+    - "Updated registration with new referral system"
+    - "Updated validation endpoint for new system"
+    - "Dashboard referral code section redesign"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "MAJOR FEATURE COMPLETE: Implemented multi-use referral code system. Key changes: 1) New referral_codes collection replaces single code per user 2) Each code is single-use and expires in 10 minutes 3) Users can generate unlimited codes via dashboard 4) Dashboard shows active code + all used codes with referral details 5) Registration validates against new system (expiry + usage checks) 6) Removed uppercase conversion. CRITICAL TESTS NEEDED: 1) Code generation and expiry 2) Single-use validation 3) Registration with new vs expired vs used codes 4) Dashboard display of active and used codes 5) Mixed-case code acceptance."
 
 backend:
   - task: "Referral code validation endpoint"
