@@ -422,9 +422,9 @@ export default function AdminPanel() {
                         </div>
                         <div className="text-right ml-4 space-y-1">
                           <p className="text-amber-400 font-semibold text-lg">{u.package ? u.package.toUpperCase() : 'Paket Yok'}</p>
-                          <p className="text-gray-400 text-sm">Bakiye: ₺{u.wallet_balance?.toLocaleString('tr-TR') || '0'}</p>
-                          <p className="text-gray-400 text-sm">Yatırım: ₺{u.total_invested?.toLocaleString('tr-TR') || '0'}</p>
-                          <p className="text-gray-400 text-sm">Komisyon: ₺{u.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
+                          <p className="text-gray-400 text-sm">Bakiye: ${u.wallet_balance?.toLocaleString('tr-TR') || '0'}</p>
+                          <p className="text-gray-400 text-sm">Yatırım: ${u.total_invested?.toLocaleString('tr-TR') || '0'}</p>
+                          <p className="text-gray-400 text-sm">Komisyon: ${u.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
                         </div>
                       </div>
                       {!u.is_admin && (
