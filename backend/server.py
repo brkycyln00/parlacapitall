@@ -1339,6 +1339,150 @@ async def make_user_admin(user_id: str, admin: User = Depends(require_admin)):
     await db.users.update_one({"id": user_id}, {"$set": {"is_admin": True}})
     return {"message": "User is now an admin"}
 
+@api_router.post("/admin/place-user")
+async def admin_place_user(req: PlaceUserRequest, admin: User = Depends(require_admin)):
+    """
+    Admin can manually place any user under any upline in left or right position.
+    This also handles repositioning (moving users from one position to another).
+    """
+    # Validate position
+    if req.position not in ["left", "right"]:
+        raise HTTPException(status_code=400, detail="Pozisyon 'left' veya 'right' olmalıdır")
+    
+    # Get target user
+    target_user_doc = await db.users.find_one({"id": req.user_id}, {"_id": 0})
+    if not target_user_doc:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+    target_user = User(**target_user_doc)
+    
+    # Get upline user
+    upline_doc = await db.users.find_one({"id": req.upline_id}, {"_id": 0})
+    if not upline_doc:
+        raise HTTPException(status_code=404, detail="Üst sponsor bulunamadı")
+    upline = User(**upline_doc)
+    
+    # Check if position is available
+    if req.position == "left" and upline.left_child_id and upline.left_child_id != req.user_id:
+        raise HTTPException(status_code=400, detail="Sol kol dolu. Lütfen önce o kullanıcıyı taşıyın.")
+    if req.position == "right" and upline.right_child_id and upline.right_child_id != req.user_id:
+        raise HTTPException(status_code=400, detail="Sağ kol dolu. Lütfen önce o kullanıcıyı taşıyın.")
+    
+    # Store old placement info
+    old_upline_id = target_user.upline_id
+    old_position = target_user.position
+    action_type = "repositioning" if old_upline_id else "initial_placement"
+    
+    # Remove from old position if exists
+    if old_upline_id:
+        old_upline_doc = await db.users.find_one({"id": old_upline_id}, {"_id": 0})
+        if old_upline_doc:
+            if old_position == "left":
+                await db.users.update_one(
+                    {"id": old_upline_id},
+                    {"$set": {"left_child_id": None}}
+                )
+            elif old_position == "right":
+                await db.users.update_one(
+                    {"id": old_upline_id},
+                    {"$set": {"right_child_id": None}}
+                )
+    
+    # Place in new position
+    if req.position == "left":
+        await db.users.update_one(
+            {"id": req.upline_id},
+            {"$set": {"left_child_id": req.user_id}}
+        )
+    else:
+        await db.users.update_one(
+            {"id": req.upline_id},
+            {"$set": {"right_child_id": req.user_id}}
+        )
+    
+    # Update target user
+    await db.users.update_one(
+        {"id": req.user_id},
+        {"$set": {
+            "upline_id": req.upline_id,
+            "position": req.position
+        }}
+    )
+    
+    # Record placement history
+    history = PlacementHistory(
+        user_id=req.user_id,
+        old_upline_id=old_upline_id,
+        new_upline_id=req.upline_id,
+        old_position=old_position,
+        new_position=req.position,
+        admin_id=admin.id,
+        admin_name=admin.name,
+        action_type=action_type
+    )
+    await db.placement_history.insert_one(history.model_dump())
+    
+    # If user has investments, recalculate volumes
+    if target_user.total_invested > 0:
+        # Remove volumes from old upline tree
+        if old_upline_id:
+            await recalculate_volumes_after_removal(old_upline_id, target_user.total_invested)
+        
+        # Add volumes to new upline tree
+        await update_volumes_upline(req.user_id, target_user.total_invested)
+    
+    return {
+        "message": "Kullanıcı başarıyla yerleştirildi",
+        "action": action_type,
+        "user_name": target_user.name,
+        "upline_name": upline.name,
+        "position": req.position
+    }
+
+async def recalculate_volumes_after_removal(upline_id: str, amount: float):
+    """Subtract volume from upline tree when user is removed"""
+    current_upline_doc = await db.users.find_one({"id": upline_id}, {"_id": 0})
+    if not current_upline_doc:
+        return
+    
+    current_upline = User(**current_upline_doc)
+    
+    # Find which position the removed user was in
+    if current_upline.left_child_id:
+        child = await db.users.find_one({"id": current_upline.left_child_id}, {"_id": 0})
+        # Subtract from left volume
+        await db.users.update_one(
+            {"id": upline_id},
+            {"$inc": {"left_volume": -amount}}
+        )
+    elif current_upline.right_child_id:
+        # Subtract from right volume
+        await db.users.update_one(
+            {"id": upline_id},
+            {"$inc": {"right_volume": -amount}}
+        )
+    
+    # Continue up the tree
+    if current_upline.upline_id:
+        await recalculate_volumes_after_removal(current_upline.upline_id, amount)
+
+@api_router.get("/admin/placement-history")
+async def get_placement_history(admin: User = Depends(require_admin)):
+    """Get all placement history records"""
+    history = await db.placement_history.find({}, {"_id": 0}).sort("created_at", -1).limit(100).to_list(100)
+    
+    # Enrich with user names
+    for record in history:
+        user_doc = await db.users.find_one({"id": record["user_id"]}, {"_id": 0, "name": 1})
+        if user_doc:
+            record["user_name"] = user_doc["name"]
+        
+        if record.get("new_upline_id"):
+            upline_doc = await db.users.find_one({"id": record["new_upline_id"]}, {"_id": 0, "name": 1})
+            if upline_doc:
+                record["new_upline_name"] = upline_doc["name"]
+    
+    return history
+
 @api_router.get("/admin/stats")
 async def admin_get_stats(admin: User = Depends(require_admin)):
     total_users = await db.users.count_documents({})
