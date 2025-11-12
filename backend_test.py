@@ -670,10 +670,11 @@ class ParlaCapitalAPITester:
         var result28 = db.placement_history.deleteMany({admin_name: /Admin User/});
         
         print('Cleanup completed');
-        print('Users deleted: ' + (result1.deletedCount + result2.deletedCount + result3.deletedCount + result4.deletedCount + result5.deletedCount + result6.deletedCount + result7.deletedCount + result8.deletedCount + result9.deletedCount + result10.deletedCount + result11.deletedCount + result12.deletedCount));
-        print('Sessions deleted: ' + (result13.deletedCount + result14.deletedCount));
-        print('Referral codes deleted: ' + (result15.deletedCount + result16.deletedCount + result17.deletedCount));
-        print('Investment requests deleted: ' + (result21.deletedCount + result22.deletedCount));
+        print('Users deleted: ' + (result1.deletedCount + result2.deletedCount + result3.deletedCount + result4.deletedCount + result5.deletedCount + result6.deletedCount + result7.deletedCount + result8.deletedCount + result9.deletedCount + result10.deletedCount + result11.deletedCount + result12.deletedCount + result13.deletedCount));
+        print('Sessions deleted: ' + (result14.deletedCount + result15.deletedCount));
+        print('Referral codes deleted: ' + (result16.deletedCount + result17.deletedCount + result18.deletedCount));
+        print('Investment requests deleted: ' + (result22.deletedCount + result23.deletedCount + result24.deletedCount));
+        print('Placement history deleted: ' + result28.deletedCount);
         """
         
         try:
