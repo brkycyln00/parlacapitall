@@ -151,6 +151,15 @@ async def require_admin(request: Request) -> User:
     user = await require_auth(request)
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
+
+class InvestmentRequestCreate(BaseModel):
+    full_name: str
+    username: str
+    email: str
+    whatsapp: str
+    platform: str
+    package: str
+
     return user
 
 # ==================== JWT AUTH CONFIG ====================
