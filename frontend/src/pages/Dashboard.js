@@ -1304,6 +1304,129 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* Referral Management Dialog */}
+      <Dialog open={managementOpen} onOpenChange={setManagementOpen}>
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">Referans Ağı Yönetimi</DialogTitle>
+            <p className="text-gray-400">Referanslarınızı sol veya sağ kolunuza yerleştirin</p>
+          </DialogHeader>
+          
+          <div className="grid md:grid-cols-2 gap-6 mt-4">
+            {/* Unplaced Referrals */}
+            <div>
+              <h3 className="text-lg font-semibold text-amber-400 mb-4">⏳ Yerleşmemiş Referanslar ({myReferrals.unplaced.length})</h3>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {myReferrals.unplaced.length === 0 ? (
+                  <p className="text-gray-400 text-center py-8">Henüz yerleşmemiş referans yok</p>
+                ) : (
+                  myReferrals.unplaced.map((referral) => (
+                    <Card key={referral.id} className="bg-slate-700/50 border-amber-500/30">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="text-white font-medium">{referral.name}</p>
+                            <p className="text-sm text-gray-400">{referral.email}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Yatırım: ${referral.total_invested || 0}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                            onClick={() => handlePlaceReferral(referral.id, user.id, 'left')}
+                          >
+                            👈 Sol Kola
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-purple-500 hover:bg-purple-600 text-white"
+                            onClick={() => handlePlaceReferral(referral.id, user.id, 'right')}
+                          >
+                            👉 Sağ Kola
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Placed Referrals */}
+            <div>
+              <h3 className="text-lg font-semibold text-green-400 mb-4">✅ Yerleşmiş Referanslar ({myReferrals.placed.length})</h3>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {myReferrals.placed.length === 0 ? (
+                  <p className="text-gray-400 text-center py-8">Henüz yerleşmiş referans yok</p>
+                ) : (
+                  myReferrals.placed.map((referral) => (
+                    <Card key={referral.id} className={`border-2 ${
+                      referral.current_position === 'left' 
+                        ? 'bg-blue-500/10 border-blue-500/30' 
+                        : 'bg-purple-500/10 border-purple-500/30'
+                    }`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex-1">
+                            <p className="text-white font-medium">{referral.name}</p>
+                            <p className="text-sm text-gray-400">{referral.email}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs px-2 py-1 rounded ${
+                                referral.current_position === 'left'
+                                  ? 'bg-blue-500 text-white'
+                                  : 'bg-purple-500 text-white'
+                              }`}>
+                                {referral.current_position === 'left' ? '👈 Sol Kol' : '👉 Sağ Kol'}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                Yatırım: ${referral.total_invested || 0}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          {referral.current_position === 'right' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white"
+                              onClick={() => handlePlaceReferral(referral.id, user.id, 'left')}
+                            >
+                              Sol Kola Taşı
+                            </Button>
+                          )}
+                          {referral.current_position === 'left' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white"
+                              onClick={() => handlePlaceReferral(referral.id, user.id, 'right')}
+                            >
+                              Sağ Kola Taşı
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Info Box */}
+          <div className="mt-6 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+            <p className="text-blue-400 text-sm">
+              ℹ️ <strong>Bilgi:</strong> Referanslarınızı istediğiniz zaman sol veya sağ kolunuza yerleştirebilir, 
+              daha sonra konumlarını değiştirebilirsiniz. Binary kazançlarınız her iki koldaki hacimlere göre hesaplanır.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl max-h-[90vh] overflow-y-auto">
