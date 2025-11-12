@@ -311,7 +311,12 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "User-side referral management interface in Dashboard"
+    - "POST /api/users/place-referral endpoint (non-admin users)"
+    - "GET /api/users/my-referrals endpoint"
+    - "Interactive placement system with unplaced/placed referrals"
+    - "Drag-and-drop or click-to-place functionality"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
