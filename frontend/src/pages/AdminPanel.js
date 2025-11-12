@@ -13,6 +13,7 @@ export default function AdminPanel() {
   const [users, setUsers] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [stats, setStats] = useState({});
+  const [investmentRequests, setInvestmentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
