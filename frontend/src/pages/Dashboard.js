@@ -34,6 +34,12 @@ export default function Dashboard() {
   const [withdrawalIban, setWithdrawalIban] = useState('');
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [withdrawalLoading, setWithdrawalLoading] = useState(false);
+  
+  // Referral management state
+  const [myReferrals, setMyReferrals] = useState({ placed: [], unplaced: [], total: 0 });
+  const [managementOpen, setManagementOpen] = useState(false);
+  const [selectedReferral, setSelectedReferral] = useState(null);
+  const [placementPosition, setPlacementPosition] = useState('left');
 
   useEffect(() => {
     fetchDashboard();
