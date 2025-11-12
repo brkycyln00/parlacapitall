@@ -642,6 +642,7 @@ class ParlaCapitalAPITester:
         var result10 = db.users.deleteMany({email: /casetest\./});
         var result11 = db.users.deleteMany({email: /\.binary\./});
         var result12 = db.users.deleteMany({email: /userc\./});
+        var result13 = db.users.deleteMany({email: /\.placement\./});
         
         // Remove test sessions
         var result13 = db.user_sessions.deleteMany({session_token: /test_session/});
