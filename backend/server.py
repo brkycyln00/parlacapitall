@@ -174,6 +174,13 @@ class InvestmentRequestCreate(BaseModel):
     platform: str
     package: str
 
+
+class WithdrawalRequestCreate(BaseModel):
+    full_name: str
+    iban: str
+    amount: float
+
+
 # ==================== JWT AUTH CONFIG ====================
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
