@@ -136,6 +136,11 @@ export default function AuthModal({ open, onClose, onSuccess }) {
       toast.error('Referans kodu zorunludur. Lütfen davet eden kişinin kodunu girin.');
       return;
     }
+    
+    if (!referralValid) {
+      toast.error('Yanlış referans kodu girdiniz!');
+      return;
+    }
 
     setLoading(true);
     try {
