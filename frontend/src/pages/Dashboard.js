@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [activeReferralCode, setActiveReferralCode] = useState('');
   const [generatingCode, setGeneratingCode] = useState(false);
   const [pendingInvestments, setPendingInvestments] = useState([]);
+  const [pendingWithdrawals, setPendingWithdrawals] = useState([]);
   
   // Withdrawal state
   const [withdrawalOpen, setWithdrawalOpen] = useState(false);
