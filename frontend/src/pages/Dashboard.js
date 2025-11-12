@@ -1012,7 +1012,8 @@ export default function Dashboard() {
                             className="bg-amber-500 hover:bg-amber-600 text-white text-xs"
                             onClick={() => {
                               setSelectedReferral(referral);
-                              setManagementOpen(true);
+                              setSelectedUpline(user.id);
+                              setPlacementModalOpen(true);
                             }}
                           >
                             Yerleştir
