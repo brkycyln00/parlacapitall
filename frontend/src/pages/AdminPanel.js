@@ -158,7 +158,7 @@ export default function AdminPanel() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <Card className="stat-card" data-testid="stat-total-users">
             <CardHeader>
               <CardTitle className="text-gray-300 text-sm">Toplam Kullanıcı</CardTitle>
