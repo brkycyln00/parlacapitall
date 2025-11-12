@@ -705,6 +705,34 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
         }}
     )
     
+    # Calculate and add commission to upline if user has one
+    if target_user.upline_id:
+        # Get commission rate based on package
+        commission_rates = {
+            "silver": 0.05,   # 5%
+            "gold": 0.10,     # 10%
+            "platinum": 0.15  # 15%
+        }
+        
+        commission_rate = commission_rates.get(request.package, 0)
+        commission_amount = request.amount * commission_rate
+        
+        # Update upline's total commissions
+        await db.users.update_one(
+            {"id": target_user.upline_id},
+            {"$inc": {"total_commissions": commission_amount}}
+        )
+        
+        # Create commission transaction for upline
+        commission_transaction = Transaction(
+            user_id=target_user.upline_id,
+            type="commission",
+            amount=commission_amount,
+            status="completed",
+            description=f"Referans komisyonu - {target_user.name} ({request.package.upper()} paketi)"
+        )
+        await db.transactions.insert_one(commission_transaction.model_dump())
+    
     # Mark request as approved
     await db.investment_requests.update_one(
         {"id": request_id},
