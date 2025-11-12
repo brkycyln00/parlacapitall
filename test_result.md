@@ -267,11 +267,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "POST /api/referral/generate endpoint"
-    - "GET /api/referral/my-codes endpoint"
-    - "Updated registration with new referral system"
-    - "Updated validation endpoint for new system"
-    - "Dashboard referral code section redesign"
+    - "Binary tree position selection feature (Left/Right branch referral code generation)"
+    - "Dashboard position selection buttons functionality"
+    - "Referral network display with correct positioning"
+    - "End-to-end flow: Generate code with position -> New user registers -> Investment approved -> Verify placement"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
