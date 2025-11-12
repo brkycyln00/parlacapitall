@@ -368,6 +368,70 @@ async def validate_referral_code(referral_code: str):
         "upline_name": upline.get("name", "Unknown")
     }
 
+
+# ==================== REFERRAL CODE ENDPOINTS ====================
+
+@api_router.post("/referral/generate")
+async def generate_referral_code(request: Request):
+    """Generate a new referral code for the authenticated user"""
+    user = await require_auth(request)
+    
+    # Create new referral code
+    new_code = ReferralCode(
+        user_id=user.id,
+        code=secrets.token_urlsafe(8)
+    )
+    
+    code_dict = new_code.model_dump()
+    await db.referral_codes.insert_one(code_dict)
+    
+    return {
+        "success": True,
+        "code": new_code.code,
+        "expires_at": new_code.expires_at,
+        "message": "Yeni referans kodu oluşturuldu!"
+    }
+
+@api_router.get("/referral/my-codes")
+async def get_my_referral_codes(request: Request):
+    """Get all used referral codes for the authenticated user"""
+    user = await require_auth(request)
+    
+    # Get all used referral codes
+    codes_cursor = db.referral_codes.find(
+        {"user_id": user.id, "is_used": True},
+        {"_id": 0}
+    ).sort("used_at", -1)
+    
+    codes = await codes_cursor.to_list(length=None)
+    
+    # Get referral user details for each code
+    result = []
+    for code_doc in codes:
+        code = ReferralCode(**code_doc)
+        
+        # Get referred user info
+        referred_user = await db.users.find_one(
+            {"id": code.used_by},
+            {"_id": 0, "name": 1, "email": 1, "created_at": 1}
+        )
+        
+        result.append({
+            "code": code.code,
+            "created_at": code.created_at,
+            "used_at": code.used_at,
+            "referred_user": {
+                "name": referred_user.get("name", "Unknown") if referred_user else "Unknown",
+                "email": referred_user.get("email", "") if referred_user else "",
+                "joined_at": referred_user.get("created_at", "") if referred_user else ""
+            }
+        })
+    
+    return {
+        "codes": result,
+        "total": len(result)
+    }
+
 # ==================== GOOGLE AUTH ENDPOINTS ====================
 
 @api_router.post("/auth/session")
