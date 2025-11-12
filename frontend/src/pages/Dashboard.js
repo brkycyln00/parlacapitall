@@ -43,6 +43,9 @@ export default function Dashboard() {
       
       // Fetch used referral codes
       fetchReferralCodes();
+      
+      // Fetch pending investments
+      fetchPendingInvestments();
     } catch (error) {
       console.error('Dashboard error:', error);
       toast.error('Veri yüklenirken hata oluştu');
@@ -57,6 +60,15 @@ export default function Dashboard() {
       setReferralCodes(response.data.codes || []);
     } catch (error) {
       console.error('Referral codes error:', error);
+    }
+  };
+  
+  const fetchPendingInvestments = async () => {
+    try {
+      const response = await axios.get(`${API}/investment/my-requests`, { withCredentials: true });
+      setPendingInvestments(response.data.requests || []);
+    } catch (error) {
+      console.error('Pending investments error:', error);
     }
   };
   
