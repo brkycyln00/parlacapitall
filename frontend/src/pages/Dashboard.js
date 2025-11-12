@@ -499,7 +499,7 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {/* Active Referral Code */}
                 <div className="bg-slate-800/80 rounded-xl p-6 border border-amber-500/20">
                   <div className="flex items-center justify-between mb-4">
