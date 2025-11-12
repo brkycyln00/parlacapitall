@@ -216,6 +216,9 @@ export default function Dashboard() {
             <TrendingUp size={20} />
             <span>Panel</span>
           </button>
+          )}
+          
+          {!user?.is_admin && (
           <button 
             onClick={() => {
               navigate('/packages');
