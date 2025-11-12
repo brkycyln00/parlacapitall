@@ -1522,13 +1522,6 @@ async def get_public_stats():
         "total_volume": total_volume
     }
 
-@api_router.get("/validate-referral/{code}")
-async def validate_referral_code(code: str):
-    user = await db.users.find_one({"referral_code": code}, {"_id": 0})
-    if user:
-        return {"valid": True, "name": user["name"]}
-    return {"valid": False}
-
 # Include router
 app.include_router(api_router)
 
