@@ -137,6 +137,32 @@ export default function Dashboard() {
     }
   };
   
+  const handleJoinNetwork = async () => {
+    if (!joinReferralCode.trim()) {
+      toast.error('Lütfen referans kodunu girin');
+      return;
+    }
+    
+    setJoinLoading(true);
+    try {
+      const response = await axios.post(
+        `${API}/referral/join-network`,
+        { referral_code: joinReferralCode },
+        { withCredentials: true }
+      );
+      toast.success(response.data.message);
+      setJoinNetworkOpen(false);
+      setJoinReferralCode('');
+      fetchDashboard();
+      fetchMyReferrals();
+    } catch (error) {
+      console.error('Join network error:', error);
+      toast.error(error.response?.data?.detail || 'Referans kodu kullanılamadı');
+    } finally {
+      setJoinLoading(false);
+    }
+  };
+  
   const generateNewCode = async (position = 'auto') => {
     setGeneratingCode(true);
     try {
