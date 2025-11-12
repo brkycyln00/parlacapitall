@@ -2295,6 +2295,608 @@ class ParlaCapitalAPITester:
         except Exception as e:
             print(f"   ❌ Failed to check volume: {str(e)}")
 
+    def test_user_side_referral_management_system(self):
+        """Test the User-Side Referral Management System comprehensively"""
+        print("\n👥 Testing User-Side Referral Management System...")
+        print("=" * 60)
+        
+        # Create admin user for approving investments
+        admin_token = self.create_admin_user_and_login()
+        if not admin_token:
+            print("❌ Cannot test user referral management - admin user creation failed")
+            return
+        
+        # Scenario 1: Get My Referrals (Empty State)
+        print("\n1️⃣ Scenario 1: Get My Referrals (Empty State)")
+        
+        # Create regular user (not admin)
+        timestamp = str(int(time.time()))
+        user1_data = {
+            "email": f"user1.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 1 Referral {timestamp}"
+        }
+        
+        # Register User 1 without referral (will be root)
+        success, response = self.run_test(
+            "Register User 1 (Regular User)",
+            "POST",
+            "auth/register",
+            200,
+            data=user1_data
+        )
+        
+        if not success:
+            print("❌ Failed to create User 1")
+            return
+        
+        user1_id = response['user']['id']
+        user1_token = response.get('token')
+        print(f"   ✓ User 1 created: {user1_id}")
+        
+        # Switch to User 1 token
+        original_token = self.session_token
+        self.session_token = user1_token
+        
+        # Test GET /api/users/my-referrals (empty state)
+        success, response = self.run_test(
+            "Get My Referrals (Empty State)",
+            "GET",
+            "users/my-referrals",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            placed = response.get('placed', [])
+            unplaced = response.get('unplaced', [])
+            total = response.get('total', 0)
+            
+            if len(placed) == 0 and len(unplaced) == 0 and total == 0:
+                print("   ✅ Empty state response correct: { placed: [], unplaced: [], total: 0 }")
+            else:
+                print(f"   ❌ Empty state response incorrect: {response}")
+        
+        # Scenario 2: Create Test Structure
+        print("\n2️⃣ Scenario 2: Create Test Structure")
+        
+        # Generate referral codes for User 1
+        success, response = self.run_test(
+            "Generate Referral Code for User 1",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate referral code for User 1")
+            return
+        
+        user1_referral_code = response.get('code')
+        print(f"   ✓ User 1 referral code: {user1_referral_code}")
+        
+        # Register User 2 using User 1's code
+        user2_data = {
+            "email": f"user2.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 2 Referral {timestamp}",
+            "referral_code": user1_referral_code
+        }
+        
+        success, response = self.run_test(
+            "Register User 2 with User 1's Code",
+            "POST",
+            "auth/register",
+            200,
+            data=user2_data
+        )
+        
+        if not success:
+            print("❌ Failed to register User 2")
+            return
+        
+        user2_id = response['user']['id']
+        user2_token = response.get('token')
+        print(f"   ✓ User 2 created: {user2_id}")
+        
+        # Generate another referral code for User 1
+        self.session_token = user1_token
+        success, response = self.run_test(
+            "Generate Second Referral Code for User 1",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to generate second referral code for User 1")
+            return
+        
+        user1_referral_code2 = response.get('code')
+        print(f"   ✓ User 1 second referral code: {user1_referral_code2}")
+        
+        # Register User 3 using User 1's second code
+        user3_data = {
+            "email": f"user3.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 3 Referral {timestamp}",
+            "referral_code": user1_referral_code2
+        }
+        
+        success, response = self.run_test(
+            "Register User 3 with User 1's Second Code",
+            "POST",
+            "auth/register",
+            200,
+            data=user3_data
+        )
+        
+        if not success:
+            print("❌ Failed to register User 3")
+            return
+        
+        user3_id = response['user']['id']
+        user3_token = response.get('token')
+        print(f"   ✓ User 3 created: {user3_id}")
+        
+        # Scenario 3: Get Unplaced Referrals
+        print("\n3️⃣ Scenario 3: Get Unplaced Referrals")
+        
+        # Switch back to User 1
+        self.session_token = user1_token
+        
+        success, response = self.run_test(
+            "Get My Referrals (With Unplaced)",
+            "GET",
+            "users/my-referrals",
+            200
+        )
+        
+        if success and isinstance(response, dict):
+            placed = response.get('placed', [])
+            unplaced = response.get('unplaced', [])
+            total = response.get('total', 0)
+            
+            print(f"   ✓ Placed referrals: {len(placed)}")
+            print(f"   ✓ Unplaced referrals: {len(unplaced)}")
+            print(f"   ✓ Total referrals: {total}")
+            
+            # Verify unplaced array contains user2 and user3
+            unplaced_ids = [ref.get('id') for ref in unplaced]
+            if user2_id in unplaced_ids and user3_id in unplaced_ids:
+                print("   ✅ Unplaced referrals contain User 2 and User 3")
+                
+                # Check fields: name, email, total_invested, current_position="unplaced"
+                for ref in unplaced:
+                    if ref.get('id') == user2_id:
+                        if (ref.get('name') == f"User 2 Referral {timestamp}" and 
+                            ref.get('email') == f"user2.referral.{timestamp}@example.com" and
+                            ref.get('current_position') == "unplaced"):
+                            print("   ✅ User 2 fields correct in unplaced array")
+                        else:
+                            print(f"   ❌ User 2 fields incorrect: {ref}")
+            else:
+                print(f"   ❌ Unplaced referrals missing expected users: {unplaced_ids}")
+        
+        # Scenario 4: Place Unplaced Referral (LEFT)
+        print("\n4️⃣ Scenario 4: Place Unplaced Referral (LEFT)")
+        
+        place_left_data = {
+            "user_id": user2_id,
+            "upline_id": user1_id,
+            "position": "left"
+        }
+        
+        success, response = self.run_test(
+            "Place User 2 in LEFT Position",
+            "POST",
+            "users/place-referral",
+            200,
+            data=place_left_data
+        )
+        
+        if success and isinstance(response, dict):
+            print(f"   ✅ User 2 placed in LEFT position: {response.get('message', '')}")
+            
+            # Verify placement by getting referrals again
+            success, response = self.run_test(
+                "Get My Referrals (After LEFT Placement)",
+                "GET",
+                "users/my-referrals",
+                200
+            )
+            
+            if success and isinstance(response, dict):
+                placed = response.get('placed', [])
+                unplaced = response.get('unplaced', [])
+                
+                # Verify User 2 is now in placed array with position="left"
+                placed_user2 = None
+                for ref in placed:
+                    if ref.get('id') == user2_id:
+                        placed_user2 = ref
+                        break
+                
+                if placed_user2 and placed_user2.get('current_position') == 'left':
+                    print("   ✅ User 2 now in placed array with current_position='left'")
+                else:
+                    print(f"   ❌ User 2 not correctly placed: {placed_user2}")
+                
+                # Verify User 2 removed from unplaced array
+                unplaced_ids = [ref.get('id') for ref in unplaced]
+                if user2_id not in unplaced_ids:
+                    print("   ✅ User 2 removed from unplaced array")
+                else:
+                    print("   ❌ User 2 still in unplaced array")
+        
+        # Scenario 5: Place Unplaced Referral (RIGHT)
+        print("\n5️⃣ Scenario 5: Place Unplaced Referral (RIGHT)")
+        
+        place_right_data = {
+            "user_id": user3_id,
+            "upline_id": user1_id,
+            "position": "right"
+        }
+        
+        success, response = self.run_test(
+            "Place User 3 in RIGHT Position",
+            "POST",
+            "users/place-referral",
+            200,
+            data=place_right_data
+        )
+        
+        if success and isinstance(response, dict):
+            print(f"   ✅ User 3 placed in RIGHT position: {response.get('message', '')}")
+            
+            # Verify placement
+            success, response = self.run_test(
+                "Get My Referrals (After RIGHT Placement)",
+                "GET",
+                "users/my-referrals",
+                200
+            )
+            
+            if success and isinstance(response, dict):
+                placed = response.get('placed', [])
+                unplaced = response.get('unplaced', [])
+                
+                # Verify User 3 is now in placed array with position="right"
+                placed_user3 = None
+                for ref in placed:
+                    if ref.get('id') == user3_id:
+                        placed_user3 = ref
+                        break
+                
+                if placed_user3 and placed_user3.get('current_position') == 'right':
+                    print("   ✅ User 3 now in placed array with current_position='right'")
+                else:
+                    print(f"   ❌ User 3 not correctly placed: {placed_user3}")
+        
+        # Scenario 6: Reposition Existing Referral
+        print("\n6️⃣ Scenario 6: Reposition Existing Referral")
+        
+        # Move User 2 from LEFT to RIGHT (this should fail since RIGHT is occupied)
+        reposition_data = {
+            "user_id": user2_id,
+            "upline_id": user1_id,
+            "position": "right"
+        }
+        
+        success, response = self.run_test(
+            "Try to Move User 2 from LEFT to RIGHT (Should Fail)",
+            "POST",
+            "users/place-referral",
+            400,
+            data=reposition_data
+        )
+        
+        if success and isinstance(response, dict):
+            if "Sağ kol dolu" in response.get('detail', ''):
+                print("   ✅ Repositioning correctly blocked - RIGHT position occupied")
+            else:
+                print(f"   ❌ Repositioning error message incorrect: {response}")
+        
+        # Scenario 7: Security - User Can't Place Others' Referrals
+        print("\n7️⃣ Scenario 7: Security - User Can't Place Others' Referrals")
+        
+        # Create User 4 (not referred by User 1)
+        user4_data = {
+            "email": f"user4.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"User 4 Referral {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register User 4 (Independent User)",
+            "POST",
+            "auth/register",
+            200,
+            data=user4_data
+        )
+        
+        if success:
+            user4_id = response['user']['id']
+            
+            # Try to place User 4 under User 1 (should fail)
+            invalid_place_data = {
+                "user_id": user4_id,
+                "upline_id": user1_id,
+                "position": "left"
+            }
+            
+            # This should fail because User 4 is not User 1's referral
+            success, response = self.run_test(
+                "Try to Place Non-Referral User (Should Fail)",
+                "POST",
+                "users/place-referral",
+                400,  # Expecting error
+                data=invalid_place_data
+            )
+            
+            if success:
+                print("   ✅ Security check passed - Cannot place non-referral users")
+            else:
+                print("   ⚠️ Security check - Error response received (expected)")
+        
+        # Scenario 8: Security - User Can't Place Under Others
+        print("\n8️⃣ Scenario 8: Security - User Can't Place Under Others")
+        
+        # Switch to admin token to create another user
+        self.session_token = admin_token
+        
+        # Create admin user in database for testing
+        admin_user_data = {
+            "email": f"admin.referral.{timestamp}@example.com",
+            "password": "SecurePass123!",
+            "name": f"Admin Referral {timestamp}"
+        }
+        
+        success, response = self.run_test(
+            "Register Admin User for Testing",
+            "POST",
+            "auth/register",
+            200,
+            data=admin_user_data
+        )
+        
+        if success:
+            admin_user_id = response['user']['id']
+            
+            # Switch back to User 1
+            self.session_token = user1_token
+            
+            # Try to place User 2 under admin (should fail)
+            invalid_upline_data = {
+                "user_id": user2_id,
+                "upline_id": admin_user_id,
+                "position": "left"
+            }
+            
+            success, response = self.run_test(
+                "Try to Place Under Non-Network User (Should Fail)",
+                "POST",
+                "users/place-referral",
+                403,  # Expecting forbidden
+                data=invalid_upline_data
+            )
+            
+            if success and isinstance(response, dict):
+                if "Bu kullanıcıyı sadece kendi ağınızdaki üyelerin altına yerleştirebilirsiniz" in response.get('detail', ''):
+                    print("   ✅ Security check passed - Cannot place under non-network users")
+                else:
+                    print(f"   ❌ Security error message incorrect: {response}")
+        
+        # Scenario 9: Multi-Level Network
+        print("\n9️⃣ Scenario 9: Multi-Level Network")
+        
+        # Switch to User 2 to generate referral code
+        self.session_token = user2_token
+        
+        success, response = self.run_test(
+            "Generate Referral Code for User 2",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if success:
+            user2_referral_code = response.get('code')
+            
+            # Register User 4 with User 2's code (making User 4 a grandchild of User 1)
+            user4_grandchild_data = {
+                "email": f"user4.grandchild.{timestamp}@example.com",
+                "password": "SecurePass123!",
+                "name": f"User 4 Grandchild {timestamp}",
+                "referral_code": user2_referral_code
+            }
+            
+            success, response = self.run_test(
+                "Register User 4 as Grandchild",
+                "POST",
+                "auth/register",
+                200,
+                data=user4_grandchild_data
+            )
+            
+            if success:
+                user4_grandchild_id = response['user']['id']
+                
+                # Switch back to User 1 and check network
+                self.session_token = user1_token
+                
+                success, response = self.run_test(
+                    "Get My Referrals (Multi-Level Network)",
+                    "GET",
+                    "users/my-referrals",
+                    200
+                )
+                
+                if success and isinstance(response, dict):
+                    all_referrals = response.get('placed', []) + response.get('unplaced', [])
+                    referral_ids = [ref.get('id') for ref in all_referrals]
+                    
+                    # Check if User 4 (grandchild) is included in the network
+                    if user4_grandchild_id in referral_ids:
+                        print("   ✅ Multi-level network includes grandchild")
+                        
+                        # Find User 4 and check depth field
+                        for ref in all_referrals:
+                            if ref.get('id') == user4_grandchild_id:
+                                depth = ref.get('depth', 0)
+                                if depth > 1:
+                                    print(f"   ✅ Grandchild depth correctly set: {depth}")
+                                else:
+                                    print(f"   ❌ Grandchild depth incorrect: {depth}")
+                                break
+                    else:
+                        print("   ❌ Multi-level network missing grandchild")
+        
+        # Scenario 10: Position Occupied Error
+        print("\n🔟 Scenario 10: Position Occupied Error")
+        
+        # Generate referral code for User 5 to make them User 1's referral
+        self.session_token = user1_token
+        success, response = self.run_test(
+            "Generate Referral Code for User 5 Test",
+            "POST",
+            "referral/generate",
+            200
+        )
+        
+        if success:
+            user1_code_for_user5 = response.get('code')
+            
+            # Register User 5 with User 1's code
+            user5_referral_data = {
+                "email": f"user5.withreferral.{timestamp}@example.com",
+                "password": "SecurePass123!",
+                "name": f"User 5 With Referral {timestamp}",
+                "referral_code": user1_code_for_user5
+            }
+            
+            success, response = self.run_test(
+                "Register User 5 with User 1's Code",
+                "POST",
+                "auth/register",
+                200,
+                data=user5_referral_data
+            )
+            
+            if success:
+                user5_with_referral_id = response['user']['id']
+                
+                # Switch back to User 1 and try to place User 5 in occupied LEFT position
+                self.session_token = user1_token
+                
+                occupied_position_data = {
+                    "user_id": user5_with_referral_id,
+                    "upline_id": user1_id,
+                    "position": "left"
+                }
+                
+                success, response = self.run_test(
+                    "Try to Place in Occupied LEFT Position",
+                    "POST",
+                    "users/place-referral",
+                    400,
+                    data=occupied_position_data
+                )
+                
+                if success and isinstance(response, dict):
+                    if "Sol kol dolu. Lütfen önce o kullanıcıyı taşıyın." in response.get('detail', ''):
+                        print("   ✅ Position occupied error correct")
+                    else:
+                        print(f"   ❌ Position occupied error message incorrect: {response}")
+        
+        # Scenario 11: Volume Recalculation
+        print("\n1️⃣1️⃣ Scenario 11: Volume Recalculation")
+        
+        # Give User 2 an investment first
+        self.session_token = user2_token
+        
+        user2_investment_data = {
+            "full_name": f"User 2 Referral {timestamp}",
+            "username": f"user2_referral_{timestamp}",
+            "email": f"user2.referral.{timestamp}@example.com",
+            "whatsapp": "+1234567890",
+            "platform": "tether_trc20",
+            "package": "gold"  # $500
+        }
+        
+        success, response = self.run_test(
+            "User 2 Investment Request ($500)",
+            "POST",
+            "investment/request",
+            200,
+            data=user2_investment_data
+        )
+        
+        if success:
+            user2_request_id = response.get('request_id')
+            
+            # Admin approves investment
+            self.session_token = admin_token
+            success, response = self.run_test(
+                "Admin Approve User 2 Investment",
+                "POST",
+                f"admin/investment-requests/{user2_request_id}/approve",
+                200
+            )
+            
+            if success:
+                print("   ✅ User 2 investment approved - $500")
+                
+                # Check User 1's left_volume should be $500
+                self.check_user_volumes(user1_id, "After User 2 Investment", expected_left=500.0, expected_right=0.0)
+                
+                # Now move User 2 from LEFT to RIGHT (first need to move User 3 out of RIGHT)
+                # For this test, let's create a new position for User 3 under User 2
+                self.session_token = user1_token
+                
+                # Move User 3 to be under User 2 (left position)
+                move_user3_data = {
+                    "user_id": user3_id,
+                    "upline_id": user2_id,
+                    "position": "left"
+                }
+                
+                success, response = self.run_test(
+                    "Move User 3 Under User 2",
+                    "POST",
+                    "users/place-referral",
+                    200,
+                    data=move_user3_data
+                )
+                
+                if success:
+                    print("   ✅ User 3 moved under User 2")
+                    
+                    # Now move User 2 from LEFT to RIGHT
+                    move_user2_data = {
+                        "user_id": user2_id,
+                        "upline_id": user1_id,
+                        "position": "right"
+                    }
+                    
+                    success, response = self.run_test(
+                        "Move User 2 from LEFT to RIGHT",
+                        "POST",
+                        "users/place-referral",
+                        200,
+                        data=move_user2_data
+                    )
+                    
+                    if success:
+                        print("   ✅ User 2 moved from LEFT to RIGHT")
+                        
+                        # Check volumes: left_volume should be $0, right_volume should be $500
+                        self.check_user_volumes(user1_id, "After User 2 Repositioning", expected_left=0.0, expected_right=500.0)
+        
+        # Restore original token
+        self.session_token = original_token
+        
+        print("\n✅ User-Side Referral Management System Testing Complete")
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting ParlaCapital API Tests")
