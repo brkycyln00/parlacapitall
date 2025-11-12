@@ -255,6 +255,10 @@ export default function Dashboard() {
             <Users size={20} />
             <span>Referans Ağı</span>
           </button>
+          )}
+          
+          {!user?.is_admin && (
+          <>
           <div className="border-t border-slate-700 my-4"></div>
           <button 
             onClick={() => {
