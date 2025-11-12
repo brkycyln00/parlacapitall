@@ -136,6 +136,24 @@ class PackageInfo(BaseModel):
     commission_rate: float
     weekly_profit_rate: float = 0.05
 
+class PlacementHistory(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    old_upline_id: Optional[str] = None
+    new_upline_id: str
+    old_position: Optional[str] = None  # left, right, or None
+    new_position: str  # left or right
+    admin_id: str
+    admin_name: str
+    action_type: str  # "initial_placement" or "repositioning"
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class PlaceUserRequest(BaseModel):
+    user_id: str
+    upline_id: str
+    position: str  # "left" or "right"
+
 # ==================== AUTH HELPERS ====================
 
 async def get_session_token(request: Request) -> Optional[str]:
