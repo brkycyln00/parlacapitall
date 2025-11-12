@@ -189,6 +189,21 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - Validation endpoint working perfectly. Tested: 1) Valid codes return {valid: true, upline_name: 'name'} 2) Expired codes return 'Bu kodun süresi dolmuş!' 3) Used codes return 'Bu kod kullanılmış!' 4) Invalid codes return 'Yanlış referans kodu girdiniz!' 5) Case-sensitive validation works correctly. All error messages in Turkish as required."
 
+  - task: "POST /api/referral/join-network endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented POST /api/referral/join-network endpoint that allows existing users to join a sponsor's network by entering their referral code. One-time only action, users cannot use their own codes, and user becomes 'unplaced' in sponsor's network until manually placed."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETE - Join Network with Referral Code feature working perfectly! All 10 critical scenarios PASSED: 1) User Without Upline Joins Network ✅ - Ali successfully joined Fatma's network with correct success message 'Başarılı! Fatma ağına katıldınız.' 2) User Appears in Sponsor's Unplaced List ✅ - Ali correctly appears in Fatma's unplaced referrals array 3) One-Time Only Rule ✅ - Ali cannot join another network, blocked with Turkish error 'Zaten bir sponsor ağına katılmışsınız' 4) Cannot Use Own Code ✅ - Fatma cannot use her own referral code, blocked with 'Kendi referans kodunuzu kullanamazsınız' 5) Expired Code ✅ - Expired codes rejected with 'Bu referans kodunun süresi dolmuş' 6) Already Used Code ✅ - Used codes rejected with 'Bu referans kodu daha önce kullanılmış' 7) Invalid Code ✅ - Invalid codes rejected with 'Geçersiz referans kodu' 8) Multi-Level Commission Works ✅ - Ali's $500 investment triggered $50 commission to Fatma 9) Manual Placement After Join ✅ - Fatma successfully placed Ali in left position, Ali moved from unplaced to placed array 10) Referral Code Stats ✅ - GET /api/referral/my-codes shows Ali's referral with correct timestamp. SUCCESS RATE: 100% (25/25 tests passed). All Turkish error messages correct. Feature is PRODUCTION-READY!"
+
   - task: "Helper function ensure_user_has_referral_code"
     implemented: true
     working: true
