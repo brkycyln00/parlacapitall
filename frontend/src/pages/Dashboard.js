@@ -38,11 +38,37 @@ export default function Dashboard() {
     try {
       const response = await axios.get(`${API}/dashboard`, { withCredentials: true });
       setDashboard(response.data);
+      setActiveReferralCode(response.data.active_referral_code || '');
+      
+      // Fetch used referral codes
+      fetchReferralCodes();
     } catch (error) {
       console.error('Dashboard error:', error);
       toast.error('Veri yüklenirken hata oluştu');
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const fetchReferralCodes = async () => {
+    try {
+      const response = await axios.get(`${API}/referral/my-codes`, { withCredentials: true });
+      setReferralCodes(response.data.codes || []);
+    } catch (error) {
+      console.error('Referral codes error:', error);
+    }
+  };
+  
+  const generateNewCode = async () => {
+    setGeneratingCode(true);
+    try {
+      const response = await axios.post(`${API}/referral/generate`, {}, { withCredentials: true });
+      setActiveReferralCode(response.data.code);
+      toast.success('Yeni referans kodu oluşturuldu! 10 dakika içinde kullanılmalıdır.');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Kod oluşturulamadı');
+    } finally {
+      setGeneratingCode(false);
     }
   };
 
