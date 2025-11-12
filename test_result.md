@@ -333,6 +333,12 @@ test_plan:
     - "GET /api/users/my-referrals endpoint ✅"
     - "Interactive placement system with unplaced/placed referrals ✅"
     - "Click-to-place functionality (👈 Sol Kola / 👉 Sağ Kola buttons) ✅"
+    - "Multi-level commission system - ALL uplines receive commission up to 11 levels ✅"
+    - "Commission rate verification (Silver 5%, Gold 10%, Platinum 15%) ✅"
+    - "Transaction descriptions with level labels (Direkt, Seviye 2, Seviye 3) ✅"
+    - "Wallet balance and total_commissions updates for all uplines ✅"
+    - "Admin dashboard visibility of commission totals ✅"
+    - "No upline case handling (root user investments) ✅"
 
 agent_communication:
   - agent: "main"
