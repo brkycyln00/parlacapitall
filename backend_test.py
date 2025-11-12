@@ -555,7 +555,7 @@ class ParlaCapitalAPITester:
         print("\n👑 Testing Admin Endpoints...")
         
         # Create admin user and get token
-        admin_token = self.create_admin_user()
+        admin_token = self.create_admin_user_and_login()
         if not admin_token:
             print("❌ Cannot test admin endpoints - admin user creation failed")
             return
