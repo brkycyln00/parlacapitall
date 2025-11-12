@@ -287,6 +287,10 @@ export default function AuthModal({ open, onClose, onSuccess }) {
                   placeholder="Referans kodunu girin"
                   className="bg-slate-700 border-amber-500/50 text-white mt-2 font-mono text-lg"
                   data-testid="register-referral-input"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  spellCheck="false"
                   required
                 />
                 {referralValidating && (
