@@ -201,13 +201,14 @@ export default function Dashboard() {
         </div>
 
         <nav className="flex-1 px-3">
-          <button 
-            onClick={() => {
-              setActiveTab('dashboard');
-              setSidebarOpen(false);
-            }}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-semibold mb-2 ${
-              activeTab === 'dashboard' 
+          {!user?.is_admin && (
+            <button 
+              onClick={() => {
+                setActiveTab('dashboard');
+                setSidebarOpen(false);
+              }}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-semibold mb-2 ${
+                activeTab === 'dashboard' 
                 ? 'bg-amber-500 text-slate-900' 
                 : 'text-gray-300 hover:bg-slate-700'
             }`}
