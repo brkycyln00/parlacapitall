@@ -137,6 +137,24 @@ export default function AdminPanel() {
   };
 
 
+  const handleRejectWithdrawal = async (requestId) => {
+    if (!window.confirm('Bu çekim talebini reddetmek istediğinizden emin misiniz?')) return;
+    
+    try {
+      await axios.post(
+        `${API}/admin/withdrawal-requests/${requestId}/reject`,
+        {},
+        { withCredentials: true }
+      );
+      toast.success('Çekim talebi reddedildi');
+      fetchAdminData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Reddetme başarısız');
+    }
+  };
+
+
+
   const handleMakeAdmin = async (userId) => {
     if (!window.confirm('Bu kullanıcıyı admin yapmak istediğinizden emin misiniz?')) return;
     
