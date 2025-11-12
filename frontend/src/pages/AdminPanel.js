@@ -425,6 +425,28 @@ export default function AdminPanel() {
                     </div>
                   </div>
                 )}
+
+                
+                {/* Reddedilen Çekimler */}
+                {withdrawalRequests.filter(req => req.status === 'rejected').length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-white font-semibold mb-4">Reddedilen Çekimler</h3>
+                    <div className="space-y-2">
+                      {withdrawalRequests.filter(req => req.status === 'rejected').map((req, idx) => (
+                        <div key={idx} className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-white font-semibold">{req.full_name}</p>
+                              <p className="text-gray-400 text-sm">${req.amount.toFixed(2)} - {req.iban}</p>
+                            </div>
+                            <p className="text-red-400 font-semibold">✗ Reddedildi</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               </CardContent>
             </Card>
           </TabsContent>
