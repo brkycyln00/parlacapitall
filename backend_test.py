@@ -640,30 +640,35 @@ class ParlaCapitalAPITester:
         var result8 = db.users.deleteMany({email: /usera\./});
         var result9 = db.users.deleteMany({email: /userb\./});
         var result10 = db.users.deleteMany({email: /casetest\./});
+        var result11 = db.users.deleteMany({email: /\.binary\./});
+        var result12 = db.users.deleteMany({email: /userc\./});
         
         // Remove test sessions
-        var result11 = db.user_sessions.deleteMany({session_token: /test_session/});
-        var result12 = db.user_sessions.deleteMany({session_token: /admin_session/});
+        var result13 = db.user_sessions.deleteMany({session_token: /test_session/});
+        var result14 = db.user_sessions.deleteMany({session_token: /admin_session/});
         
         // Remove test referral codes
-        var result13 = db.referral_codes.deleteMany({user_id: /test-user-/});
-        var result14 = db.referral_codes.deleteMany({user_id: /admin-user-/});
-        var result15 = db.referral_codes.deleteMany({user_id: /seed-user-/});
+        var result15 = db.referral_codes.deleteMany({user_id: /test-user-/});
+        var result16 = db.referral_codes.deleteMany({user_id: /admin-user-/});
+        var result17 = db.referral_codes.deleteMany({user_id: /seed-user-/});
         
-        // Remove test investments
-        var result16 = db.investments.deleteMany({user_id: /test-user-/});
-        var result17 = db.investments.deleteMany({user_id: /admin-user-/});
-        var result18 = db.investments.deleteMany({user_id: /seed-user-/});
+        // Remove test investments and investment requests
+        var result18 = db.investments.deleteMany({user_id: /test-user-/});
+        var result19 = db.investments.deleteMany({user_id: /admin-user-/});
+        var result20 = db.investments.deleteMany({user_id: /seed-user-/});
+        var result21 = db.investment_requests.deleteMany({email: /\.binary\./});
+        var result22 = db.investment_requests.deleteMany({email: /test\.user\./});
         
         // Remove test transactions
-        var result19 = db.transactions.deleteMany({user_id: /test-user-/});
-        var result20 = db.transactions.deleteMany({user_id: /admin-user-/});
-        var result21 = db.transactions.deleteMany({user_id: /seed-user-/});
+        var result23 = db.transactions.deleteMany({user_id: /test-user-/});
+        var result24 = db.transactions.deleteMany({user_id: /admin-user-/});
+        var result25 = db.transactions.deleteMany({user_id: /seed-user-/});
         
         print('Cleanup completed');
-        print('Users deleted: ' + (result1.deletedCount + result2.deletedCount + result3.deletedCount + result4.deletedCount + result5.deletedCount + result6.deletedCount + result7.deletedCount + result8.deletedCount + result9.deletedCount + result10.deletedCount));
-        print('Sessions deleted: ' + (result11.deletedCount + result12.deletedCount));
-        print('Referral codes deleted: ' + (result13.deletedCount + result14.deletedCount + result15.deletedCount));
+        print('Users deleted: ' + (result1.deletedCount + result2.deletedCount + result3.deletedCount + result4.deletedCount + result5.deletedCount + result6.deletedCount + result7.deletedCount + result8.deletedCount + result9.deletedCount + result10.deletedCount + result11.deletedCount + result12.deletedCount));
+        print('Sessions deleted: ' + (result13.deletedCount + result14.deletedCount));
+        print('Referral codes deleted: ' + (result15.deletedCount + result16.deletedCount + result17.deletedCount));
+        print('Investment requests deleted: ' + (result21.deletedCount + result22.deletedCount));
         """
         
         try:
