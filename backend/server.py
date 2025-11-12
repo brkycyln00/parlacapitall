@@ -473,24 +473,37 @@ async def ensure_user_has_referral_code(user_id: str) -> str:
     return new_code.code
 
 @api_router.post("/referral/generate")
-async def generate_referral_code(request: Request):
+async def generate_referral_code(request: Request, position: str = "auto"):
     """Generate a new referral code for the authenticated user"""
     user = await require_auth(request)
+    
+    # Validate position
+    if position not in ["left", "right", "auto"]:
+        raise HTTPException(status_code=400, detail="Position must be 'left', 'right', or 'auto'")
     
     # Create new referral code
     new_code = ReferralCode(
         user_id=user.id,
-        code=secrets.token_urlsafe(8)
+        code=secrets.token_urlsafe(8),
+        position=position
     )
     
     code_dict = new_code.model_dump()
     await db.referral_codes.insert_one(code_dict)
     
+    position_text = {
+        "left": "Sol Kol",
+        "right": "Sağ Kol",
+        "auto": "Otomatik"
+    }
+    
     return {
         "success": True,
         "code": new_code.code,
+        "position": position,
+        "position_text": position_text.get(position),
         "expires_at": new_code.expires_at,
-        "message": "Yeni referans kodu oluşturuldu!"
+        "message": f"Yeni referans kodu oluşturuldu! ({position_text.get(position)})"
     }
 
 @api_router.get("/referral/my-codes")
