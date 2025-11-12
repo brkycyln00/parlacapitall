@@ -107,27 +107,33 @@ user_problem_statement: "Implement mandatory referral code validation during use
 backend:
   - task: "Referral code validation endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added new GET endpoint /api/auth/validate-referral/{referral_code} that checks if a referral code exists in the database and returns validation status with upline name."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Comprehensive testing completed. Valid referral codes return {valid: true, upline_name: 'name'}. Invalid codes return {valid: false, message: 'Yanlış referans kodu girdiniz!'}. Special characters and empty codes handled correctly. All test scenarios passed successfully."
   
   - task: "Binary tree placement logic in registration"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Registration endpoint already has logic to place users in binary tree (left/right) based on available positions in upline's structure. This needs to be tested with multiple registrations."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Binary tree placement working correctly. First child placed on LEFT, second child placed on RIGHT. Upline's left_child_id and right_child_id updated properly. New users have correct upline_id and position ('left'/'right'). Registration with valid referral code succeeds, invalid codes fail with Turkish error 'Geçersiz referans kodu', missing referral codes fail with 'Referans kodu zorunludur'."
 
 frontend:
   - task: "Real-time referral code validation"
