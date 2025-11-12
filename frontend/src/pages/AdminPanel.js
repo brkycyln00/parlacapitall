@@ -230,7 +230,7 @@ export default function AdminPanel() {
                 <div className="space-y-4">
                   {investmentRequests.filter(req => req.status === 'pending').map((req, idx) => (
                     <div key={idx} className="bg-slate-700/50 rounded-lg p-6 border border-amber-500/20">
-                      <div className="grid md:grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4">
                         <div>
                           <p className="text-gray-400 text-sm">İsim Soyisim</p>
                           <p className="text-white font-semibold">{req.full_name}</p>
