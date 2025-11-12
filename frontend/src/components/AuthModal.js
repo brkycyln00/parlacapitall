@@ -278,7 +278,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
               </div>
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
                 <Label className="text-amber-400 font-semibold">
-                  Referans Kodu (Zorunlu)
+                  Referans Kodu (Opsiyonel)
                 </Label>
                 <Input
                   type="text"
@@ -288,14 +288,13 @@ export default function AuthModal({ open, onClose, onSuccess }) {
                     const cleanCode = e.target.value.trim().replace(/\s/g, '');
                     setReferralCode(cleanCode);
                   }}
-                  placeholder="Referans kodunu girin"
+                  placeholder="Varsa referans kodunu girin"
                   className="bg-slate-700 border-amber-500/50 text-white mt-2 font-mono text-lg"
                   data-testid="register-referral-input"
                   autoCapitalize="none"
                   autoCorrect="off"
                   autoComplete="off"
                   spellCheck="false"
-                  required
                 />
                 {referralValidating && (
                   <p className="text-blue-400 text-sm mt-2 flex items-center">
