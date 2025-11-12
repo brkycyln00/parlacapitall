@@ -312,10 +312,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Manual user placement system - Admin can place users in binary tree"
-    - "POST /api/admin/place-user endpoint"
-    - "Placement history tracking"
-    - "Volume recalculation after repositioning"
     - "Frontend user placement interface in Admin Panel"
   stuck_tasks: []
   test_all: false
@@ -326,6 +322,10 @@ test_plan:
     - "Binary earnings added to wallet_balance ✅"
     - "Binary transaction creation ✅"
     - "End-to-end flow: Create binary tree structure -> Add investments -> Verify volume accumulation -> Verify bonus calculation ✅"
+    - "Manual user placement system - Admin can place users in binary tree ✅"
+    - "POST /api/admin/place-user endpoint ✅"
+    - "Placement history tracking ✅"
+    - "Volume recalculation after repositioning ✅"
 
 agent_communication:
   - agent: "main"
