@@ -334,6 +334,75 @@ export default function AdminPanel() {
             </Card>
           </TabsContent>
 
+
+          {/* Withdrawal Requests Tab */}
+          <TabsContent value="withdrawals">
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-white">Çekim Talepleri</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {withdrawalRequests.filter(req => req.status === 'pending').map((req, idx) => (
+                    <div key={idx} className="bg-slate-700/50 rounded-lg p-6 border border-green-500/20">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4">
+                        <div>
+                          <p className="text-gray-400 text-sm">İsim Soyisim</p>
+                          <p className="text-white font-semibold">{req.full_name}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-sm">Kullanıcı</p>
+                          <p className="text-white">{req.user_name}</p>
+                          <p className="text-gray-500 text-xs">{req.user_email}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-sm">IBAN</p>
+                          <p className="text-white font-mono text-sm">{req.iban}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-sm">Çekim Tutarı</p>
+                          <p className="text-green-400 font-bold text-xl">${req.amount.toFixed(2)}</p>
+                        </div>
+                      </div>
+                      <div className="text-gray-500 text-xs mb-4">
+                        Talep Tarihi: {new Date(req.created_at).toLocaleString('tr-TR')}
+                      </div>
+                      <Button
+                        onClick={() => handleApproveWithdrawal(req.id)}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold"
+                      >
+                        Çekimi Onayla
+                      </Button>
+                    </div>
+                  ))}
+                  {withdrawalRequests.filter(req => req.status === 'pending').length === 0 && (
+                    <p className="text-gray-500 text-center py-8">Bekleyen çekim talebi yok</p>
+                  )}
+                </div>
+                
+                {/* Onaylanmış Çekimler */}
+                {withdrawalRequests.filter(req => req.status === 'approved').length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-white font-semibold mb-4">Onaylanmış Çekimler</h3>
+                    <div className="space-y-2">
+                      {withdrawalRequests.filter(req => req.status === 'approved').map((req, idx) => (
+                        <div key={idx} className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-white font-semibold">{req.full_name}</p>
+                              <p className="text-gray-400 text-sm">${req.amount.toFixed(2)} - {req.iban}</p>
+                            </div>
+                            <p className="text-green-400 font-semibold">✓ Onaylandı</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Transactions Tab */}
           <TabsContent value="transactions">
             <Card className="glass-card">
