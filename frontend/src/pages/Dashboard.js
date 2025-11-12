@@ -387,7 +387,7 @@ export default function Dashboard() {
                               </p>
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-sm mt-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-3">
                             <div>
                               <p className="text-gray-500">Tutar</p>
                               <p className="text-amber-400 font-bold">${inv.amount}</p>
