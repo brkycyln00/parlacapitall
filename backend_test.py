@@ -654,11 +654,12 @@ class ParlaCapitalAPITester:
         var result18 = db.referral_codes.deleteMany({user_id: /seed-user-/});
         
         // Remove test investments and investment requests
-        var result18 = db.investments.deleteMany({user_id: /test-user-/});
-        var result19 = db.investments.deleteMany({user_id: /admin-user-/});
-        var result20 = db.investments.deleteMany({user_id: /seed-user-/});
-        var result21 = db.investment_requests.deleteMany({email: /\.binary\./});
-        var result22 = db.investment_requests.deleteMany({email: /test\.user\./});
+        var result19 = db.investments.deleteMany({user_id: /test-user-/});
+        var result20 = db.investments.deleteMany({user_id: /admin-user-/});
+        var result21 = db.investments.deleteMany({user_id: /seed-user-/});
+        var result22 = db.investment_requests.deleteMany({email: /\.binary\./});
+        var result23 = db.investment_requests.deleteMany({email: /test\.user\./});
+        var result24 = db.investment_requests.deleteMany({email: /\.placement\./});
         
         // Remove test transactions
         var result23 = db.transactions.deleteMany({user_id: /test-user-/});
