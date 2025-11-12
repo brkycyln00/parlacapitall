@@ -586,31 +586,33 @@ export default function Dashboard() {
             </Card>
           )}
 
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            {/* Weekly Earnings Chart */}
-            <Card className="bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white">Haftalık Kazançlar</CardTitle>
-                <p className="text-sm text-gray-400">Son 7 günlük kazanç detayları</p>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={weeklyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis dataKey="day" stroke="#9CA3AF" />
-                    <YAxis stroke="#9CA3AF" />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}
-                      labelStyle={{ color: '#F3F4F6' }}
-                    />
-                    <Legend />
-                    <Bar dataKey="binary" fill="#06B6D4" name="Binary" />
-                    <Bar dataKey="career" fill="#10B981" name="Kariyer" />
-                    <Bar dataKey="commission" fill="#F59E0B" name="Paket Komisyon" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+          {/* Charts - Only show if user has investment */}
+          {(user?.package || user?.total_invested > 0) ? (
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              {/* Weekly Earnings Chart */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Haftalık Kazançlar</CardTitle>
+                  <p className="text-sm text-gray-400">Son 7 günlük kazanç detayları</p>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={weeklyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="day" stroke="#9CA3AF" />
+                      <YAxis stroke="#9CA3AF" />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #334155' }}
+                        labelStyle={{ color: '#F3F4F6' }}
+                      />
+                      <Legend />
+                      <Bar dataKey="binary" fill="#06B6D4" name="Binary" />
+                      <Bar dataKey="career" fill="#10B981" name="Kariyer" />
+                      <Bar dataKey="commission" fill="#F59E0B" name="Paket Komisyon" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
 
             {/* Binary Earnings */}
             <Card className="bg-slate-800 border-slate-700">
