@@ -30,6 +30,13 @@ export default function Dashboard() {
   const [activeReferralCode, setActiveReferralCode] = useState('');
   const [generatingCode, setGeneratingCode] = useState(false);
   const [pendingInvestments, setPendingInvestments] = useState([]);
+  
+  // Withdrawal state
+  const [withdrawalOpen, setWithdrawalOpen] = useState(false);
+  const [withdrawalFullName, setWithdrawalFullName] = useState('');
+  const [withdrawalIban, setWithdrawalIban] = useState('');
+  const [withdrawalAmount, setWithdrawalAmount] = useState('');
+  const [withdrawalLoading, setWithdrawalLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
