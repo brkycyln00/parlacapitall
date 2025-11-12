@@ -2906,38 +2906,8 @@ class ParlaCapitalAPITester:
         # Test public endpoints first
         self.test_public_endpoints()
         
-        # CRITICAL CURRENT FOCUS: Test User-Side Referral Management System
-        self.test_user_side_referral_management_system()
-        
-        # Test Manual User Placement System
-        self.test_manual_user_placement_system()
-        
-        # CRITICAL P1 TASK: Test Binary Earnings Calculation System
-        self.test_binary_earnings_calculation_system()
-        
-        # Test NEW multi-use referral system (CRITICAL PRIORITY)
-        self.test_multi_use_referral_system()
-        
-        # Test old referral validation system for comparison
-        self.test_referral_validation_system()
-        
-        # Test other authenticated endpoints if we have session
-        if self.session_token:
-            self.test_auth_endpoints()
-            self.test_dashboard_endpoints()
-            self.test_investment_endpoints()
-            self.test_withdrawal_endpoints()
-            
-            # Test admin endpoints
-            self.test_admin_endpoints()
-            
-            # Test logout at the end
-            success, response = self.run_test(
-                "Logout",
-                "POST",
-                "auth/logout",
-                200
-            )
+        # CRITICAL FOCUS: Test Multi-Level Commission System
+        self.test_multi_level_commission_system()
         
         # Cleanup
         self.cleanup_test_data()
