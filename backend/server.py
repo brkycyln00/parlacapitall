@@ -548,6 +548,83 @@ async def get_my_referral_codes(request: Request):
         "total": len(result)
     }
 
+class JoinNetworkRequest(BaseModel):
+    referral_code: str
+
+@api_router.post("/referral/join-network")
+async def join_network_with_code(req: JoinNetworkRequest, current_user: User = Depends(require_auth)):
+    """
+    Allow existing users to join a network by entering a referral code.
+    - One-time only (if user already has upline, cannot change)
+    - Cannot use own referral codes
+    - Code must be valid and not expired
+    """
+    # Check if user already has an upline
+    if current_user.upline_id:
+        raise HTTPException(
+            status_code=400, 
+            detail="Zaten bir sponsor ağına katılmışsınız. Sadece bir kez referans kodu girebilirsiniz."
+        )
+    
+    # Find referral code
+    referral_doc = await db.referral_codes.find_one({"code": req.referral_code}, {"_id": 0})
+    if not referral_doc:
+        raise HTTPException(status_code=400, detail="Geçersiz referans kodu.")
+    
+    referral = ReferralCode(**referral_doc)
+    
+    # Check if user is trying to use their own code
+    if referral.user_id == current_user.id:
+        raise HTTPException(
+            status_code=400,
+            detail="Kendi referans kodunuzu kullanamazsınız."
+        )
+    
+    # Check if code is expired
+    expires_at = datetime.fromisoformat(referral.expires_at)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=400, 
+            detail="Bu referans kodunun süresi dolmuş. Lütfen yeni bir kod isteyin."
+        )
+    
+    # Check if code is already used
+    if referral.is_used:
+        raise HTTPException(
+            status_code=400, 
+            detail="Bu referans kodu daha önce kullanılmış. Her kod sadece bir kez kullanılabilir."
+        )
+    
+    # Get sponsor user
+    sponsor_doc = await db.users.find_one({"id": referral.user_id}, {"_id": 0})
+    if not sponsor_doc:
+        raise HTTPException(status_code=400, detail="Sponsor bulunamadı.")
+    
+    sponsor = User(**sponsor_doc)
+    
+    # Update current user's upline_id (but DON'T place in binary tree yet)
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {"upline_id": sponsor.id}}
+    )
+    
+    # Mark referral code as used
+    await db.referral_codes.update_one(
+        {"id": referral.id},
+        {"$set": {
+            "is_used": True,
+            "used_by": current_user.id,
+            "used_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {
+        "message": f"Başarılı! {sponsor.name} ağına katıldınız.",
+        "sponsor_name": sponsor.name,
+        "sponsor_email": sponsor.email,
+        "note": "Sponsor sizi binary ağaçta istediği konuma yerleştirecektir."
+    }
+
 # ==================== GOOGLE AUTH ENDPOINTS ====================
 
 @api_router.post("/auth/session")
