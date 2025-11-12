@@ -105,9 +105,9 @@ export default function Dashboard() {
   };
 
   const copyReferralLink = () => {
-    const link = `${process.env.REACT_APP_BASE_URL}/?ref=${user.referral_code}`;
+    const link = `${process.env.REACT_APP_BASE_URL}/?ref=${activeReferralCode}`;
     navigator.clipboard.writeText(link);
-    toast.success('Referans linki kopyalandı!');
+    toast.success('Davet linki kopyalandı!');
   };
 
   // Mock data for weekly earnings chart
