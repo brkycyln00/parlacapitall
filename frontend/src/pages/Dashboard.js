@@ -50,6 +50,9 @@ export default function Dashboard() {
       
       // Fetch pending investments
       fetchPendingInvestments();
+      
+      // Fetch pending withdrawals
+      fetchPendingWithdrawals();
     } catch (error) {
       console.error('Dashboard error:', error);
       toast.error('Veri yüklenirken hata oluştu');
