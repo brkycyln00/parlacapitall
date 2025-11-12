@@ -339,15 +339,26 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
+                {/* Active Referral Code */}
                 <div className="bg-slate-800/80 rounded-xl p-6 border border-amber-500/20">
-                  <p className="text-sm text-gray-400 mb-2">Referans Kodunuz</p>
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm text-gray-400">Aktif Referans Kodunuz</p>
+                    <Button
+                      onClick={generateNewCode}
+                      disabled={generatingCode}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {generatingCode ? 'Oluşturuluyor...' : '+ Yeni Kod'}
+                    </Button>
+                  </div>
                   <div className="flex items-center space-x-2 mb-4">
                     <div className="flex-1 bg-slate-900 rounded-lg px-4 py-3 border border-amber-500/30">
-                      <p className="text-2xl font-bold text-amber-400 font-mono">{user?.referral_code}</p>
+                      <p className="text-2xl font-bold text-amber-400 font-mono">{activeReferralCode || 'Yükleniyor...'}</p>
                     </div>
                     <Button 
                       onClick={() => {
-                        navigator.clipboard.writeText(user?.referral_code);
+                        navigator.clipboard.writeText(activeReferralCode);
                         toast.success('Referans kodu kopyalandı!');
                       }}
                       className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-6"
@@ -355,10 +366,13 @@ export default function Dashboard() {
                       Kopyala
                     </Button>
                   </div>
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
+                    <p className="text-amber-400 text-xs font-semibold">⏰ Her kod TEK KULLANIMLIK ve 10 dakika sonra sona erer!</p>
+                  </div>
                   <p className="text-sm text-gray-400 mb-2">Davet Linkiniz</p>
                   <div className="flex items-center space-x-2">
                     <Input
-                      value={`${process.env.REACT_APP_BASE_URL}/?ref=${user?.referral_code}`}
+                      value={`${process.env.REACT_APP_BASE_URL}/?ref=${activeReferralCode}`}
                       readOnly
                       className="bg-slate-900 border-amber-500/30 text-white text-sm"
                     />
@@ -371,21 +385,29 @@ export default function Dashboard() {
                   </div>
                 </div>
 
+                {/* Used Referral Codes */}
                 <div className="bg-slate-800/80 rounded-xl p-6 border border-amber-500/20">
-                  <p className="text-sm text-gray-400 mb-4">Komisyon Oranları</p>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-300">Silver Paket</span>
-                      <span className="text-purple-400 font-bold">%5 Komisyon</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-300">Gold Paket</span>
-                      <span className="text-amber-400 font-bold">%10 Komisyon</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-300">Platinum Paket</span>
-                      <span className="text-cyan-400 font-bold">%15 Komisyon</span>
-                    </div>
+                  <p className="text-sm text-gray-400 mb-4">Kullanılan Referans Kodlarınız</p>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {referralCodes.length > 0 ? (
+                      referralCodes.map((codeData, idx) => (
+                        <div key={idx} className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-amber-400 font-mono font-bold">{codeData.code}</span>
+                            <span className="text-green-400 text-xs">✓ Kullanıldı</span>
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            <p>👤 {codeData.referred_user.name}</p>
+                            <p>📅 {new Date(codeData.used_at).toLocaleDateString('tr-TR')}</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500 text-sm">Henüz kullanılan kod yok</p>
+                        <p className="text-gray-600 text-xs mt-1">Kodlarınızı paylaşarak üye kazanın!</p>
+                      </div>
+                    )}
                   </div>
                   <div className="mt-4 pt-4 border-t border-slate-700">
                     <div className="flex items-center justify-between">
