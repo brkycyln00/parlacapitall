@@ -55,7 +55,8 @@ export default function Dashboard() {
       fetchPendingWithdrawals();
     } catch (error) {
       console.error('Dashboard error:', error);
-      toast.error('Veri yüklenirken hata oluştu');
+      console.error('Error response:', error.response?.data);
+      toast.error('Veri yüklenirken hata oluştu: ' + (error.response?.data?.detail || error.message));
     } finally {
       setLoading(false);
     }
