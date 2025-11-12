@@ -841,6 +841,28 @@ async def approve_withdrawal_request(request_id: str, user: User = Depends(requi
     
     return {"success": True, "message": "Withdrawal approved"}
 
+
+@api_router.post("/admin/withdrawal-requests/{request_id}/reject")
+async def reject_withdrawal_request(request_id: str, user: User = Depends(require_admin)):
+    """Reject withdrawal request"""
+    request_doc = await db.withdrawal_requests.find_one({"id": request_id}, {"_id": 0})
+    if not request_doc:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    withdrawal = WithdrawalRequest(**request_doc)
+    
+    if withdrawal.status != "pending":
+        raise HTTPException(status_code=400, detail="Request already processed")
+    
+    # Mark request as rejected
+    await db.withdrawal_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "rejected"}}
+    )
+    
+    return {"success": True, "message": "Withdrawal request rejected"}
+
+
 @api_router.delete("/admin/users/{user_id}")
 async def delete_user(user_id: str, admin: User = Depends(require_admin)):
     """Delete a user (admin only)"""
