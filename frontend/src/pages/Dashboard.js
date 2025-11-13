@@ -1318,53 +1318,78 @@ export default function Dashboard() {
             </div>
 
             {/* Binary Tree Visualization */}
-            <div className="bg-slate-900 rounded-lg p-6">
+            <div className="bg-slate-900 rounded-lg p-6 overflow-x-auto">
               <h3 className="text-white font-semibold mb-6 text-center">Binary Ağaç Yapısı</h3>
-              <div className="flex flex-col items-center space-y-8">
-                {/* You */}
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="text-slate-900 font-bold text-xl">{user?.name?.charAt(0)}</span>
-                  </div>
-                  <p className="text-white font-semibold">{user?.name}</p>
-                  <p className="text-gray-400 text-sm">Siz</p>
+              
+              {treeLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
+                  <p className="text-gray-400 mt-4">Ağaç yükleniyor...</p>
                 </div>
-
-                {/* Children */}
-                <div className="grid grid-cols-2 gap-24">
-                  {/* Left Child */}
-                  <div className="text-center">
-                    <div className="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                      {dashboard?.network?.left ? (
-                        <span className="text-white font-bold">{dashboard.network.left.name?.charAt(0)}</span>
-                      ) : (
-                        <span className="text-white text-2xl">+</span>
-                      )}
-                    </div>
-                    <p className="text-white text-sm font-semibold">
-                      {dashboard?.network?.left?.name || 'Boş'}
-                    </p>
-                    <p className="text-blue-400 text-xs">Sol Kol</p>
-                    <p className="text-gray-500 text-xs mt-1">${user?.left_volume?.toLocaleString('tr-TR') || '0'}</p>
-                  </div>
-
-                  {/* Right Child */}
-                  <div className="text-center">
-                    <div className="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                      {dashboard?.network?.right ? (
-                        <span className="text-white font-bold">{dashboard.network.right.name?.charAt(0)}</span>
-                      ) : (
-                        <span className="text-white text-2xl">+</span>
-                      )}
-                    </div>
-                    <p className="text-white text-sm font-semibold">
-                      {dashboard?.network?.right?.name || 'Boş'}
-                    </p>
-                    <p className="text-green-400 text-xs">Sağ Kol</p>
-                    <p className="text-gray-500 text-xs mt-1">${user?.right_volume?.toLocaleString('tr-TR') || '0'}</p>
-                  </div>
+              ) : binaryTree ? (
+                <div className="min-w-max">
+                  {/* Recursive Tree Node Component */}
+                  {(() => {
+                    const TreeNode = ({ node, isRoot = false }) => {
+                      if (!node) return (
+                        <div className="flex flex-col items-center">
+                          <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center border-2 border-dashed border-slate-600">
+                            <span className="text-slate-500 text-xl">+</span>
+                          </div>
+                          <p className="text-slate-500 text-xs mt-1">Boş</p>
+                        </div>
+                      );
+                      
+                      return (
+                        <div className="flex flex-col items-center">
+                          {/* Node */}
+                          <div className={`relative ${isRoot ? 'bg-gradient-to-r from-amber-500 to-amber-600' : 'bg-slate-700'} rounded-lg p-3 mb-4 shadow-lg min-w-[140px]`}>
+                            <div className="text-center">
+                              <div className={`w-10 h-10 ${isRoot ? 'bg-white' : 'bg-amber-500'} rounded-full flex items-center justify-center mx-auto mb-2`}>
+                                <span className={`${isRoot ? 'text-amber-600' : 'text-white'} font-bold`}>{node.name?.charAt(0)}</span>
+                              </div>
+                              <p className={`${isRoot ? 'text-white' : 'text-white'} text-sm font-semibold truncate`}>{node.name}</p>
+                              {isRoot && <p className="text-amber-100 text-xs">Siz</p>}
+                              <div className="mt-2 space-y-1">
+                                <p className="text-xs text-gray-300">Yatırım: ${node.total_invested || 0}</p>
+                                {node.left_volume > 0 && (
+                                  <p className="text-xs text-blue-300">👈 ${node.left_volume?.toLocaleString('tr-TR')}</p>
+                                )}
+                                {node.right_volume > 0 && (
+                                  <p className="text-xs text-purple-300">👉 ${node.right_volume?.toLocaleString('tr-TR')}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Children */}
+                          {(node.left || node.right) && (
+                            <div className="flex gap-8">
+                              {/* Left Branch */}
+                              <div className="flex flex-col items-center">
+                                <div className="w-px h-8 bg-blue-500"></div>
+                                <TreeNode node={node.left} />
+                              </div>
+                              
+                              {/* Right Branch */}
+                              <div className="flex flex-col items-center">
+                                <div className="w-px h-8 bg-purple-500"></div>
+                                <TreeNode node={node.right} />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    };
+                    
+                    return <TreeNode node={binaryTree} isRoot={true} />;
+                  })()}
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-400">Ağaç verisi yüklenemedi</p>
+                </div>
+              )}
             </div>
 
             {/* All Network Members */}
