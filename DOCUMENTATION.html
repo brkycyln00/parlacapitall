@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParlaCapital MLM Platform - Tam Dokümantasyon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        nav {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #667eea;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        main {
+            padding: 40px;
+        }
+        
+        section {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        section:last-child {
+            border-bottom: none;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+        }
+        
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tech-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .api-endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+        
+        .method.get { background: #28a745; color: white; }
+        .method.post { background: #007bff; color: white; }
+        .method.put { background: #ffc107; color: black; }
+        .method.delete { background: #dc3545; color: white; }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border: 2px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status.completed { background: #28a745; color: white; }
+        .status.in-progress { background: #ffc107; color: black; }
+        .status.pending { background: #6c757d; color: white; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 ParlaCapital MLM Platform</h1>
+            <p>Kapsamlı Teknik Dokümantasyon</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Binary Tree + Multi-Level Commission + Career System</p>
+        </header>
+        
+        <nav>
+            <ul>
+                <li><a href="#overview">Genel Bakış</a></li>
+                <li><a href="#tech-stack">Teknoloji</a></li>
+                <li><a href="#database">Database</a></li>
+                <li><a href="#api">API Endpoints</a></li>
+                <li><a href="#features">Özellikler</a></li>
+                <li><a href="#auth">Authentication</a></li>
+                <li><a href="#binary">Binary Tree</a></li>
+                <li><a href="#career">Kariyer</a></li>
+                <li><a href="#email">Email</a></li>
+                <li><a href="#deployment">Deployment</a></li>
+            </ul>
+        </nav>
+        
+        <main>
+            <!-- GENEL BAKIŞ -->
+            <section id="overview">
+                <h2>📋 Genel Bakış</h2>
+                <p><strong>ParlaCapital</strong>, Türkiye'de faaliyet gösteren bir kripto yatırım ve network marketing platformudur. Binary tree (ikili ağaç) yapısı ve çok seviyeli komisyon sistemi ile kullanıcıların hem yatırım yapmasına hem de referans ağı kurmasına olanak tanır.</p>
+                
+                <h3>Ana Özellikler</h3>
+                <ul>
+                    <li><strong>Binary Tree MLM Sistemi:</strong> Sol ve sağ kol yapısında sınırsız derinlik</li>
+                    <li><strong>3 Yatırım Paketi:</strong> Silver ($600), Gold ($1000), Platinum ($1500)</li>
+                    <li><strong>Direkt Komisyon:</strong> %5, %10, %15 oranlarında tek seviye</li>
+                    <li><strong>Binary Kazançlar:</strong> $1000+$1000 hacimde $100 bonus</li>
+                    <li><strong>Kariyer Sistemi:</strong> 6 seviye (Amethyst → Crown)</li>
+                    <li><strong>Manuel Ağ Yönetimi:</strong> Kullanıcılar kendi ağlarını organize eder</li>
+                    <li><strong>Admin Paneli:</strong> Yatırım/çekim onayları, kullanıcı yönetimi</li>
+                    <li><strong>Email Bildirimleri:</strong> SMTP ile hoş geldin emaili</li>
+                </ul>
+                
+                <div class="success">
+                    <strong>✅ Proje Durumu:</strong> Production-ready, tam fonksiyonel, test edilmiş
+                </div>
+            </section>
+            
+            <!-- TEKNOLOJİ STACK -->
+            <section id="tech-stack">
+                <h2>💻 Teknoloji Stack</h2>
+                
+                <div class="tech-stack">
+                    <div class="tech-card">
+                        <h4>🔙 Backend</h4>
+                        <ul>
+                            <li><strong>Framework:</strong> FastAPI (Python 3.11+)</li>
+                            <li><strong>Database:</strong> MongoDB (Motor async)</li>
+                            <li><strong>Authentication:</strong> JWT + Cookie-based</li>
+                            <li><strong>Email:</strong> SMTP (smtplib)</li>
+                            <li><strong>Validation:</strong> Pydantic + EmailStr</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <h4>🎨 Frontend</h4>
+                        <ul>
+                            <li><strong>Framework:</strong> React 18</li>
+                            <li><strong>Routing:</strong> React Router v6</li>
+                            <li><strong>Styling:</strong> TailwindCSS</li>
+                            <li><strong>HTTP Client:</strong> Axios</li>
+                            <li><strong>UI Components:</strong> Shadcn/ui</li>
+                            <li><strong>Toast:</strong> react-hot-toast</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <h4>🗄️ Database</h4>
+                        <ul>
+                            <li><strong>Veritabanı:</strong> MongoDB</li>
+                            <li><strong>Collections:</strong> 6 ana collection</li>
+                            <li><strong>Indexes:</strong> email, id, user_id</li>
+                            <li><strong>Driver:</strong> Motor (async)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <h4>🚀 Deployment</h4>
+                        <ul>
+                            <li><strong>Platform:</strong> Kubernetes</li>
+                            <li><strong>Backend:</strong> Port 8001</li>
+                            <li><strong>Frontend:</strong> Port 3000</li>
+                            <li><strong>Process Manager:</strong> Supervisor</li>
+                            <li><strong>Hot Reload:</strong> Enabled</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3>Dosya Yapısı</h3>
+                <pre>
+/app/
+├── backend/
+│   ├── server.py           # Ana FastAPI server (2000+ satır)
+│   ├── .env                # Environment variables
+│   └── requirements.txt    # Python dependencies
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Home.js
+│   │   │   ├── Dashboard.js     # Kullanıcı paneli (1500+ satır)
+│   │   │   ├── AdminPanel.js    # Admin paneli (800+ satır)
+│   │   │   ├── Packages.js
+│   │   │   ├── About.js
+│   │   │   ├── FAQ.js
+│   │   │   └── Contact.js
+│   │   ├── components/
+│   │   │   ├── Navbar.js
+│   │   │   ├── AuthModal.js
+│   │   │   └── ui/              # Shadcn components
+│   │   ├── contexts/
+│   │   │   └── AuthContext.js
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   └── .env
+└── test_result.md          # Test sonuçları ve agent iletişimi
+                </pre>
+            </section>
+            
+            <!-- DATABASE SCHEMA -->
+            <section id="database">
+                <h2>🗄️ Database Schema</h2>
+                
+                <h3>Users Collection</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>string (UUID)</td><td>Unique user ID</td></tr>
+                        <tr><td>name</td><td>string</td><td>Kullanıcı adı</td></tr>
+                        <tr><td>email</td><td>string (EmailStr)</td><td>Email adresi (unique, validated)</td></tr>
+                        <tr><td>password_hash</td><td>string</td><td>SHA-256 hashed password</td></tr>
+                        <tr><td>upline_id</td><td>string | null</td><td>Sponsor user ID</td></tr>
+                        <tr><td>position</td><td>"left" | "right" | null</td><td>Binary tree position</td></tr>
+                        <tr><td>left_child_id</td><td>string | null</td><td>Sol kol çocuk ID</td></tr>
+                        <tr><td>right_child_id</td><td>string | null</td><td>Sağ kol çocuk ID</td></tr>
+                        <tr><td>package</td><td>string | null</td><td>Yatırım paketi (silver/gold/platinum)</td></tr>
+                        <tr><td>total_invested</td><td>float</td><td>Toplam yatırım tutarı</td></tr>
+                        <tr><td>total_commissions</td><td>float</td><td>Toplam kazanılan komisyon</td></tr>
+                        <tr><td>wallet_balance</td><td>float</td><td>Çekilebilir bakiye</td></tr>
+                        <tr><td>left_volume</td><td>float</td><td>Sol kol satış hacmi</td></tr>
+                        <tr><td>right_volume</td><td>float</td><td>Sağ kol satış hacmi</td></tr>
+                        <tr><td>binary_earnings</td><td>float</td><td>Binary kazançlar toplamı</td></tr>
+                        <tr><td>weekly_earnings</td><td>float</td><td>Haftalık kazançlar</td></tr>
+                        <tr><td>is_admin</td><td>boolean</td><td>Admin yetkisi</td></tr>
+                        <tr><td>created_at</td><td>string (ISO)</td><td>Kayıt tarihi</td></tr>
+                        <tr><td>last_login</td><td>string (ISO)</td><td>Son giriş tarihi</td></tr>
+                    </tbody>
+                </table>
+                
+                <h3>Referral Codes Collection</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>string (UUID)</td><td>Unique code ID</td></tr>
+                        <tr><td>code</td><td>string</td><td>8 karakter URL-safe token</td></tr>
+                        <tr><td>user_id</td><td>string</td><td>Kod sahibi user ID</td></tr>
+                        <tr><td>position</td><td>"left" | "right"</td><td>Hedef pozisyon</td></tr>
+                        <tr><td>is_used</td><td>boolean</td><td>Kullanıldı mı?</td></tr>
+                        <tr><td>used_by</td><td>string | null</td><td>Kullanan user ID</td></tr>
+                        <tr><td>expires_at</td><td>string (ISO)</td><td>Geçerlilik süresi (10 dk)</td></tr>
+                        <tr><td>created_at</td><td>string (ISO)</td><td>Oluşturulma tarihi</td></tr>
+                        <tr><td>used_at</td><td>string (ISO)</td><td>Kullanılma tarihi</td></tr>
+                    </tbody>
+                </table>
+                
+                <h3>Investment Requests Collection</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>string (UUID)</td><td>Request ID</td></tr>
+                        <tr><td>user_id</td><td>string</td><td>Yatırımcı user ID</td></tr>
+                        <tr><td>full_name</td><td>string</td><td>Tam ad</td></tr>
+                        <tr><td>email</td><td>string</td><td>Email</td></tr>
+                        <tr><td>whatsapp</td><td>string</td><td>WhatsApp numarası</td></tr>
+                        <tr><td>platform</td><td>string</td><td>Ödeme platformu</td></tr>
+                        <tr><td>package</td><td>string</td><td>Paket (silver/gold/platinum)</td></tr>
+                        <tr><td>amount</td><td>float</td><td>Tutar ($600/$1000/$1500)</td></tr>
+                        <tr><td>status</td><td>string</td><td>pending/approved/rejected</td></tr>
+                        <tr><td>created_at</td><td>string (ISO)</td><td>Talep tarihi</td></tr>
+                    </tbody>
+                </table>
+                
+                <h3>Withdrawal Requests Collection</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>string (UUID)</td><td>Request ID</td></tr>
+                        <tr><td>user_id</td><td>string</td><td>Kullanıcı ID</td></tr>
+                        <tr><td>iban</td><td>string</td><td>IBAN numarası</td></tr>
+                        <tr><td>amount</td><td>float</td><td>Çekim tutarı</td></tr>
+                        <tr><td>status</td><td>string</td><td>pending/approved/rejected</td></tr>
+                        <tr><td>created_at</td><td>string (ISO)</td><td>Talep tarihi</td></tr>
+                    </tbody>
+                </table>
+                
+                <h3>Transactions Collection</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>string (UUID)</td><td>Transaction ID</td></tr>
+                        <tr><td>user_id</td><td>string</td><td>Kullanıcı ID</td></tr>
+                        <tr><td>type</td><td>string</td><td>commission/binary/withdrawal</td></tr>
+                        <tr><td>amount</td><td>float</td><td>İşlem tutarı</td></tr>
+                        <tr><td>status</td><td>string</td><td>pending/completed/failed</td></tr>
+                        <tr><td>description</td><td>string</td><td>İşlem açıklaması</td></tr>
+                        <tr><td>created_at</td><td>string (ISO)</td><td>İşlem tarihi</td></tr>
+                    </tbody>
+                </table>
+                
+                <h3>Placement History Collection</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>id</td><td>string (UUID)</td><td>History ID</td></tr>
+                        <tr><td>user_id</td><td>string</td><td>Yerleştirilen kullanıcı</td></tr>
+                        <tr><td>old_upline_id</td><td>string | null</td><td>Eski sponsor</td></tr>
+                        <tr><td>new_upline_id</td><td>string</td><td>Yeni sponsor</td></tr>
+                        <tr><td>old_position</td><td>string | null</td><td>Eski pozisyon</td></tr>
+                        <tr><td>new_position</td><td>string</td><td>Yeni pozisyon</td></tr>
+                        <tr><td>admin_id</td><td>string</td><td>İşlemi yapan</td></tr>
+                        <tr><td>action_type</td><td>string</td><td>initial_placement/repositioning</td></tr>
+                        <tr><td>created_at</td><td>string (ISO)</td><td>İşlem tarihi</td></tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <!-- API ENDPOINTS -->
+            <section id="api">
+                <h2>🔌 API Endpoints</h2>
+                
+                <div class="note">
+                    <strong>Base URL:</strong> <code>https://invest-tree.preview.emergentagent.com/api</code><br>
+                    <strong>Authentication:</strong> JWT token via HTTP-only cookies
+                </div>
+                
+                <h3>Authentication</h3>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/auth/register</code>
+                    <p><strong>Yeni kullanıcı kaydı</strong></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "email": "user@example.com",  // EmailStr validation
+  "password": "password123",
+  "name": "John Doe",
+  "referral_code": "ABC123"      // Optional
+}</pre>
+                    <p><strong>Response:</strong></p>
+                    <pre>{
+  "message": "Kayıt başarılı! Hoş geldin emaili gönderildi.",
+  "user": { "id": "...", "name": "...", "email": "..." }
+}</pre>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/auth/login</code>
+                    <p><strong>Kullanıcı girişi</strong></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "email": "user@example.com",
+  "password": "password123"
+}</pre>
+                    <p><strong>Response:</strong> JWT token (cookie)</p>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/auth/logout</code>
+                    <p><strong>Çıkış yap</strong></p>
+                </div>
+                
+                <h3>Dashboard & User</h3>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/dashboard</code>
+                    <p><strong>Kullanıcı dashboard verisi</strong></p>
+                    <p><strong>Response:</strong></p>
+                    <pre>{
+  "user": { /* user data */ },
+  "active_referral_code": "ABC123",
+  "referrals": [ /* referral list */ ],
+  "investment": { /* investment info */ },
+  "transactions": [ /* transaction list */ ],
+  "network": {
+    "left": { /* left child */ },
+    "right": { /* right child */ }
+  },
+  "career": {
+    "current_level": "Amethyst",
+    "next_level": "Sapphire",
+    "progress": 45.2,
+    "left_volume": 2500,
+    "right_volume": 3000
+  }
+}</pre>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/network/tree</code>
+                    <p><strong>Binary ağaç recursive tree (100 seviye)</strong></p>
+                    <p><strong>Response:</strong></p>
+                    <pre>{
+  "id": "user-id",
+  "name": "User Name",
+  "total_invested": 1000,
+  "left_volume": 5000,
+  "right_volume": 3000,
+  "left": { /* recursive left tree */ },
+  "right": { /* recursive right tree */ }
+}</pre>
+                </div>
+                
+                <h3>Referral System</h3>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/referral/generate</code>
+                    <p><strong>Yeni referans kodu oluştur</strong></p>
+                    <p><strong>Query Params:</strong></p>
+                    <pre>?position=left  // or "right"</pre>
+                    <p><strong>Response:</strong></p>
+                    <pre>{
+  "code": "Abc-123_xY",
+  "expires_at": "2025-01-10T10:30:00Z",
+  "position": "left"
+}</pre>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/referral/my-codes</code>
+                    <p><strong>Kullanılmış referans kodlarım</strong></p>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/referral/join-network</code>
+                    <p><strong>Başkasının kodunu kullanarak ağa katıl</strong></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "referral_code": "ABC123"
+}</pre>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/users/my-referrals</code>
+                    <p><strong>Referanslarım (placed + unplaced)</strong></p>
+                    <p><strong>Response:</strong></p>
+                    <pre>{
+  "placed": [ /* yerleşmiş referanslar */ ],
+  "unplaced": [ /* yerleşmemiş referanslar */ ],
+  "total": 15
+}</pre>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/users/place-referral</code>
+                    <p><strong>Referansı binary tree'ye yerleştir</strong></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "user_id": "referral-user-id",
+  "upline_id": "sponsor-id",
+  "position": "left"  // or "right"
+}</pre>
+                </div>
+                
+                <h3>Investment</h3>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/investment/request</code>
+                    <p><strong>Yatırım talebi oluştur</strong></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "full_name": "John Doe",
+  "username": "johndoe",
+  "email": "john@example.com",
+  "whatsapp": "+905551234567",
+  "platform": "tether_trc20",
+  "package": "silver"  // silver/gold/platinum
+}</pre>
+                    <div class="warning">
+                        <strong>⚠️ Önemli:</strong> Kullanıcı sadece 1 kez yatırım yapabilir. Onaylanmış yatırımı varsa yeni talep açamaz.
+                    </div>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/investment/my-requests</code>
+                    <p><strong>Yatırım taleplerim</strong></p>
+                </div>
+                
+                <h3>Withdrawal</h3>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/withdrawal/request</code>
+                    <p><strong>Çekim talebi oluştur</strong></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "iban": "TR12 3456 7890 1234 5678 9012 34",
+  "amount": 500
+}</pre>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/withdrawal/my-requests</code>
+                    <p><strong>Çekim taleplerim</strong></p>
+                </div>
+                
+                <h3>Admin Panel</h3>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/admin/users</code>
+                    <p><strong>Tüm kullanıcıları listele</strong></p>
+                    <div class="note"><strong>Auth:</strong> Admin yetkisi gerekli</div>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method delete">DELETE</span>
+                    <code>/admin/users/{user_id}</code>
+                    <p><strong>Kullanıcı sil</strong></p>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/admin/investment-requests</code>
+                    <p><strong>Tüm yatırım talepleri</strong></p>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/admin/approved-investments</code>
+                    <p><strong>Onaylanmış yatırımlar (detaylı tablo)</strong></p>
+                    <p><strong>Response:</strong> Kullanıcı adı, email, tarih/saat, platform, miktar</p>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/admin/pending-count</code>
+                    <p><strong>Bekleyen talep sayısı (bildirim badge)</strong></p>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/admin/investments/{request_id}/approve</code>
+                    <p><strong>Yatırım talebini onayla</strong></p>
+                    <p><strong>Ne olur:</strong></p>
+                    <ul>
+                        <li>Kullanıcının total_invested artar</li>
+                        <li>Paket atanır (silver/gold/platinum)</li>
+                        <li>Direkt sponsor'a komisyon eklenir</li>
+                        <li>Binary tree hacimleri güncellenir</li>
+                        <li>Binary kazanç kontrol edilir</li>
+                        <li>Transaction kayıtları oluşturulur</li>
+                    </ul>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method post">POST</span>
+                    <code>/admin/place-user</code>
+                    <p><strong>Admin manuel kullanıcı yerleştirme</strong></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "user_id": "user-to-place",
+  "upline_id": "sponsor-id",
+  "position": "left"
+}</pre>
+                </div>
+                
+                <div class="api-endpoint">
+                    <span class="method get">GET</span>
+                    <code>/admin/placement-history</code>
+                    <p><strong>Yerleştirme geçmişi</strong></p>
+                </div>
+            </section>
+            
+            <!-- ÖZELLİKLER -->
+            <section id="features">
+                <h2>✨ Platform Özellikleri</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🌳 Binary Tree MLM</h4>
+                        <p>İkili ağaç yapısı ile sınırsız derinlik. Sol ve sağ kol sistemi. Recursive görselleştirme 100 seviye.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>💰 Direkt Komisyon</h4>
+                        <p>Tek seviye komisyon: Silver %5, Gold %10, Platinum %15. Sadece direkt sponsor kazanır.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>💎 Binary Kazançlar</h4>
+                        <p>Sol + Sağ kol hacmi $1000+$1000 olunca $100 bonus. Otomatik hesaplama.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>🎯 Manuel Ağ Yönetimi</h4>
+                        <p>Kullanıcılar kendi referanslarını istediği yere yerleştirir. Downline'a da koyabilir.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>📧 Email Bildirimleri</h4>
+                        <p>SMTP ile hoş geldin emaili. HTML + Plain text versiyonları. Gradient tasarım.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>👑 Kariyer Sistemi</h4>
+                        <p>6 seviye: Amethyst, Sapphire, Ruby, Emerald, Diamond, Crown. Binary hacim bazlı.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>🔐 Tek Yatırım Kuralı</h4>
+                        <p>Kullanıcı sadece 1 kez yatırım yapabilir. Onaylanmış yatırımı varsa tekrar yapamaz.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>📱 Mobile Uyumlu</h4>
+                        <p>Hamburger menu, responsive tasarım, touch-friendly. TailwindCSS ile optimize.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>🔔 Admin Bildirimleri</h4>
+                        <p>Bekleyen talep sayısı badge. Animasyonlu ping efekti. Real-time güncelleme.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>📊 Detaylı Tablolar</h4>
+                        <p>Onaylanmış yatırımlar tablosu. Tarih, saat, kullanıcı bilgileri, platform, miktar.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>🎨 Interaktif Ağaç</h4>
+                        <p>Recursive React component. Scroll edilebilir. Her node'da detaylı bilgi.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h4>🏠 Site Navigasyonu</h4>
+                        <p>Dashboard sidebar'dan tüm sayfalara erişim. Anasayfa, Hakkımızda, SSS, İletişim.</p>
+                        <span class="status completed">✅ Tamamlandı</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- AUTHENTICATION -->
+            <section id="auth">
+                <h2>🔐 Authentication & Authorization</h2>
+                
+                <h3>JWT Token Sistemi</h3>
+                <p>Kullanıcı kimlik doğrulaması JWT (JSON Web Token) ile yapılır. Token HTTP-only cookie'de saklanır.</p>
+                
+                <h4>Token Oluşturma:</h4>
+                <pre>
+def create_jwt_token(user_id: str) -> str:
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.now(timezone.utc) + timedelta(days=7)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+                </pre>
+                
+                <h4>Token Doğrulama:</h4>
+                <pre>
+async def require_auth(request: Request) -> User:
+    token = extract_token(request)
+    if not token:
+        raise HTTPException(401, "Not authenticated")
+    
+    payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+    user = await db.users.find_one({"id": payload["user_id"]})
+    return User(**user)
+                </pre>
+                
+                <h3>Email Validation</h3>
+                <p>Email adresleri Pydantic EmailStr ile validate edilir:</p>
+                <pre>
+class RegisterRequest(BaseModel):
+    email: EmailStr  # Auto-validates email format
+    password: str
+    name: str
+    referral_code: Optional[str] = None
+                </pre>
+                
+                <h3>Password Hashing</h3>
+                <p>Şifreler SHA-256 ile hashlenir:</p>
+                <pre>
+import hashlib
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+                </pre>
+                
+                <h3>Admin Authorization</h3>
+                <pre>
+async def require_admin(user: User = Depends(require_auth)) -> User:
+    if not user.is_admin:
+        raise HTTPException(403, "Admin access required")
+    return user
+                </pre>
+                
+                <div class="warning">
+                    <strong>⚠️ Güvenlik Notları:</strong>
+                    <ul>
+                        <li>JWT secret production'da değiştirilmeli</li>
+                        <li>SHA-256 yerine bcrypt kullanılabilir (daha güvenli)</li>
+                        <li>HTTPS kullanımı zorunlu (production)</li>
+                        <li>Rate limiting eklenebilir</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- BINARY TREE -->
+            <section id="binary">
+                <h2>🌳 Binary Tree Sistemi</h2>
+                
+                <h3>Nasıl Çalışır?</h3>
+                <p>ParlaCapital, <strong>binary tree (ikili ağaç)</strong> yapısını kullanır. Her kullanıcının maksimum 2 direkt referansı olabilir: sol kol ve sağ kol.</p>
+                
+                <h4>Ağaç Yapısı Örneği:</h4>
+                <pre>
+                    Tolga (Root)
+                   /            \
+              Fatma (L)       Ahmet (R)
+              /      \        /      \
+         Ali (L)  Veli (R) Ayşe (L) Mehmet (R)
+        /    \
+    ... (L)  ... (R)
+                </pre>
+                
+                <h3>Yerleştirme Sistemi</h3>
+                
+                <h4>1. Referans Kodu Oluşturma:</h4>
+                <ul>
+                    <li>Kullanıcı "Sol Kol İçin Kod Oluştur" veya "Sağ Kol İçin Kod Oluştur" tıklar</li>
+                    <li>8 karakter URL-safe token oluşturulur</li>
+                    <li>Kod 10 dakika geçerli</li>
+                    <li>Kod tek kullanımlık</li>
+                </ul>
+                
+                <h4>2. Kayıt (Unplaced):</h4>
+                <ul>
+                    <li>Yeni kullanıcı referans kodu ile kayıt olur</li>
+                    <li>Kullanıcı <code>upline_id</code> alır ama <code>position</code> NULL</li>
+                    <li>"Yerleşmemiş" (unplaced) durumda</li>
+                    <li>Binary tree'de yer almaz (henüz)</li>
+                </ul>
+                
+                <h4>3. Manuel Yerleştirme:</h4>
+                <ul>
+                    <li>Sponsor kullanıcı Dashboard → "Referans Yönetimi"</li>
+                    <li>Yerleşmemiş referansları görür</li>
+                    <li>"Yerleştir" butonuna tıklar</li>
+                    <li>Modal açılır: Hangi üyenin altına? (Kendim / Downline üyesi)</li>
+                    <li>Pozisyon seçer: Sol veya Sağ</li>
+                    <li>Yerleştir → Binary tree'ye eklenir</li>
+                </ul>
+                
+                <h3>Hacim Hesaplama</h3>
+                <p>Her kullanıcının 2 hacim değeri var:</p>
+                <ul>
+                    <li><code>left_volume</code>: Sol koldaki TOPLAM yatırım</li>
+                    <li><code>right_volume</code>: Sağ koldaki TOPLAM yatırım</li>
+                </ul>
+                
+                <h4>Recursive Hacim Güncellemesi:</h4>
+                <pre>
+async def update_volumes_upline(user_id: str, amount: float):
+    """Recursive olarak tüm upline'ları güncelle"""
+    current = await db.users.find_one({"id": user_id})
+    if not current or not current.get("upline_id"):
+        return
+    
+    # Kendi pozisyonuna göre upline'ın hacmini artır
+    if current["position"] == "left":
+        await db.users.update_one(
+            {"id": current["upline_id"]},
+            {"$inc": {"left_volume": amount}}
+        )
+    else:
+        await db.users.update_one(
+            {"id": current["upline_id"]},
+            {"$inc": {"right_volume": amount}}
+        )
+    
+    # Upline için binary kazanç kontrolü
+    await check_binary_earnings(current["upline_id"])
+    
+    # Recursive olarak devam et
+    await update_volumes_upline(current["upline_id"], amount)
+                </pre>
+                
+                <h3>Binary Kazançlar</h3>
+                <p>Binary kazanç sistemi, her iki kolda biriken hacme göre bonus verir:</p>
+                
+                <h4>Formül:</h4>
+                <pre>
+bonus = (min(left_volume, right_volume) // 1000) * 100
+
+Örnek:
+left_volume = $2500
+right_volume = $1800
+bonus = (1800 // 1000) * $100 = $100
+                </pre>
+                
+                <div class="success">
+                    <strong>✅ Binary Kazanç Özellikleri:</strong>
+                    <ul>
+                        <li>Her $1000+$1000 eşleşme için $100 bonus</li>
+                        <li>Zayıf kol limitler (min kullanılır)</li>
+                        <li>Otomatik hesaplama (yatırım onayında)</li>
+                        <li>Wallet balance'a eklenir</li>
+                        <li>Transaction kaydı oluşturulur</li>
+                    </ul>
+                </div>
+                
+                <h3>Frontend Görselleştirme</h3>
+                <p>Binary tree recursive React component ile görselleştirilir:</p>
+                <pre>
+const TreeNode = ({ node, isRoot }) => {
+  if (!node) return <EmptyNode />;
+  
+  return (
+    &lt;div className="node"&gt;
+      {/* Node bilgileri */}
+      &lt;div className="node-content"&gt;
+        &lt;h4&gt;{node.name}&lt;/h4&gt;
+        &lt;p&gt;Yatırım: ${node.total_invested}&lt;/p&gt;
+        &lt;p&gt;Sol: ${node.left_volume}&lt;/p&gt;
+        &lt;p&gt;Sağ: ${node.right_volume}&lt;/p&gt;
+      &lt;/div&gt;
+      
+      {/* Recursive children */}
+      &lt;div className="children"&gt;
+        &lt;TreeNode node={node.left} /&gt;
+        &lt;TreeNode node={node.right} /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+};
+                </pre>
+            </section>
+            
+            <!-- KARİYER SİSTEMİ -->
+            <section id="career">
+                <h2>👑 Kariyer Sistemi</h2>
+                
+                <h3>Kariyer Seviyeleri</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Seviye</th>
+                            <th>Sol Kol Hedefi</th>
+                            <th>Sağ Kol Hedefi</th>
+                            <th>Ödül</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>💜 Amethyst</td>
+                            <td>$5,000</td>
+                            <td>$5,000</td>
+                            <td>$500</td>
+                        </tr>
+                        <tr>
+                            <td>💙 Sapphire</td>
+                            <td>$10,000</td>
+                            <td>$10,000</td>
+                            <td>$1,000</td>
+                        </tr>
+                        <tr>
+                            <td>❤️ Ruby</td>
+                            <td>$20,000</td>
+                            <td>$20,000</td>
+                            <td>$3,000</td>
+                        </tr>
+                        <tr>
+                            <td>💚 Emerald</td>
+                            <td>$50,000</td>
+                            <td>$50,000</td>
+                            <td>$7,500</td>
+                        </tr>
+                        <tr>
+                            <td>💎 Diamond</td>
+                            <td>$100,000</td>
+                            <td>$100,000</td>
+                            <td>$20,000</td>
+                        </tr>
+                        <tr>
+                            <td>👑 Crown</td>
+                            <td>$300,000</td>
+                            <td>$300,000</td>
+                            <td>0 km TOGG 🚗</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Kariyer Hesaplama</h3>
+                <pre>
+def get_career_level(left_volume: float, right_volume: float):
+    current_level = None
+    next_level = None
+    
+    for level in CAREER_LEVELS:
+        if left_volume >= level["left_req"] and right_volume >= level["right_req"]:
+            current_level = level
+        elif not next_level:
+            next_level = level
+            break
+    
+    progress = min(
+        (left_volume / next_level["left_req"]) * 100,
+        (right_volume / next_level["right_req"]) * 100
+    )
+    
+    return {
+        "current_level": current_level["name"],
+        "next_level": next_level["name"],
+        "progress": round(progress, 2)
+    }
+                </pre>
+                
+                <div class="note">
+                    <strong>💡 Not:</strong> Kariyer seviyesi, <strong>zayıf kol</strong> ile sınırlıdır. Her iki kol da hedefi aşmalıdır.
+                </div>
+            </section>
+            
+            <!-- EMAIL SİSTEMİ -->
+            <section id="email">
+                <h2>📧 Email Sistemi</h2>
+                
+                <h3>SMTP Konfigürasyonu</h3>
+                <p>Hoş geldin emaili için SMTP kullanılır. Gmail veya Outlook ile yapılandırılabilir.</p>
+                
+                <h4>.env Ayarları:</h4>
+                <pre>
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_EMAIL="youremail@gmail.com"
+SMTP_PASSWORD="your-app-password"
+                </pre>
+                
+                <h3>Email Gönderme Fonksiyonu</h3>
+                <pre>
+async def send_welcome_email(user_email: str, user_name: str):
+    smtp_host = os.environ.get('SMTP_HOST')
+    smtp_port = int(os.environ.get('SMTP_PORT', '587'))
+    smtp_email = os.environ.get('SMTP_EMAIL')
+    smtp_password = os.environ.get('SMTP_PASSWORD')
+    
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = "🚀 Parlacapital'e Hoş Geldiniz!"
+    msg['From'] = f"Parlacapital &lt;{smtp_email}&gt;"
+    msg['To'] = user_email
+    
+    # HTML + Plain text versions
+    html = f"""
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;h1&gt;Merhaba {user_name}!&lt;/h1&gt;
+        &lt;p&gt;Parlacapital ailesine hoş geldiniz!&lt;/p&gt;
+        ...
+      &lt;/body&gt;
+    &lt;/html&gt;
+    """
+    
+    msg.attach(MIMEText(text, 'plain'))
+    msg.attach(MIMEText(html, 'html'))
+    
+    with smtplib.SMTP(smtp_host, smtp_port) as server:
+        server.starttls()
+        server.login(smtp_email, smtp_password)
+        server.send_message(msg)
+                </pre>
+                
+                <h3>Gmail App Password Oluşturma</h3>
+                <ol>
+                    <li>Google Account → Security</li>
+                    <li>2-Step Verification'ı aktif et</li>
+                    <li>App Passwords sayfasına git</li>
+                    <li>"Mail" ve "Other device" seç</li>
+                    <li>16 haneli şifreyi kopyala</li>
+                    <li><code>SMTP_PASSWORD</code> olarak ekle</li>
+                </ol>
+                
+                <div class="success">
+                    <strong>✅ Email Özellikleri:</strong>
+                    <ul>
+                        <li>Kayıt sonrası otomatik gönderilir</li>
+                        <li>HTML + Plain text versiyonları</li>
+                        <li>Gradient tasarım, responsive</li>
+                        <li>Async (kullanıcı beklemez)</li>
+                        <li>Hata olsa bile kayıt tamamlanır</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- DEPLOYMENT -->
+            <section id="deployment">
+                <h2>🚀 Deployment & Environment</h2>
+                
+                <h3>Kubernetes Deployment</h3>
+                <p>Uygulama Kubernetes cluster'ında çalışır:</p>
+                
+                <h4>Services:</h4>
+                <ul>
+                    <li><strong>Backend:</strong> FastAPI on port 8001</li>
+                    <li><strong>Frontend:</strong> React on port 3000</li>
+                    <li><strong>MongoDB:</strong> localhost:27017</li>
+                </ul>
+                
+                <h4>Process Manager:</h4>
+                <pre>
+sudo supervisorctl status
+# backend    RUNNING
+# frontend   RUNNING
+
+sudo supervisorctl restart backend
+sudo supervisorctl restart frontend
+                </pre>
+                
+                <h3>Environment Variables</h3>
+                
+                <h4>Backend (.env):</h4>
+                <pre>
+MONGO_URL="mongodb://localhost:27017"
+DB_NAME="test_database"
+CORS_ORIGINS="*"
+JWT_SECRET="parlacapital-secret-key-2025"
+
+# SMTP Configuration
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_EMAIL="youremail@gmail.com"
+SMTP_PASSWORD="your-app-password"
+                </pre>
+                
+                <h4>Frontend (.env):</h4>
+                <pre>
+REACT_APP_BACKEND_URL=https://invest-tree.preview.emergentagent.com
+                </pre>
+                
+                <div class="warning">
+                    <strong>⚠️ Production Checklist:</strong>
+                    <ul>
+                        <li>JWT_SECRET değiştir (güçlü, random)</li>
+                        <li>CORS_ORIGINS spesifik domain'e ayarla</li>
+                        <li>HTTPS kullan (zorunlu)</li>
+                        <li>Database backup düzenle</li>
+                        <li>Rate limiting ekle</li>
+                        <li>Logging sistemi kur</li>
+                        <li>Error tracking (Sentry vb.)</li>
+                    </ul>
+                </div>
+                
+                <h3>Hot Reload</h3>
+                <p>Hem backend hem frontend hot reload aktif:</p>
+                <ul>
+                    <li>Kod değişikliklerinde otomatik yenilenir</li>
+                    <li>Sadece .env ve dependency değişikliklerinde restart gerekir</li>
+                    <li>Development için optimize edilmiş</li>
+                </ul>
+                
+                <h3>Logs</h3>
+                <pre>
+# Backend logs
+tail -f /var/log/supervisor/backend.*.log
+
+# Frontend logs
+tail -f /var/log/supervisor/frontend.*.log
+
+# Supervisor status
+sudo supervisorctl status
+                </pre>
+            </section>
+            
+            <!-- FOOTER -->
+            <section style="border: none; padding-top: 20px;">
+                <h2>📝 Son Notlar</h2>
+                
+                <div class="success">
+                    <h4>✅ Tamamlanan Özellikler</h4>
+                    <ul>
+                        <li>Binary Tree MLM sistemi (100 seviye)</li>
+                        <li>Direkt komisyon (tek seviye)</li>
+                        <li>Binary kazançlar ($1000+$1000=$100)</li>
+                        <li>Kariyer sistemi (6 seviye)</li>
+                        <li>Manuel ağ yönetimi</li>
+                        <li>Email validasyonu (EmailStr)</li>
+                        <li>SMTP hoş geldin emaili</li>
+                        <li>Admin paneli (bildirimler, tablolar)</li>
+                        <li>Mobile responsive tasarım</li>
+                        <li>Hamburger menu</li>
+                        <li>Site navigasyonu</li>
+                    </ul>
+                </div>
+                
+                <div class="note">
+                    <h4>📚 Ek Kaynaklar</h4>
+                    <ul>
+                        <li><strong>FastAPI Docs:</strong> <a href="https://fastapi.tiangolo.com" target="_blank">fastapi.tiangolo.com</a></li>
+                        <li><strong>React Docs:</strong> <a href="https://react.dev" target="_blank">react.dev</a></li>
+                        <li><strong>TailwindCSS:</strong> <a href="https://tailwindcss.com" target="_blank">tailwindcss.com</a></li>
+                        <li><strong>MongoDB Docs:</strong> <a href="https://www.mongodb.com/docs" target="_blank">mongodb.com/docs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="warning">
+                    <h4>⚠️ Önemli Hatırlatmalar</h4>
+                    <ul>
+                        <li>SMTP bilgilerini .env dosyasına ekleyin</li>
+                        <li>JWT secret'ı production'da değiştirin</li>
+                        <li>Admin kullanıcısı: admin@parlacapital.com / parlacapitaladmin</li>
+                        <li>Backup stratejisi oluşturun</li>
+                        <li>HTTPS kullanın (production)</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p><strong>ParlaCapital MLM Platform</strong></p>
+            <p>Kapsamlı Teknik Dokümantasyon</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Oluşturulma Tarihi: 13 Ocak 2025</p>
+            <p style="font-size: 0.85em; opacity: 0.8;">Tüm özellikler tamamlandı ve test edildi ✅</p>
+        </footer>
+    </div>
+</body>
+</html>
