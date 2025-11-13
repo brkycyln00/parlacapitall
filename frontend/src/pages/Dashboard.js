@@ -357,6 +357,81 @@ export default function Dashboard() {
           {!user?.is_admin && (
           <>
           <div className="border-t border-slate-700 my-4"></div>
+          {/* Divider */}
+          <div className="my-4 border-t border-slate-700"></div>
+          
+          {/* Site Navigation */}
+          <p className="text-xs text-gray-500 uppercase font-semibold px-4 mb-2">Site Menüsü</p>
+          
+          <button 
+            onClick={() => {
+              navigate('/');
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
+            <span>🏠</span>
+            <span>Anasayfa</span>
+          </button>
+          
+          <button 
+            onClick={() => {
+              navigate('/about');
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
+            <span>ℹ️</span>
+            <span>Hakkımızda</span>
+          </button>
+          
+          <button 
+            onClick={() => {
+              navigate('/packages');
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
+            <span>📦</span>
+            <span>Paketler</span>
+          </button>
+          
+          <button 
+            onClick={() => {
+              navigate('/earning-systems');
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
+            <span>💰</span>
+            <span>Kazanç Sistemleri</span>
+          </button>
+          
+          <button 
+            onClick={() => {
+              navigate('/faq');
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
+            <span>❓</span>
+            <span>SSS</span>
+          </button>
+          
+          <button 
+            onClick={() => {
+              navigate('/contact');
+              setSidebarOpen(false);
+            }}
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700 mb-2"
+          >
+            <span>📧</span>
+            <span>İletişim</span>
+          </button>
+
+          {/* Divider */}
+          <div className="my-4 border-t border-slate-700"></div>
+          
           <button 
             onClick={() => {
               setSettingsOpen(true);
@@ -366,16 +441,6 @@ export default function Dashboard() {
           >
             <span>⚙️</span>
             <span>Ayarlar</span>
-          </button>
-          <button 
-            onClick={() => {
-              navigate('/contact');
-              setSidebarOpen(false);
-            }}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-slate-700"
-          >
-            <span>❓</span>
-            <span>Destek</span>
           </button>
           </>
           )}
