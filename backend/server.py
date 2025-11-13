@@ -154,6 +154,45 @@ class PlaceUserRequest(BaseModel):
     upline_id: str
     position: str  # "left" or "right"
 
+# Career levels configuration
+CAREER_LEVELS = [
+    {"name": "Amethyst", "left_req": 5000, "right_req": 5000, "reward": 500},
+    {"name": "Sapphire", "left_req": 10000, "right_req": 10000, "reward": 1000},
+    {"name": "Ruby", "left_req": 20000, "right_req": 20000, "reward": 3000},
+    {"name": "Emerald", "left_req": 50000, "right_req": 50000, "reward": 7500},
+    {"name": "Diamond", "left_req": 100000, "right_req": 100000, "reward": 20000},
+    {"name": "Crown", "left_req": 300000, "right_req": 300000, "reward": "TOGG"}
+]
+
+def get_career_level(left_volume: float, right_volume: float):
+    """Calculate user's career level based on binary volumes"""
+    current_level = None
+    next_level = None
+    progress = 0
+    
+    for i, level in enumerate(CAREER_LEVELS):
+        if left_volume >= level["left_req"] and right_volume >= level["right_req"]:
+            current_level = level
+        elif not next_level:
+            next_level = level
+            # Calculate progress to next level
+            left_progress = (left_volume / level["left_req"]) * 100
+            right_progress = (right_volume / level["right_req"]) * 100
+            progress = min(left_progress, right_progress)  # Limited by weaker leg
+            break
+    
+    return {
+        "current_level": current_level["name"] if current_level else "None",
+        "current_reward": current_level["reward"] if current_level else 0,
+        "next_level": next_level["name"] if next_level else "Crown",
+        "next_reward": next_level["reward"] if next_level else "TOGG",
+        "left_volume": left_volume,
+        "right_volume": right_volume,
+        "left_needed": next_level["left_req"] if next_level else 300000,
+        "right_needed": next_level["right_req"] if next_level else 300000,
+        "progress": round(progress, 2)
+    }
+
 # ==================== AUTH HELPERS ====================
 
 async def get_session_token(request: Request) -> Optional[str]:
