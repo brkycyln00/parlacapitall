@@ -1413,6 +1413,41 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
+
+            {/* Referral Management in Network Dialog */}
+            <div className="bg-slate-900 rounded-lg p-4 border border-amber-500/30">
+              <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                🎯 Referans Yönetimi
+                <span className="text-xs text-amber-400">({myReferrals.unplaced.length} yerleşmemiş)</span>
+              </h3>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-amber-400">{myReferrals.unplaced.length}</p>
+                  <p className="text-xs text-gray-400">Yerleşmemiş</p>
+                </div>
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-blue-400">
+                    {myReferrals.placed.filter(r => r.current_position === 'left').length}
+                  </p>
+                  <p className="text-xs text-gray-400">Sol Kol</p>
+                </div>
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-purple-400">
+                    {myReferrals.placed.filter(r => r.current_position === 'right').length}
+                  </p>
+                  <p className="text-xs text-gray-400">Sağ Kol</p>
+                </div>
+              </div>
+              <Button
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                onClick={() => {
+                  setNetworkOpen(false);
+                  setManagementOpen(true);
+                }}
+              >
+                Referansları Yönet
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
