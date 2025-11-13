@@ -261,6 +261,112 @@ class RegisterRequest(BaseModel):
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
+async def send_welcome_email(user_email: str, user_name: str):
+    """Send welcome email to new users via SMTP"""
+    try:
+        # SMTP configuration from environment variables
+        smtp_host = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
+        smtp_port = int(os.environ.get('SMTP_PORT', '587'))
+        smtp_email = os.environ.get('SMTP_EMAIL', '')
+        smtp_password = os.environ.get('SMTP_PASSWORD', '')
+        
+        # Skip if SMTP not configured
+        if not smtp_email or not smtp_password:
+            logger.warning("SMTP not configured. Skipping welcome email.")
+            return False
+        
+        # Create message
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = '🚀 Parlacapital ile Network Marketing'de Büyük Kazançlar Sizi Bekliyor!'
+        msg['From'] = f"Parlacapital <{smtp_email}>"
+        msg['To'] = user_email
+        
+        # Email body
+        text = f"""
+Merhaba {user_name},
+
+Parlacapital ailesine hoş geldiniz! 🎉 Şimdi network marketing dünyasında inanılmaz fırsatlar kapınızı çalıyor! 💥
+
+Kripto yatırımından daha fazlasını sunuyoruz! Sadece para kazanmakla kalmayacak, aynı zamanda güçlü bir network kurarak gelirlerinizi katlayabileceksiniz. Bu yolculuğun her anı heyecan dolu olacak!
+
+Unutmayın: Network marketing sadece kazanç değil, bir topluluk inşa etme sanatıdır.
+
+Parlacapital ile hem finansal özgürlüğünüzü kazanacak, hem de sizinle aynı hedefe yürüyen güçlü bir ekip kuracaksınız. 🤝
+
+Bugün attığınız küçük bir adım, yarın büyük bir fark yaratabilir.
+
+Şimdi harekete geçin — network'ünüzü büyütün, geleceğinizi şekillendirin! 🌟
+
+Başarı ve bolluk dileklerimizle,
+✨ Parlacapital Ekibi
+        """
+        
+        html = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0;">Parlacapital ile Network Marketing'de<br/>Büyük Kazançlar Sizi Bekliyor! 🚀</h1>
+            </div>
+            <div style="padding: 30px; background: #f9f9f9;">
+              <h2 style="color: #667eea;">Merhaba {user_name},</h2>
+              
+              <p style="font-size: 16px;">
+                <strong>Parlacapital ailesine hoş geldiniz!</strong> 🎉 Şimdi network marketing dünyasında inanılmaz fırsatlar kapınızı çalıyor! 💥
+              </p>
+              
+              <p style="font-size: 16px;">
+                Kripto yatırımından daha fazlasını sunuyoruz! Sadece para kazanmakla kalmayacak, aynı zamanda <strong>güçlü bir network kurarak</strong> gelirlerinizi katlayabileceksiniz. Bu yolculuğun her anı heyecan dolu olacak!
+              </p>
+              
+              <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0; font-style: italic; color: #856404;">
+                  <strong>Unutmayın:</strong> Network marketing sadece kazanç değil, bir topluluk inşa etme sanatıdır.
+                </p>
+              </div>
+              
+              <p style="font-size: 16px;">
+                Parlacapital ile hem finansal özgürlüğünüzü kazanacak, hem de sizinle aynı hedefe yürüyen güçlü bir ekip kuracaksınız. 🤝
+              </p>
+              
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; margin: 30px 0;">
+                <p style="font-size: 18px; margin: 0; font-weight: bold;">
+                  Bugün attığınız küçük bir adım, yarın büyük bir fark yaratabilir.
+                </p>
+              </div>
+              
+              <p style="font-size: 16px; text-align: center;">
+                <strong>Şimdi harekete geçin — network'ünüzü büyütün, geleceğinizi şekillendirin! 🌟</strong>
+              </p>
+              
+              <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                <p style="color: #667eea; font-size: 16px; margin: 0;">
+                  Başarı ve bolluk dileklerimizle,<br/>
+                  <strong>✨ Parlacapital Ekibi</strong>
+                </p>
+              </div>
+            </div>
+          </body>
+        </html>
+        """
+        
+        part1 = MIMEText(text, 'plain', 'utf-8')
+        part2 = MIMEText(html, 'html', 'utf-8')
+        msg.attach(part1)
+        msg.attach(part2)
+        
+        # Send email
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_email, smtp_password)
+            server.send_message(msg)
+        
+        logger.info(f"Welcome email sent to {user_email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send welcome email to {user_email}: {str(e)}")
+        return False
+
 def create_jwt_token(user_id: str) -> str:
     payload = {
         'user_id': user_id,
