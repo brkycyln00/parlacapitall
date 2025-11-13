@@ -1288,7 +1288,8 @@ async def get_dashboard(user: User = Depends(require_auth)):
 
 @api_router.get("/network/tree")
 async def get_network_tree(user: User = Depends(require_auth)):
-    async def build_tree(user_id: str, depth: int = 0, max_depth: int = 10):
+    async def build_tree(user_id: str, depth: int = 0, max_depth: int = 100):
+        # Allow up to 100 levels (virtually unlimited for practical purposes)
         if depth >= max_depth:
             return None
         
