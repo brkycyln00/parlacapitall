@@ -1014,7 +1014,10 @@ export default function Dashboard() {
                 </div>
                 <Button 
                   className="w-full mt-6 bg-slate-700 hover:bg-slate-600 text-white"
-                  onClick={() => setNetworkOpen(true)}
+                  onClick={() => {
+                    setNetworkOpen(true);
+                    fetchBinaryTree();
+                  }}
                 >
                   Tam Ağı Görüntüle
                 </Button>
