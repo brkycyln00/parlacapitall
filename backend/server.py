@@ -1288,7 +1288,7 @@ async def get_dashboard(user: User = Depends(require_auth)):
 
 @api_router.get("/network/tree")
 async def get_network_tree(user: User = Depends(require_auth)):
-    async def build_tree(user_id: str, depth: int = 0, max_depth: int = 5):
+    async def build_tree(user_id: str, depth: int = 0, max_depth: int = 10):
         if depth >= max_depth:
             return None
         
@@ -1296,13 +1296,25 @@ async def get_network_tree(user: User = Depends(require_auth)):
         if not user_doc:
             return None
         
+        # Calculate total volume under this node (left + right subtrees)
+        async def calculate_subtree_volume(uid: str):
+            u = await db.users.find_one({"id": uid}, {"_id": 0})
+            if not u:
+                return 0
+            return u.get("left_volume", 0) + u.get("right_volume", 0) + u.get("total_invested", 0)
+        
         node = {
             "id": user_doc["id"],
             "name": user_doc["name"],
+            "email": user_doc.get("email", ""),
             "package": user_doc.get("package"),
             "total_invested": user_doc.get("total_invested", 0),
+            "left_volume": user_doc.get("left_volume", 0),
+            "right_volume": user_doc.get("right_volume", 0),
+            "position": user_doc.get("position"),
             "left": None,
-            "right": None
+            "right": None,
+            "depth": depth
         }
         
         if user_doc.get("left_child_id"):
