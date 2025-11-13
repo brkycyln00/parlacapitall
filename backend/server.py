@@ -1270,6 +1270,9 @@ async def get_dashboard(user: User = Depends(require_auth)):
         if right_doc:
             right_child = {"name": right_doc["name"], "package": right_doc.get("package")}
     
+    # Calculate career level
+    career_info = get_career_level(user.left_volume, user.right_volume)
+    
     return {
         "user": user.model_dump(),
         "active_referral_code": active_code,
@@ -1279,7 +1282,8 @@ async def get_dashboard(user: User = Depends(require_auth)):
         "network": {
             "left": left_child,
             "right": right_child
-        }
+        },
+        "career": career_info
     }
 
 @api_router.get("/network/tree")
