@@ -47,6 +47,10 @@ export default function Dashboard() {
   const [joinNetworkOpen, setJoinNetworkOpen] = useState(false);
   const [joinReferralCode, setJoinReferralCode] = useState('');
   const [joinLoading, setJoinLoading] = useState(false);
+  
+  // Binary tree state
+  const [binaryTree, setBinaryTree] = useState(null);
+  const [treeLoading, setTreeLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
