@@ -798,7 +798,7 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
         }}
     )
     
-    # Calculate and add multi-level commissions to all uplines
+    # Calculate and add commission to direct upline ONLY (single level)
     if target_user.upline_id:
         # Get commission rate based on package
         commission_rates = {
@@ -808,16 +808,26 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
         }
         
         commission_rate = commission_rates.get(request.package, 0)
+        commission_amount = request.amount * commission_rate
         
-        # Pay commission to all uplines (multi-level)
-        await pay_multi_level_commissions(
-            target_user.id,
-            target_user.name,
-            request.package,
-            request.amount,
-            commission_rate,
-            max_levels=11  # Pay up to 11 levels
+        # Update direct upline's total commissions and wallet balance
+        await db.users.update_one(
+            {"id": target_user.upline_id},
+            {"$inc": {
+                "total_commissions": commission_amount,
+                "wallet_balance": commission_amount
+            }}
         )
+        
+        # Create commission transaction for direct upline only
+        commission_transaction = Transaction(
+            user_id=target_user.upline_id,
+            type="commission",
+            amount=commission_amount,
+            status="completed",
+            description=f"Direkt komisyon - {target_user.name} ({request.package.upper()} paketi)"
+        )
+        await db.transactions.insert_one(commission_transaction.model_dump())
         
         # Update volumes up the binary tree and check for binary earnings
         await update_volumes_upline(target_user.id, request.amount)
