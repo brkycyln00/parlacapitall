@@ -253,7 +253,7 @@ class LoginRequest(BaseModel):
     password: str
 
 class RegisterRequest(BaseModel):
-    email: str
+    email: EmailStr  # Email validation
     password: str
     name: str
     referral_code: Optional[str] = None
