@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turhost DNS Ayarlama Rehberi - ParlaCapital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        main {
+            padding: 40px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border-left: 5px solid #f12711;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .step h2 {
+            color: #f12711;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .step h3 {
+            color: #555;
+            margin: 20px 0 10px 0;
+        }
+        
+        .screenshot-placeholder {
+            background: #e9ecef;
+            border: 3px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .code-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .input-example {
+            background: white;
+            border: 2px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .input-example label {
+            display: block;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .input-example input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: monospace;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin: 10px 0;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+            margin: 30px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #f12711;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f12711;
+            border: 3px solid white;
+        }
+        
+        .timeline-item h4 {
+            color: #f12711;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            background: #2d2d2d;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Turhost DNS Ayarlama Rehberi</h1>
+            <p>ParlaCapital'i kendi domain'inize nasıl bağlarsınız?</p>
+        </header>
+        
+        <main>
+            <!-- GİRİŞ -->
+            <div class="info">
+                <h3>📌 Bu Rehber Size Şunları Gösterecek:</h3>
+                <ul>
+                    <li>Emergent'te nasıl deploy edileceğini</li>
+                    <li>Turhost DNS ayarlarını nasıl yapacağınızı</li>
+                    <li>Domain'inizi nasıl bağlayacağınızı</li>
+                    <li>Sorun çözme ipuçlarını</li>
+                </ul>
+            </div>
+            
+            <!-- ADIM 1: EMERGENT DEPLOYMENT -->
+            <div class="step">
+                <h2>📍 ADIM 1: Emergent'te Deploy Et</h2>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>1.1 Preview Testi</h4>
+                        <p>Deploy etmeden önce "Preview" butonu ile test edin. Tüm özellikler çalışıyor mu kontrol edin.</p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4>1.2 Deploy Butonu</h4>
+                        <p>Sağ üstteki <strong>"Deploy"</strong> butonuna tıklayın.</p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4>1.3 Deploy Now</h4>
+                        <p>"Deploy Now" seçeneğini seçin.</p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4>1.4 Bekleyin (~10 dakika)</h4>
+                        <p>Deployment işlemi tamamlanana kadar bekleyin. Progress bar göreceksiniz.</p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4>1.5 URL Alın</h4>
+                        <p>Deploy tamamlandığında size bir URL verilecek:</p>
+                        <div class="code-box">
+https://invest-tree.emergent.sh
+                        </div>
+                        <p>Bu URL'yi not edin!</p>
+                    </div>
+                </div>
+                
+                <div class="success">
+                    <strong>✅ Başarılı!</strong> Artık siteniz <code>invest-tree.emergent.sh</code> adresinde canlı!
+                </div>
+            </div>
+            
+            <!-- ADIM 2: TURHOST'A GİRİŞ -->
+            <div class="step">
+                <h2>📍 ADIM 2: Turhost Panel'e Giriş Yapın</h2>
+                
+                <h3>2.1 Turhost'a Giriş:</h3>
+                <ol>
+                    <li>Tarayıcınızda <strong>turhost.com</strong> açın</li>
+                    <li>Sağ üstte "Müşteri Girişi" butonuna tıklayın</li>
+                    <li>Email ve şifrenizi girin</li>
+                    <li>"Giriş Yap" tıklayın</li>
+                </ol>
+                
+                <div class="screenshot-placeholder">
+                    📸 EKRAN GÖRÜNTÜsÜ: Turhost giriş sayfası
+                </div>
+            </div>
+            
+            <!-- ADIM 3: DOMAIN YÖNETİMİ -->
+            <div class="step">
+                <h2>📍 ADIM 3: Domain Yönetimi'ne Gidin</h2>
+                
+                <h3>3.1 Domain Bul:</h3>
+                <ol>
+                    <li>Sol menüden <strong>"Domain"</strong> veya <strong>"Alan Adları"</strong> seçeneğini bulun</li>
+                    <li><strong>"Domain Yönetimi"</strong> veya <strong>"Aktif Domainlerim"</strong> tıklayın</li>
+                    <li>Domain listesinde <strong>parlacapital.com</strong> (veya sizin domain'iniz) bulun</li>
+                    <li>Domain adının yanındaki <strong>"Yönet"</strong> veya <strong>"Ayarlar"</strong> butonuna tıklayın</li>
+                </ol>
+                
+                <div class="screenshot-placeholder">
+                    📸 EKRAN GÖRÜNTÜSÜ: Domain listesi<br>
+                    parlacapital.com → [Yönet] butonu
+                </div>
+            </div>
+            
+            <!-- ADIM 4: DNS AYARLARI -->
+            <div class="step">
+                <h2>📍 ADIM 4: DNS Kayıtlarını Düzenleyin</h2>
+                
+                <h3>4.1 DNS Panel'i Açın:</h3>
+                <p>Domain yönetim sayfasında şu seçeneklerden birini bulun:</p>
+                <ul>
+                    <li><strong>"DNS Yönetimi"</strong></li>
+                    <li><strong>"DNS Kayıtları"</strong></li>
+                    <li><strong>"Name Server Ayarları"</strong></li>
+                    <li>Veya <strong>"Gelişmiş DNS"</strong></li>
+                </ul>
+                
+                <div class="screenshot-placeholder">
+                    📸 EKRAN GÖRÜNTÜSÜ: DNS Yönetimi butonu
+                </div>
+                
+                <h3>4.2 Mevcut A Kaydını Kontrol Edin:</h3>
+                <p>DNS kayıtları tablosunda şu kolonları göreceksiniz:</p>
+                <ul>
+                    <li><strong>Tip:</strong> A, CNAME, MX, TXT vb.</li>
+                    <li><strong>Host/Ad:</strong> @, www, mail vb.</li>
+                    <li><strong>Değer/IP:</strong> IP adresi veya hedef</li>
+                    <li><strong>TTL:</strong> Geçerlilik süresi</li>
+                </ul>
+                
+                <div class="warning">
+                    <strong>⚠️ ÖNEMLİ:</strong> Eğer mevcut bir A kaydı varsa (@ veya www için), onu SİLİN veya DÜZENLEYİN. Aynı host için birden fazla A kaydı olamaz!
+                </div>
+            </div>
+            
+            <!-- ADIM 5: A RECORD EKLE -->
+            <div class="step">
+                <h2>📍 ADIM 5: Yeni A Record Ekleyin</h2>
+                
+                <h3>5.1 "Yeni Kayıt Ekle" veya "Add Record":</h3>
+                <ol>
+                    <li><strong>"Kayıt Ekle"</strong> veya <strong>"Yeni DNS Kaydı"</strong> butonuna tıklayın</li>
+                    <li>Kayıt tipi olarak <strong>"A"</strong> seçin</li>
+                </ol>
+                
+                <h3>5.2 Değerleri Girin:</h3>
+                
+                <div class="input-example">
+                    <label>Kayıt Tipi / Type:</label>
+                    <input type="text" value="A" readonly style="background: #f0f0f0;">
+                </div>
+                
+                <div class="input-example">
+                    <label>Host / Ad / Name:</label>
+                    <input type="text" value="@" readonly style="background: #f0f0f0;">
+                    <p style="margin-top: 8px; font-size: 0.9em; color: #666;">
+                        <strong>@</strong> = Ana domain (parlacapital.com)<br>
+                        <strong>www</strong> = Alt domain (www.parlacapital.com)<br>
+                        💡 İpucu: Her ikisi için de ayrı A record ekleyebilirsiniz
+                    </p>
+                </div>
+                
+                <div class="input-example">
+                    <label>Değer / Value / Points To / IP Adresi:</label>
+                    <input type="text" placeholder="Emergent'ten alacağınız IP (örn: 34.57.15.54)" style="color: #f12711; font-weight: bold;">
+                    <p style="margin-top: 8px; font-size: 0.9em; color: #666;">
+                        ⚠️ Bu IP adresini Emergent'ten alacaksınız (Adım 6'ya bakın)
+                    </p>
+                </div>
+                
+                <div class="input-example">
+                    <label>TTL (Time To Live):</label>
+                    <input type="text" value="300" readonly style="background: #f0f0f0;">
+                    <p style="margin-top: 8px; font-size: 0.9em; color: #666;">
+                        300 saniye (5 dakika) önerilir. Bazı panellerde "Auto" veya "Default" seçebilirsiniz.
+                    </p>
+                </div>
+                
+                <h3>5.3 Kaydet:</h3>
+                <ol>
+                    <li><strong>"Kaydet"</strong>, <strong>"Save"</strong> veya <strong>"Ekle"</strong> butonuna tıklayın</li>
+                    <li>Başarı mesajı göreceksiniz: "DNS kaydı eklendi"</li>
+                </ol>
+                
+                <div class="success">
+                    <strong>✅ Tamamlandı!</strong> A kaydınız Turhost'a eklendi. Şimdi Emergent'ten IP adresini almalısınız.
+                </div>
+            </div>
+            
+            <!-- ADIM 6: EMERGENT CUSTOM DOMAIN -->
+            <div class="step">
+                <h2>📍 ADIM 6: Emergent'te Custom Domain Bağlayın</h2>
+                
+                <h3>6.1 Deployments Sayfası:</h3>
+                <ol>
+                    <li>Emergent dashboard'da <strong>"Deployments"</strong> sekmesine gidin</li>
+                    <li>Deploy ettiğiniz uygulamayı bulun: <strong>invest-tree</strong></li>
+                    <li><strong>"Custom Domain"</strong> bölümünü bulun</li>
+                </ol>
+                
+                <h3>6.2 Domain Bağla:</h3>
+                <ol>
+                    <li><strong>"Link Domain"</strong> veya <strong>"Add Custom Domain"</strong> butonuna tıklayın</li>
+                    <li>Domain adınızı girin:</li>
+                </ol>
+                
+                <div class="input-example">
+                    <label>Domain Name:</label>
+                    <input type="text" placeholder="parlacapital.com" style="color: #667eea; font-weight: bold;">
+                    <p style="margin-top: 8px; font-size: 0.9em; color: #666;">
+                        💡 www olmadan girin: <strong>parlacapital.com</strong><br>
+                        (www.parlacapital.com değil)
+                    </p>
+                </div>
+                
+                <h3>6.3 IP Adresini Alın:</h3>
+                <p>Emergent size bir <strong>IP adresi</strong> gösterecek:</p>
+                <div class="code-box">
+IP Address: 34.57.15.54
+                </div>
+                <p>Bu IP adresini kopyalayın! Turhost'a geri döneceksiniz.</p>
+                
+                <div class="warning">
+                    <strong>⚠️ ÖNEMLİ:</strong> Bu IP adresini ADIM 5'te girmeniz gerekiyordu. Eğer girmediyseniz, şimdi Turhost'a geri dönüp düzenleyin!
+                </div>
+            </div>
+            
+            <!-- ADIM 7: IP'Yİ TURHOST'A GİR -->
+            <div class="step">
+                <h2>📍 ADIM 7: IP Adresini Turhost'a Girin</h2>
+                
+                <h3>7.1 Turhost DNS Panel'e Dön:</h3>
+                <ol>
+                    <li>Turhost panel → Domain Yönetimi → DNS Kayıtları</li>
+                    <li>Az önce eklediğiniz A kaydını bulun</li>
+                    <li><strong>"Düzenle"</strong> veya <strong>"Edit"</strong> butonuna tıklayın</li>
+                </ol>
+                
+                <h3>7.2 IP Adresini Güncelleyin:</h3>
+                <div class="input-example">
+                    <label>Değer / Value / IP Adresi:</label>
+                    <input type="text" value="34.57.15.54" readonly style="background: #d4edda; font-weight: bold; color: #28a745;">
+                    <p style="margin-top: 8px; font-size: 0.9em; color: #666;">
+                        Emergent'ten aldığınız IP adresini buraya yapıştırın
+                    </p>
+                </div>
+                
+                <h3>7.3 Kaydet:</h3>
+                <ol>
+                    <li>"Kaydet" butonuna tıklayın</li>
+                    <li>Başarı mesajı: "DNS kaydı güncellendi"</li>
+                </ol>
+                
+                <div class="success">
+                    <strong>✅ Harika!</strong> DNS ayarlarınız tamamlandı. Şimdi yayılmasını bekleyin.
+                </div>
+            </div>
+            
+            <!-- ADIM 8: DOĞRULAMA -->
+            <div class="step">
+                <h2>📍 ADIM 8: Domain Doğrulaması</h2>
+                
+                <h3>8.1 Emergent'te Check Status:</h3>
+                <ol>
+                    <li>Emergent Custom Domain sayfasında kalın</li>
+                    <li><strong>"Check Status"</strong> veya <strong>"Verify"</strong> butonuna tıklayın</li>
+                    <li>DNS kayıtlarınız kontrol edilecek</li>
+                </ol>
+                
+                <h3>8.2 Bekleme Süresi:</h3>
+                <div class="info">
+                    <strong>⏱️ DNS Yayılma Süreleri:</strong>
+                    <ul>
+                        <li><strong>Minimum:</strong> 5-15 dakika (Turhost sunucuları)</li>
+                        <li><strong>Türkiye:</strong> 1-2 saat (yerel ISP'ler)</li>
+                        <li><strong>Global:</strong> 24-48 saat (tüm dünya)</li>
+                    </ul>
+                </div>
+                
+                <h3>8.3 Doğrulama Araçları:</h3>
+                <p>DNS yayılımını kontrol etmek için:</p>
+                <ul>
+                    <li><strong>whatsmydns.net</strong> → Domain'inizi girin, A record kontrol edin</li>
+                    <li><strong>dnschecker.org</strong> → Global DNS propagation durumu</li>
+                    <li><strong>Komut satırı:</strong></li>
+                </ul>
+                <div class="code-box">
+# Windows Command Prompt:
+nslookup parlacapital.com
+
+# Mac/Linux Terminal:
+dig parlacapital.com
+
+# Çıktıda Emergent IP adresini görmelisiniz
+                </div>
+            </div>
+            
+            <!-- ADIM 9: TEST -->
+            <div class="step">
+                <h2>📍 ADIM 9: Domain'inizi Test Edin</h2>
+                
+                <h3>9.1 Tarayıcıda Açın:</h3>
+                <ol>
+                    <li>Tarayıcınızı açın (Chrome, Firefox vb.)</li>
+                    <li>Address bar'a domain'inizi yazın:</li>
+                </ol>
+                <div class="code-box">
+https://parlacapital.com
+                </div>
+                
+                <h3>9.2 HTTPS Kontrolü:</h3>
+                <p>Emergent otomatik SSL sertifikası sağlar. Domain adresiniz şöyle açılmalı:</p>
+                <ul>
+                    <li>🔒 Kilit simgesi (güvenli bağlantı)</li>
+                    <li>HTTPS protokolü</li>
+                    <li>ParlaCapital anasayfası yüklenir</li>
+                </ul>
+                
+                <div class="success">
+                    <strong>🎉 BAŞARILI!</strong> Domain'iniz çalışıyor! Artık siteniz <code>parlacapital.com</code> adresinden erişilebilir!
+                </div>
+            </div>
+            
+            <!-- SORUN ÇÖZME -->
+            <div class="step">
+                <h2>🔧 Sorun Giderme</h2>
+                
+                <h3>❌ Sorun 1: "Site açılmıyor"</h3>
+                <p><strong>Çözüm:</strong></p>
+                <ul>
+                    <li>DNS yayılma süresini bekleyin (15 dakika - 2 saat)</li>
+                    <li>Browser cache temizleyin (Ctrl+Shift+Del)</li>
+                    <li>Farklı cihaz/network deneyin (mobil data)</li>
+                    <li>whatsmydns.net ile DNS yayılımını kontrol edin</li>
+                </ul>
+                
+                <h3>❌ Sorun 2: "Emergent verification başarısız"</h3>
+                <p><strong>Çözüm:</strong></p>
+                <ul>
+                    <li>Turhost'ta A kaydının <strong>Host</strong> kısmı <code>@</code> olmalı</li>
+                    <li>IP adresi doğru mu kontrol edin</li>
+                    <li>Mevcut çakışan kayıtları silin</li>
+                    <li>5-10 dakika bekleyip tekrar "Check Status" deneyin</li>
+                </ul>
+                
+                <h3>❌ Sorun 3: "Eski site açılıyor"</h3>
+                <p><strong>Çözüm:</strong></p>
+                <ul>
+                    <li>Turhost'ta "Park" modu kapalı mı kontrol edin</li>
+                    <li>Eski A kayıtlarını silin</li>
+                    <li>Browser cache temizleyin</li>
+                    <li>Incognito/Private mode deneyin</li>
+                </ul>
+                
+                <h3>❌ Sorun 4: "www.parlacapital.com çalışmıyor"</h3>
+                <p><strong>Çözüm:</strong></p>
+                <ul>
+                    <li>www için AYRI bir A record ekleyin:</li>
+                </ul>
+                <div class="input-example">
+                    <label>Host:</label>
+                    <input type="text" value="www" readonly>
+                    <label>Value:</label>
+                    <input type="text" placeholder="Aynı IP adresi (34.57.15.54)">
+                </div>
+                <p>Veya CNAME record ekleyin: <code>www → parlacapital.com</code></p>
+            </div>
+            
+            <!-- HIZLI KONTROL LİSTESİ -->
+            <div class="step">
+                <h2>✅ Hızlı Kontrol Listesi</h2>
+                
+                <table style="width: 100%; margin: 20px 0;">
+                    <thead>
+                        <tr style="background: #f12711; color: white;">
+                            <th style="padding: 15px;">Adım</th>
+                            <th style="padding: 15px;">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px;">1. Emergent'te deploy edildi</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">2. Emergent URL çalışıyor (invest-tree.emergent.sh)</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">3. Turhost'a giriş yapıldı</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">4. Domain yönetimi bulundu</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">5. DNS kayıtları sayfası açıldı</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">6. A record eklendi (Tip: A, Host: @)</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">7. Emergent IP adresi alındı</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">8. IP adresi Turhost A record'a girildi</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">9. Kaydedildi ve 15 dakika beklendi</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">10. Emergent'te "Check Status" tıklandı</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">11. Domain doğrulandı ✅</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">12. parlacapital.com açıldı (HTTPS ile)</td>
+                            <td style="padding: 12px;">☐</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- ÖRNEK TABLO -->
+            <div class="step">
+                <h2>📊 Örnek DNS Tablosu (Turhost)</h2>
+                <p>DNS kayıtlarınız şöyle görünmeli:</p>
+                
+                <table style="width: 100%; margin: 20px 0;">
+                    <thead>
+                        <tr style="background: #667eea; color: white;">
+                            <th style="padding: 12px;">Tip</th>
+                            <th style="padding: 12px;">Host</th>
+                            <th style="padding: 12px;">Değer</th>
+                            <th style="padding: 12px;">TTL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">A</td>
+                            <td style="padding: 10px;">@</td>
+                            <td style="padding: 10px; font-family: monospace;">34.57.15.54</td>
+                            <td style="padding: 10px;">300</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold;">A</td>
+                            <td style="padding: 10px;">www</td>
+                            <td style="padding: 10px; font-family: monospace;">34.57.15.54</td>
+                            <td style="padding: 10px;">300</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="info">
+                    <strong>💡 İpucu:</strong> Hem <code>@</code> hem <code>www</code> için A record eklerseniz, 
+                    her iki adres de çalışır:<br>
+                    ✅ <code>parlacapital.com</code><br>
+                    ✅ <code>www.parlacapital.com</code>
+                </div>
+            </div>
+            
+            <!-- TEKNİK DETAYLAR -->
+            <div class="step">
+                <h2>🔬 Teknik Detaylar</h2>
+                
+                <h3>A Record Nedir?</h3>
+                <p><strong>A Record (Address Record):</strong> Domain adını IP adresine yönlendirir.</p>
+                <div class="code-box">
+parlacapital.com → 34.57.15.54
+                </div>
+                <p>Kullanıcı <code>parlacapital.com</code> yazdığında, tarayıcı <code>34.57.15.54</code> IP adresindeki sunucuya gider.</p>
+                
+                <h3>TTL Nedir?</h3>
+                <p><strong>TTL (Time To Live):</strong> DNS kaydının ne kadar süre cache'de kalacağı.</p>
+                <ul>
+                    <li><strong>300 saniye (5 dk):</strong> Hızlı değişiklikler için ideal</li>
+                    <li><strong>3600 saniye (1 saat):</strong> Stabil domain'ler için</li>
+                    <li>Düşük TTL = Hızlı güncelleme ama daha fazla DNS sorgusu</li>
+                </ul>
+                
+                <h3>SSL/HTTPS</h3>
+                <p>Emergent otomatik olarak <strong>Let's Encrypt SSL sertifikası</strong> sağlar:</p>
+                <ul>
+                    <li>Ücretsiz</li>
+                    <li>Otomatik yenileme</li>
+                    <li>Domain doğrulandıktan 5-10 dakika sonra aktif</li>
+                    <li>HTTPS otomatik redirect</li>
+                </ul>
+            </div>
+            
+            <!-- YARDIM -->
+            <div class="step">
+                <h2>🆘 Yardıma İhtiyacınız Var mı?</h2>
+                
+                <h3>Turhost Destek:</h3>
+                <ul>
+                    <li><strong>Canlı Destek:</strong> Turhost.com → Canlı Destek</li>
+                    <li><strong>Ticket:</strong> Müşteri paneli → Destek Talebi Oluştur</li>
+                    <li><strong>Telefon:</strong> +90 (850) 885 0 885</li>
+                </ul>
+                
+                <h3>Emergent Destek:</h3>
+                <ul>
+                    <li>Platform içinde "Support" agent'ı çağırın</li>
+                    <li>Deployment ile ilgili sorunlar için deployment agent</li>
+                </ul>
+                
+                <div class="warning">
+                    <strong>⚠️ Turhost'a Soracağınız Soru:</strong><br>
+                    "Merhaba, domain'im için A record eklemek istiyorum. DNS yönetimi paneline nasıl erişebilirim? 
+                    Domain: parlacapital.com, eklemek istediğim IP: 34.57.15.54"
+                </div>
+            </div>
+            
+            <!-- SONUÇ -->
+            <div class="success" style="text-align: center; padding: 40px; font-size: 1.1em;">
+                <h2 style="color: #28a745; margin-bottom: 20px;">🎉 Tebrikler!</h2>
+                <p>Bu adımları tamamladığınızda, <strong>ParlaCapital MLM platformunuz</strong> 
+                kendi domain adresinizde (<strong>parlacapital.com</strong>) canlı olacak!</p>
+                
+                <p style="margin-top: 30px;">
+                    <a href="#" class="btn">🚀 Hemen Başla</a>
+                </p>
+            </div>
+        </main>
+        
+        <footer>
+            <p><strong>Turhost DNS Ayarlama Rehberi</strong></p>
+            <p>ParlaCapital MLM Platform</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">Sorularınız için Emergent support agent'ı çağırabilirsiniz</p>
+        </footer>
+    </div>
+</body>
+</html>
