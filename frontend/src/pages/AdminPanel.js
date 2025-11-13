@@ -387,17 +387,70 @@ export default function AdminPanel() {
                 </div>
                 
                 {/* Onaylanmış Talepler */}
-                {investmentRequests.filter(req => req.status === 'approved').length > 0 && (
+                {approvedInvestments.length > 0 && (
                   <div className="mt-8">
-                    <h3 className="text-white font-semibold mb-4">Onaylanmış Talepler</h3>
-                    <div className="space-y-2">
-                      {investmentRequests.filter(req => req.status === 'approved').map((req, idx) => (
-                        <div key={idx} className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <p className="text-white font-semibold">{req.full_name}</p>
-                              <p className="text-gray-400 text-sm">{req.package.toUpperCase()} - ${req.amount}</p>
-                            </div>
+                    <h3 className="text-white text-xl font-semibold mb-4 flex items-center gap-2">
+                      <span className="text-green-400">✓</span> Onaylanmış Yatırımlar
+                      <span className="text-sm text-gray-400">({approvedInvestments.length})</span>
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-green-500/30 bg-green-900/20">
+                            <th className="text-left text-green-400 pb-3 px-4">Tarih & Saat</th>
+                            <th className="text-left text-green-400 pb-3 px-4">Kullanıcı</th>
+                            <th className="text-left text-green-400 pb-3 px-4">Email</th>
+                            <th className="text-left text-green-400 pb-3 px-4">WhatsApp</th>
+                            <th className="text-left text-green-400 pb-3 px-4">Platform</th>
+                            <th className="text-left text-green-400 pb-3 px-4">Paket</th>
+                            <th className="text-left text-green-400 pb-3 px-4">Miktar</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {approvedInvestments.map((req, idx) => (
+                            <tr key={idx} className="border-b border-slate-700 hover:bg-green-900/10">
+                              <td className="py-4 px-4">
+                                <div className="text-white font-mono text-xs">
+                                  {new Date(req.created_at).toLocaleDateString('tr-TR')}
+                                </div>
+                                <div className="text-green-400 font-mono text-xs">
+                                  {new Date(req.created_at).toLocaleTimeString('tr-TR')}
+                                </div>
+                              </td>
+                              <td className="py-4 px-4">
+                                <div className="text-white font-semibold">{req.full_name}</div>
+                                <div className="text-gray-400 text-xs">@{req.username}</div>
+                              </td>
+                              <td className="py-4 px-4 text-gray-300">{req.email}</td>
+                              <td className="py-4 px-4 text-green-400">{req.whatsapp}</td>
+                              <td className="py-4 px-4">
+                                <span className="px-2 py-1 rounded text-xs bg-amber-500/20 text-amber-300">
+                                  {req.platform === 'tether_trc20' ? 'USDT TRC20' : 
+                                   req.platform === 'ethereum_erc20' ? 'ETH ERC20' : 
+                                   'IBAN'}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4">
+                                <span className="font-bold text-white">{req.package.toUpperCase()}</span>
+                              </td>
+                              <td className="py-4 px-4">
+                                <span className="text-green-400 font-bold">${req.amount}</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                {approvedInvestments.length === 0 && investmentRequests.filter(req => req.status === 'pending').length === 0 && (
+                  <div className="mt-8">
+                    <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-white font-semibold">Henüz onaylanmış yatırım yok</p>
+                          <p className="text-gray-400 text-sm">Bekleyen talepleri onaylayın</p>
+                        </div>
                             <p className="text-green-400 font-semibold">✓ Onaylandı</p>
                           </div>
                         </div>
