@@ -760,6 +760,18 @@ async def create_investment_request(
     req: InvestmentRequestCreate,
     user: User = Depends(require_auth)
 ):
+    # Check if user already has an approved investment
+    existing_approved = await db.investment_requests.find_one({
+        "user_id": user.id,
+        "status": "approved"
+    })
+    
+    if existing_approved:
+        raise HTTPException(
+            status_code=400,
+            detail="Zaten onaylanmış bir yatırımınız var. Sadece bir kez yatırım yapabilirsiniz."
+        )
+    
     if req.package not in PACKAGES:
         raise HTTPException(status_code=400, detail="Invalid package")
     
