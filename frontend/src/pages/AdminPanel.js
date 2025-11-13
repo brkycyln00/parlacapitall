@@ -235,8 +235,21 @@ export default function AdminPanel() {
                 className="h-10 w-auto"
               />
               <div>
-                <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-                <p className="text-sm text-gray-400">ParlaCapital Yönetim Paneli</p>
+                <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+                  Admin Panel
+                  {pendingCount > 0 && (
+                    <span className="relative flex items-center">
+                      <span className="animate-ping absolute inline-flex h-5 w-5 rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex items-center justify-center rounded-full h-6 w-6 bg-red-500 text-white text-xs font-bold">
+                        {pendingCount}
+                      </span>
+                    </span>
+                  )}
+                </h1>
+                <p className="text-sm text-gray-400">
+                  ParlaCapital Yönetim Paneli
+                  {pendingCount > 0 && <span className="text-red-400 ml-2">• {pendingCount} bekleyen talep</span>}
+                </p>
               </div>
             </div>
             <div className="flex gap-3">
