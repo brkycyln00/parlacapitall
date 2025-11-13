@@ -8,6 +8,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout, checkAuth } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <nav className="fixed top-0 w-full bg-slate-900/95 backdrop-blur-md z-50 border-b border-amber-500/30 shadow-lg">
