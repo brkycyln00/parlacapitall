@@ -1078,6 +1078,90 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
+            {/* Career Rewards */}
+            <Card className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-purple-500/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  💎 Kariyer Ödülleri
+                </CardTitle>
+                <p className="text-sm text-gray-300">Binary ağ satış hacminize göre seviye atlayın</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Current Level */}
+                  <div className="bg-slate-800/50 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-gray-400 text-sm">Mevcut Seviye</span>
+                      <span className="text-2xl font-bold text-purple-400">
+                        {dashboard?.career?.current_level || 'None'}
+                      </span>
+                    </div>
+                    {dashboard?.career?.current_level !== 'None' && (
+                      <div className="text-green-400 text-sm">
+                        🎉 Ödül: ${dashboard?.career?.current_reward || 0}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Progress to Next Level */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-white font-semibold">
+                        Sonraki: {dashboard?.career?.next_level}
+                      </span>
+                      <span className="text-sm text-amber-400">
+                        Ödül: {dashboard?.career?.next_reward === 'TOGG' ? '0 km TOGG 🚗' : `$${dashboard?.career?.next_reward}`}
+                      </span>
+                    </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="relative w-full h-4 bg-slate-700 rounded-full overflow-hidden">
+                      <div 
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500"
+                        style={{width: `${dashboard?.career?.progress || 0}%`}}
+                      ></div>
+                      <div className="absolute inset-0 flex items-center justify-center text-xs text-white font-bold">
+                        {dashboard?.career?.progress || 0}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Volume Requirements */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+                      <div className="text-xs text-blue-400 mb-1">👈 Sol Kol</div>
+                      <div className="text-white font-bold">${dashboard?.career?.left_volume?.toLocaleString('tr-TR') || 0}</div>
+                      <div className="text-xs text-gray-400">
+                        Hedef: ${dashboard?.career?.left_needed?.toLocaleString('tr-TR') || 0}
+                      </div>
+                    </div>
+                    <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3">
+                      <div className="text-xs text-purple-400 mb-1">👉 Sağ Kol</div>
+                      <div className="text-white font-bold">${dashboard?.career?.right_volume?.toLocaleString('tr-TR') || 0}</div>
+                      <div className="text-xs text-gray-400">
+                        Hedef: ${dashboard?.career?.right_needed?.toLocaleString('tr-TR') || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Career Levels Info */}
+                  <details className="text-sm">
+                    <summary className="text-amber-400 cursor-pointer hover:text-amber-300">
+                      📋 Tüm Kariyer Seviyeleri
+                    </summary>
+                    <div className="mt-3 space-y-2 text-gray-300">
+                      <div className="flex justify-between"><span>💜 Amethyst:</span><span>$5.000 + $5.000 = $500</span></div>
+                      <div className="flex justify-between"><span>💙 Sapphire:</span><span>$10.000 + $10.000 = $1.000</span></div>
+                      <div className="flex justify-between"><span>❤️ Ruby:</span><span>$20.000 + $20.000 = $3.000</span></div>
+                      <div className="flex justify-between"><span>💚 Emerald:</span><span>$50.000 + $50.000 = $7.500</span></div>
+                      <div className="flex justify-between"><span>💎 Diamond:</span><span>$100.000 + $100.000 = $20.000</span></div>
+                      <div className="flex justify-between"><span>👑 Crown:</span><span>$300.000 + $300.000 = TOGG 🚗</span></div>
+                    </div>
+                  </details>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Recent Activities */}
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader>
