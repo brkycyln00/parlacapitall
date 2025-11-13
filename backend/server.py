@@ -479,6 +479,12 @@ async def register(req: RegisterRequest):
     user_dict = user.model_dump()
     await db.users.insert_one(user_dict)
     
+    # Send welcome email (async, don't wait for it)
+    try:
+        await send_welcome_email(user.email, user.name)
+    except Exception as e:
+        logger.error(f"Welcome email failed but user created: {e}")
+    
     # Create JWT token
     token = create_jwt_token(user.id)
     
