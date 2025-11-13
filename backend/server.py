@@ -800,6 +800,32 @@ async def get_investment_requests(user: User = Depends(require_admin)):
     requests = await db.investment_requests.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     return {"requests": requests}
 
+@api_router.get("/admin/approved-investments")
+async def get_approved_investments(user: User = Depends(require_admin)):
+    """Get all approved investments with user details"""
+    approved_requests = await db.investment_requests.find(
+        {"status": "approved"},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(500)
+    
+    # Enrich with user data
+    result = []
+    for req in approved_requests:
+        user_doc = await db.users.find_one({"id": req["user_id"]}, {"_id": 0, "name": 1, "email": 1})
+        result.append({
+            **req,
+            "user_name": user_doc.get("name") if user_doc else "Unknown",
+            "user_email": user_doc.get("email") if user_doc else "Unknown"
+        })
+    
+    return {"approved_investments": result}
+
+@api_router.get("/admin/pending-count")
+async def get_pending_count(user: User = Depends(require_admin)):
+    """Get count of pending investment requests"""
+    count = await db.investment_requests.count_documents({"status": "pending"})
+    return {"pending_count": count}
+
 @api_router.post("/admin/investment-requests/{request_id}/approve")
 async def approve_investment_request(request_id: str, user: User = Depends(require_admin)):
     request_doc = await db.investment_requests.find_one({"id": request_id}, {"_id": 0})
