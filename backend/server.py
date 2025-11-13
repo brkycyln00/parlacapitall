@@ -1104,64 +1104,6 @@ async def create_investment(
     
     return {"message": "Investment created successfully", "investment": investment.model_dump()}
 
-async def pay_multi_level_commissions(
-    investor_id: str,
-    investor_name: str,
-    package: str,
-    investment_amount: float,
-    commission_rate: float,
-    max_levels: int = 11
-):
-    """
-    Pay commissions to all uplines up to max_levels.
-    Each upline receives the same commission rate.
-    Example: If investor makes $1000 investment with 5% rate:
-    - Direct upline (level 1) gets $50
-    - Upline's upline (level 2) gets $50
-    - And so on up to level 11
-    """
-    commission_amount = investment_amount * commission_rate
-    
-    # Get the investor's upline
-    investor_doc = await db.users.find_one({"id": investor_id}, {"_id": 0})
-    if not investor_doc or not investor_doc.get("upline_id"):
-        return
-    
-    current_upline_id = investor_doc["upline_id"]
-    level = 1
-    
-    while current_upline_id and level <= max_levels:
-        # Get upline user
-        upline_doc = await db.users.find_one({"id": current_upline_id}, {"_id": 0})
-        if not upline_doc:
-            break
-        
-        upline_user = User(**upline_doc)
-        
-        # Update upline's total commissions and wallet balance
-        await db.users.update_one(
-            {"id": upline_user.id},
-            {"$inc": {
-                "total_commissions": commission_amount,
-                "wallet_balance": commission_amount
-            }}
-        )
-        
-        # Create commission transaction
-        level_label = f"Seviye {level}" if level > 1 else "Direkt"
-        commission_transaction = Transaction(
-            user_id=upline_user.id,
-            type="commission",
-            amount=commission_amount,
-            status="completed",
-            description=f"{level_label} komisyon - {investor_name} ({package.upper()} paketi)"
-        )
-        await db.transactions.insert_one(commission_transaction.model_dump())
-        
-        # Move to next upline
-        current_upline_id = upline_user.upline_id
-        level += 1
-
 async def update_volumes_upline(user_id: str, amount: float):
     """Update left/right volumes up the tree and check for binary earnings"""
     current_user = await db.users.find_one({"id": user_id}, {"_id": 0})
