@@ -68,46 +68,149 @@ export default function Navbar() {
           </div>
           
           <div className="flex items-center gap-3">
-            {user ? (
-              <>
-                <Button 
-                  onClick={() => navigate('/dashboard')} 
-                  variant="outline" 
-                  className="border-amber-500 text-amber-400 hover:bg-amber-500/10"
-                  data-testid="nav-dashboard-button"
-                >
-                  Panelim
-                </Button>
-                {user.is_admin && (
+            {/* Desktop Auth Buttons */}
+            <div className="hidden md:flex items-center gap-3">
+              {user ? (
+                <>
                   <Button 
-                    onClick={() => navigate('/admin')} 
+                    onClick={() => navigate('/dashboard')} 
                     variant="outline" 
-                    className="border-purple-500 text-purple-400 hover:bg-purple-500/10"
-                    data-testid="nav-admin-button"
+                    className="border-amber-500 text-amber-400 hover:bg-amber-500/10"
+                    data-testid="nav-dashboard-button"
                   >
-                    Admin
+                    Panelim
                   </Button>
-                )}
+                  {user.is_admin && (
+                    <Button 
+                      onClick={() => navigate('/admin')} 
+                      variant="outline" 
+                      className="border-purple-500 text-purple-400 hover:bg-purple-500/10"
+                      data-testid="nav-admin-button"
+                    >
+                      Admin
+                    </Button>
+                  )}
+                  <Button 
+                    onClick={logout} 
+                    variant="outline" 
+                    className="border-red-500 text-red-400 hover:bg-red-500/10"
+                    data-testid="nav-logout-button"
+                  >
+                    Çıkış
+                  </Button>
+                </>
+              ) : (
                 <Button 
-                  onClick={logout} 
-                  variant="outline" 
-                  className="border-red-500 text-red-400 hover:bg-red-500/10"
-                  data-testid="nav-logout-button"
+                  onClick={() => setAuthModalOpen(true)}
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-2 rounded-full font-semibold"
+                  data-testid="nav-login-button"
                 >
-                  Çıkış
+                  Giriş Yap
                 </Button>
-              </>
-            ) : (
-              <Button 
-                onClick={() => setAuthModalOpen(true)}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-2 rounded-full font-semibold"
-                data-testid="nav-login-button"
-              >
-                Giriş Yap
-              </Button>
-            )}
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden text-white p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden pb-4 space-y-2">
+            <button 
+              onClick={() => { navigate('/'); setMobileMenuOpen(false); }} 
+              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
+            >
+              Ana Sayfa
+            </button>
+            <button 
+              onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} 
+              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
+            >
+              Hakkımızda
+            </button>
+            <button 
+              onClick={() => { navigate('/packages'); setMobileMenuOpen(false); }} 
+              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
+            >
+              Paketler
+            </button>
+            <button 
+              onClick={() => { navigate('/crypto-market'); setMobileMenuOpen(false); }} 
+              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
+            >
+              Kripto Piyasası
+            </button>
+            <button 
+              onClick={() => { navigate('/earning-systems'); setMobileMenuOpen(false); }} 
+              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
+            >
+              Kazanç Sistemleri
+            </button>
+            <button 
+              onClick={() => { navigate('/faq'); setMobileMenuOpen(false); }} 
+              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
+            >
+              SSS
+            </button>
+            <button 
+              onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }} 
+              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
+            >
+              İletişim
+            </button>
+
+            {/* Mobile Auth Buttons */}
+            <div className="border-t border-amber-500/30 pt-3 mt-3 space-y-2">
+              {user ? (
+                <>
+                  <Button 
+                    onClick={() => { navigate('/dashboard'); setMobileMenuOpen(false); }} 
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+                  >
+                    Panelim
+                  </Button>
+                  {user.is_admin && (
+                    <Button 
+                      onClick={() => { navigate('/admin'); setMobileMenuOpen(false); }} 
+                      className="w-full bg-purple-500 hover:bg-purple-600 text-white"
+                    >
+                      Admin
+                    </Button>
+                  )}
+                  <Button 
+                    onClick={() => { logout(); setMobileMenuOpen(false); }} 
+                    variant="outline"
+                    className="w-full border-red-500 text-red-400 hover:bg-red-500/10"
+                  >
+                    Çıkış
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  onClick={() => { setAuthModalOpen(true); setMobileMenuOpen(false); }}
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                >
+                  Giriş Yap
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
       
       <AuthModal 
