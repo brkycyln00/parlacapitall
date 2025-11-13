@@ -446,15 +446,8 @@ export default function AdminPanel() {
                 {approvedInvestments.length === 0 && investmentRequests.filter(req => req.status === 'pending').length === 0 && (
                   <div className="mt-8">
                     <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="text-white font-semibold">Henüz onaylanmış yatırım yok</p>
-                          <p className="text-gray-400 text-sm">Bekleyen talepleri onaylayın</p>
-                        </div>
-                            <p className="text-green-400 font-semibold">✓ Onaylandı</p>
-                          </div>
-                        </div>
-                      ))}
+                      <p className="text-white font-semibold text-center">Henüz onaylanmış yatırım yok</p>
+                      <p className="text-gray-400 text-sm text-center">Bekleyen talepleri onaylayın</p>
                     </div>
                   </div>
                 )}
