@@ -20,6 +20,8 @@ export default function AdminPanel() {
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedUpline, setSelectedUpline] = useState('');
   const [selectedPosition, setSelectedPosition] = useState('left');
+  const [pendingCount, setPendingCount] = useState(0);
+  const [approvedInvestments, setApprovedInvestments] = useState([]);
 
   useEffect(() => {
     if (!user?.is_admin) {
