@@ -170,11 +170,13 @@ export default function Dashboard() {
   const fetchBinaryTree = async () => {
     setTreeLoading(true);
     try {
-      const response = await axios.get(`${API}/network/tree`, { withCredentials: true });
+      const response = await axios.get(`${API}/api/network/tree`, { withCredentials: true });
+      console.log('Binary tree response:', response.data);
       setBinaryTree(response.data);
     } catch (error) {
       console.error('Binary tree error:', error);
-      toast.error('Ağaç yüklenirken hata oluştu');
+      console.error('Error details:', error.response);
+      toast.error(`Ağaç yüklenirken hata: ${error.response?.data?.detail || error.message}`);
     } finally {
       setTreeLoading(false);
     }
