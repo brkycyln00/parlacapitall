@@ -167,6 +167,19 @@ export default function Dashboard() {
     }
   };
   
+  const fetchBinaryTree = async () => {
+    setTreeLoading(true);
+    try {
+      const response = await axios.get(`${API}/network/tree`, { withCredentials: true });
+      setBinaryTree(response.data);
+    } catch (error) {
+      console.error('Binary tree error:', error);
+      toast.error('Ağaç yüklenirken hata oluştu');
+    } finally {
+      setTreeLoading(false);
+    }
+  };
+  
   const generateNewCode = async (position = 'auto') => {
     setGeneratingCode(true);
     try {
