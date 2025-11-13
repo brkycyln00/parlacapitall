@@ -277,7 +277,7 @@ async def send_welcome_email(user_email: str, user_name: str):
         
         # Create message
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = '🚀 Parlacapital ile Network Marketing'de Büyük Kazançlar Sizi Bekliyor!'
+        msg['Subject'] = "🚀 Parlacapital ile Network Marketing'de Büyük Kazançlar Sizi Bekliyor!"
         msg['From'] = f"Parlacapital <{smtp_email}>"
         msg['To'] = user_email
         
