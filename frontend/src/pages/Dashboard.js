@@ -172,6 +172,61 @@ export default function Dashboard() {
       setJoinLoading(false);
     }
   };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      toast.error('Lütfen tüm alanları doldurun');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast.error('Yeni şifre en az 6 karakter olmalıdır');
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      toast.error('Yeni şifreler eşleşmiyor');
+      return;
+    }
+    
+    if (oldPassword === newPassword) {
+      toast.error('Yeni şifre eski şifreyle aynı olamaz');
+      return;
+    }
+    
+    setPasswordChangeLoading(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await axios.post(
+        `${API}/auth/request-password-change`,
+        null,
+        {
+          params: {
+            old_password: oldPassword,
+            new_password: newPassword
+          },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      toast.success(response.data.message, { duration: 8000 });
+      
+      // Clear form
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Şifre değiştirme başarısız');
+    } finally {
+      setPasswordChangeLoading(false);
+    }
+  };
+
   
   const fetchBinaryTree = async () => {
     setTreeLoading(true);
