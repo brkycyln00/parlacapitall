@@ -31,6 +31,7 @@ export default function VerifyEmail() {
       // Save token and redirect to dashboard
       localStorage.setItem('auth_token', response.data.token);
       setVerified(true);
+      setError(''); // Clear any previous errors
       toast.success(response.data.message);
       
       // Redirect after 2 seconds
@@ -39,6 +40,7 @@ export default function VerifyEmail() {
       }, 2000);
       
     } catch (error) {
+      setVerified(false); // Ensure verified is false
       setError(error.response?.data?.detail || 'Email doğrulama başarısız');
       toast.error(error.response?.data?.detail || 'Email doğrulama başarısız');
     } finally {
