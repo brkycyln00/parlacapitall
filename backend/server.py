@@ -362,9 +362,8 @@ Başarı ve bolluk dileklerimizle,
         msg.attach(part1)
         msg.attach(part2)
         
-        # Send email
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.starttls()
+        # Send email with SSL
+        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
             server.login(smtp_email, smtp_password)
             server.send_message(msg)
         
