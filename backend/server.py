@@ -704,32 +704,11 @@ async def register(req: RegisterRequest):
     # Don't create token yet - user needs to verify email first
     # token = create_jwt_token(user.id)
     
-    # Prepare response
-    if upline_user:
-        message = f"Kayıt başarılı! {upline_user.name} ağına eklendiniz."
-        response_user = {
-            "id": user.id,
-            "email": user.email,
-            "name": user.name,
-            "referral_code": user.referral_code,
-            "upline": {
-                "name": upline_user.name,
-                "referral_code": upline_user.referral_code
-            }
-        }
-    else:
-        message = "Kayıt başarılı!"
-        response_user = {
-            "id": user.id,
-            "email": user.email,
-            "name": user.name,
-            "referral_code": user.referral_code
-        }
-    
+    # Return success message without token
     return {
-        "message": message,
-        "token": token,
-        "user": response_user
+        "message": "Kayıt başarılı! Email adresinize gönderilen doğrulama linkine tıklayarak hesabınızı aktifleştirin.",
+        "email": user.email,
+        "requires_verification": True
     }
 
 @api_router.post("/auth/login")
