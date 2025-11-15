@@ -60,6 +60,14 @@ class User(BaseModel):
     is_admin: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     last_login: Optional[str] = None
+    # Email verification fields
+    is_email_verified: bool = False
+    verification_token: Optional[str] = None
+    verification_token_expires: Optional[str] = None
+    # Password change fields
+    password_change_token: Optional[str] = None
+    password_change_token_expires: Optional[str] = None
+    new_password_hash: Optional[str] = None
 
 
 class ReferralCode(BaseModel):
