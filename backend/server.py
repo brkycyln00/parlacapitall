@@ -1876,7 +1876,7 @@ async def admin_approve_transaction(
 async def admin_distribute_profit(
     user_id: str,
     amount: float,
-    description: str = "Admin tarafından kar dağıtımı",
+    description: str = "Haftalık kar payı",
     admin: User = Depends(require_admin)
 ):
     """Admin distributes profit to a specific user"""
@@ -1901,15 +1901,25 @@ async def admin_distribute_profit(
     
     await db.transactions.insert_one(transaction.model_dump())
     
-    # Update user balance
+    # Update user balance and weekly profit tracking
     await db.users.update_one(
         {"id": user_id},
-        {"$inc": {"wallet_balance": amount}}
+        {
+            "$inc": {
+                "wallet_balance": amount,
+                "weekly_profit_count": 1,
+                "total_weekly_profit": amount
+            },
+            "$set": {
+                "last_profit_date": datetime.now(timezone.utc).isoformat()
+            }
+        }
     )
     
     return {
         "message": f"{amount} TL kar {user['name']} kullanıcısına dağıtıldı",
-        "transaction_id": transaction.id
+        "transaction_id": transaction.id,
+        "week_number": (user.get('weekly_profit_count', 0) + 1)
     }
 
 
