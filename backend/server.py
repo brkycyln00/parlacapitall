@@ -791,11 +791,17 @@ async def verify_email(token: str):
         }}
     )
     
+    # Send welcome email after verification
+    try:
+        await send_welcome_email(user.email, user.name)
+    except Exception as e:
+        logger.error(f"Welcome email failed after verification: {e}")
+    
     # Create JWT token for auto-login
     jwt_token = create_jwt_token(user.id)
     
     return {
-        "message": "Email adresiniz başarıyla doğrulandı! Şimdi giriş yapabilirsiniz.",
+        "message": "Email adresiniz başarıyla doğrulandı! Hoş geldin emaili gönderildi. Şimdi giriş yapabilirsiniz.",
         "token": jwt_token,
         "user": {
             "id": user.id,
