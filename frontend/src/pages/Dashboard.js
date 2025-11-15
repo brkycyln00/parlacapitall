@@ -38,6 +38,12 @@ export default function Dashboard() {
   // Referral management state
   const [myReferrals, setMyReferrals] = useState({ placed: [], unplaced: [], total: 0 });
   const [managementOpen, setManagementOpen] = useState(false);
+  
+  // Password change state
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
   const [selectedReferral, setSelectedReferral] = useState(null);
   const [placementPosition, setPlacementPosition] = useState('left');
   const [selectedUpline, setSelectedUpline] = useState('');
