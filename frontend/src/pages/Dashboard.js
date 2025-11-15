@@ -1979,6 +1979,64 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Password Change Section */}
+            <div className="bg-slate-900 rounded-lg p-6">
+              <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                🔐 Şifre Değiştir
+              </h3>
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div>
+                  <Label className="text-gray-400 text-sm">Eski Şifre</Label>
+                  <Input
+                    type="password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    placeholder="Mevcut şifrenizi girin"
+                    className="bg-slate-800 border-slate-700 text-white mt-2"
+                    disabled={passwordChangeLoading}
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400 text-sm">Yeni Şifre</Label>
+                  <Input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Yeni şifrenizi girin (min 6 karakter)"
+                    className="bg-slate-800 border-slate-700 text-white mt-2"
+                    disabled={passwordChangeLoading}
+                  />
+                </div>
+                <div>
+                  <Label className="text-gray-400 text-sm">Yeni Şifre (Tekrar)</Label>
+                  <Input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Yeni şifrenizi tekrar girin"
+                    className="bg-slate-800 border-slate-700 text-white mt-2"
+                    disabled={passwordChangeLoading}
+                  />
+                </div>
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                  <p className="text-amber-400 text-sm flex items-start gap-2">
+                    <span>📧</span>
+                    <span>
+                      Şifre değişikliği için email adresinize onay linki gönderilecektir. 
+                      Email'deki linke tıklayarak şifre değişikliğini onaylamanız gerekmektedir.
+                    </span>
+                  </p>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={passwordChangeLoading}
+                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                >
+                  {passwordChangeLoading ? 'Gönderiliyor...' : 'Şifre Değiştirme Talebinde Bulun'}
+                </Button>
+              </form>
+            </div>
+
             {/* Actions */}
             <div className="flex space-x-4">
               <Button 
