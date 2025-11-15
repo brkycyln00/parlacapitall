@@ -22,6 +22,13 @@ export default function AdminPanel() {
   const [selectedPosition, setSelectedPosition] = useState('left');
   const [pendingCount, setPendingCount] = useState(0);
   const [approvedInvestments, setApprovedInvestments] = useState([]);
+  
+  // Profit distribution state
+  const [profitModalOpen, setProfitModalOpen] = useState(false);
+  const [selectedUserForProfit, setSelectedUserForProfit] = useState(null);
+  const [profitAmount, setProfitAmount] = useState('');
+  const [profitDescription, setProfitDescription] = useState('Haftalık kar payı');
+  const [distributingProfit, setDistributingProfit] = useState(false);
 
   useEffect(() => {
     if (!user?.is_admin) {
