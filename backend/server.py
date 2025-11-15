@@ -47,6 +47,10 @@ class User(BaseModel):
     total_invested: float = 0.0
     weekly_earnings: float = 0.0
     total_commissions: float = 0.0
+    # Weekly profit tracking
+    weekly_profit_count: int = 0
+    total_weekly_profit: float = 0.0
+    last_profit_date: Optional[str] = None
     left_child_id: Optional[str] = None
     right_child_id: Optional[str] = None
     position: Optional[str] = None  # left or right
