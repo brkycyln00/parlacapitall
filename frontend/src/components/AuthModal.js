@@ -154,7 +154,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
       // Check if email verification is required
       if (response.data.requires_verification) {
         toast.success(
-          'Kayıt başarılı! Email adresinize doğrulama linki gönderildi. Lütfen email\'inizi kontrol edin.',
+          response.data.message || 'Kaydınız oluşturulmuştur lütfen mail adresinizden doğrulama yapınız (spam klasörünü kontrol edin)',
           { duration: 8000 }
         );
         
