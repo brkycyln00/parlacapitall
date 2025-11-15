@@ -12,30 +12,11 @@ export default function VerifyEmail() {
   const [loading, setLoading] = useState(true);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState('');
+  const verifiedRef = useRef(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    const token = searchParams.get('token');
-    
-    if (!token) {
-      setError('Geçersiz doğrulama linki');
-      setLoading(false);
-      return;
-    }
-
-    const verify = async () => {
-      if (!isMounted) return;
-      await verifyEmail(token);
-    };
-    
-    verify();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [searchParams, verifyEmail]);
-
-  const verifyEmail = async (token) => {
+  const verifyEmail = useCallback(async (token) => {
+    // Prevent multiple calls
+    if (verifiedRef.current) return;
     try {
       const response = await axios.get(`${API}/auth/verify-email/${token}`);
       
