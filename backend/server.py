@@ -1330,15 +1330,14 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
     
     await db.investments.insert_one(investment.model_dump())
     
-    # Update user
+    # Update user (wallet_balance is NOT increased with investment amount, only with profits)
     await db.users.update_one(
         {"id": target_user.id},
         {"$set": {
             "package": request.package,
             "package_amount": request.amount,
             "investment_date": investment.investment_date,
-            "total_invested": target_user.total_invested + request.amount,
-            "wallet_balance": target_user.wallet_balance + request.amount
+            "total_invested": target_user.total_invested + request.amount
         }}
     )
     
