@@ -63,14 +63,10 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto mt-16">
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-amber-500/20 rounded-2xl p-6">
-              <div className="text-4xl font-bold text-amber-400 mb-2">{stats.total_users}+</div>
-              <div className="text-gray-300">Aktif Yatırımcı</div>
-            </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-amber-500/20 rounded-2xl p-6">
-              <div className="text-4xl font-bold text-amber-400 mb-2">${stats.total_volume.toLocaleString()}+</div>
-              <div className="text-gray-300">Toplam Yatırım Hacmi</div>
+          <div className="flex justify-center max-w-2xl mx-auto mt-16">
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-amber-500/20 rounded-2xl p-8 w-full max-w-md">
+              <div className="text-5xl font-bold text-amber-400 mb-2 text-center">1000+</div>
+              <div className="text-gray-300 text-center text-lg">Aktif Yatırımcı</div>
             </div>
           </div>
         </div>
