@@ -162,6 +162,8 @@ import EarningSystems from './pages/EarningSystems';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import CryptoMarket from './pages/CryptoMarket';
+import VerifyEmail from './pages/VerifyEmail';
+import ConfirmPasswordChange from './pages/ConfirmPasswordChange';
 
 function App() {
   return (
