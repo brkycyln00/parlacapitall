@@ -42,6 +42,18 @@ export default function VerifyEmail() {
     }
   }, []);
 
+  useEffect(() => {
+    const token = searchParams.get('token');
+    
+    if (!token) {
+      setError('Geçersiz doğrulama linki');
+      setLoading(false);
+      return;
+    }
+
+    verifyEmail(token);
+  }, [searchParams, verifyEmail]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4">
       <div className="max-w-md w-full bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
