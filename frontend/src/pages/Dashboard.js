@@ -604,10 +604,14 @@ export default function Dashboard() {
                 <TrendingUp className="h-4 w-4 text-cyan-500" />
               </CardHeader>
               <CardContent>
-                {user?.package || user?.total_invested > 0 ? (
+                {user?.weekly_profit_count > 0 ? (
                   <>
-                    <div className="text-3xl font-bold text-white">${(user?.weekly_earnings || 0).toLocaleString('tr-TR')}</div>
-                    <p className="text-xs text-green-500 mt-2">+8.2% Bu hafta</p>
+                    <div className="text-3xl font-bold text-white">${(user?.total_weekly_profit || 0).toLocaleString('tr-TR')}</div>
+                    <p className="text-xs text-green-500 mt-2 flex items-center gap-1">
+                      <span className="font-semibold">{user?.weekly_profit_count || 0}.hafta</span>
+                      <span>•</span>
+                      <span>Toplam Kar</span>
+                    </p>
                   </>
                 ) : (
                   <>
@@ -615,6 +619,18 @@ export default function Dashboard() {
                     <p className="text-xs text-gray-500 mt-2">Henüz kazanç yok</p>
                   </>
                 )}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-gray-400">Cüzdan Bakiyesi</CardTitle>
+                <Wallet className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-white">${(user?.wallet_balance || 0).toLocaleString('tr-TR')}</div>
+                <p className="text-xs text-amber-400 mt-2">Çekilebilir bakiye</p>
+                <p className="text-[10px] text-gray-500 mt-1">⏰ Kâr çekimleri cuma günü yapılmaktadır</p>
               </CardContent>
             </Card>
 
