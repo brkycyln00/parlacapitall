@@ -151,29 +151,27 @@ export default function AuthModal({ open, onClose, onSuccess }) {
         referral_code: referralCode
       });
 
-      // Store token in localStorage
-      localStorage.setItem('auth_token', response.data.token);
-      
-      // Show success with upline info
-      if (response.data.user.upline) {
+      // Check if email verification is required
+      if (response.data.requires_verification) {
         toast.success(
-          `Kayıt başarılı! ${response.data.user.upline.name} ağına eklendiniz.`,
-          { duration: 5000 }
+          'Kayıt başarılı! Email adresinize doğrulama linki gönderildi. Lütfen email\'inizi kontrol edin.',
+          { duration: 8000 }
         );
+        
+        onClose();
+        
+        // Clear form
+        setRegisterEmail('');
+        setRegisterPassword('');
+        setRegisterName('');
+        setReferralCode('');
       } else {
+        // Old flow (if email verification is disabled)
+        localStorage.setItem('auth_token', response.data.token);
         toast.success('Kayıt başarılı!');
-      }
-      
-      if (onSuccess) {
-        onSuccess(response.data.user);
-      }
-      
-      onClose();
-      
-      // Redirect to packages page
-      setTimeout(() => {
+        onClose();
         window.location.href = '/packages';
-      }, 1500);
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Kayıt başarısız');
     } finally {
