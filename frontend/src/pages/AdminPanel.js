@@ -110,6 +110,48 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDistributeProfit = async (e) => {
+    e.preventDefault();
+    
+    if (!profitAmount || parseFloat(profitAmount) <= 0) {
+      toast.error('Lütfen geçerli bir kar miktarı girin');
+      return;
+    }
+    
+    setDistributingProfit(true);
+    try {
+      const response = await axios.post(
+        `${API}/admin/distribute-profit`,
+        null,
+        {
+          params: {
+            user_id: selectedUserForProfit.id,
+            amount: parseFloat(profitAmount),
+            description: profitDescription
+          },
+          withCredentials: true
+        }
+      );
+      
+      toast.success(response.data.message);
+      setProfitModalOpen(false);
+      setProfitAmount('');
+      setProfitDescription('Haftalık kar payı');
+      setSelectedUserForProfit(null);
+      fetchAdminData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Kar dağıtımı başarısız');
+    } finally {
+      setDistributingProfit(false);
+    }
+  };
+
+  const openProfitModal = (user) => {
+    setSelectedUserForProfit(user);
+    setProfitModalOpen(true);
+  };
+
+
   const handleApproveInvestmentRequest = async (requestId) => {
     try {
       await axios.post(
