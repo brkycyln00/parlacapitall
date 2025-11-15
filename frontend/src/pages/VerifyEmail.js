@@ -17,6 +17,8 @@ export default function VerifyEmail() {
   const verifyEmail = useCallback(async (token) => {
     // Prevent multiple calls
     if (verifiedRef.current) return;
+    verifiedRef.current = true;
+    
     try {
       const response = await axios.get(`${API}/auth/verify-email/${token}`);
       
@@ -38,7 +40,7 @@ export default function VerifyEmail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4">
