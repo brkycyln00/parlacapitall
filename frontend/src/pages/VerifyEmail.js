@@ -59,7 +59,7 @@ export default function VerifyEmail() {
           </div>
         )}
 
-        {!loading && verified && (
+        {!loading && verified && !error && (
           <div>
             <div className="text-green-400 text-6xl mb-4">✓</div>
             <h2 className="text-2xl font-bold text-white mb-2">Email Doğrulandı!</h2>
@@ -69,7 +69,7 @@ export default function VerifyEmail() {
           </div>
         )}
 
-        {!loading && error && (
+        {!loading && !verified && error && (
           <div>
             <div className="text-red-400 text-6xl mb-4">✗</div>
             <h2 className="text-2xl font-bold text-white mb-2">Doğrulama Başarısız</h2>
