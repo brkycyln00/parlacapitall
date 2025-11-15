@@ -706,7 +706,7 @@ async def register(req: RegisterRequest):
     
     # Return success message without token
     return {
-        "message": "Kayıt başarılı! Email adresinize gönderilen doğrulama linkine tıklayarak hesabınızı aktifleştirin.",
+        "message": "Kaydınız oluşturulmuştur lütfen mail adresinizden doğrulama yapınız (spam klasörünü kontrol edin)",
         "email": user.email,
         "requires_verification": True
     }
