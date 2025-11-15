@@ -893,6 +893,13 @@ export default function AdminPanel() {
                       {!u.is_admin && (
                         <div className="mt-3 flex gap-2">
                           <Button
+                            onClick={() => openProfitModal(u)}
+                            size="sm"
+                            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
+                          >
+                            💰 Kar Dağıt
+                          </Button>
+                          <Button
                             data-testid={`make-admin-${idx}`}
                             onClick={() => handleMakeAdmin(u.id)}
                             size="sm"
