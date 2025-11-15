@@ -179,6 +179,8 @@ function App() {
             <Route path="/earning-systems" element={<EarningSystems />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/confirm-password-change" element={<ConfirmPasswordChange />} />
             <Route
               path="/dashboard"
               element={
