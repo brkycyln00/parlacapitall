@@ -1868,6 +1868,47 @@ async def admin_approve_transaction(
     
     return {"message": "Transaction approved"}
 
+@api_router.post("/admin/distribute-profit")
+async def admin_distribute_profit(
+    user_id: str,
+    amount: float,
+    description: str = "Admin tarafından kar dağıtımı",
+    admin: User = Depends(require_admin)
+):
+    """Admin distributes profit to a specific user"""
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Kar miktarı 0'dan büyük olmalıdır")
+    
+    # Check if user exists
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+    
+    # Create transaction record
+    from datetime import datetime, timezone
+    transaction = Transaction(
+        user_id=user_id,
+        type="profit",
+        amount=amount,
+        status="completed",
+        description=description,
+        created_at=datetime.now(timezone.utc).isoformat()
+    )
+    
+    await db.transactions.insert_one(transaction.model_dump())
+    
+    # Update user balance
+    await db.users.update_one(
+        {"id": user_id},
+        {"$inc": {"wallet_balance": amount}}
+    )
+    
+    return {
+        "message": f"{amount} TL kar {user['name']} kullanıcısına dağıtıldı",
+        "transaction_id": transaction.id
+    }
+
+
 @api_router.post("/admin/transactions/{tx_id}/reject")
 async def admin_reject_transaction(tx_id: str, admin: User = Depends(require_admin)):
     tx = await db.transactions.find_one({"id": tx_id}, {"_id": 0})
