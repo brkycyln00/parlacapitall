@@ -929,6 +929,84 @@ export default function AdminPanel() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Profit Distribution Modal */}
+      <Dialog open={profitModalOpen} onOpenChange={setProfitModalOpen}>
+        <DialogContent className="bg-slate-800 border-green-500/30 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl flex items-center gap-2">
+              💰 Kar Dağıt
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleDistributeProfit} className="space-y-4 mt-4">
+            {selectedUserForProfit && (
+              <div className="bg-slate-900 rounded-lg p-4 mb-4">
+                <p className="text-sm text-gray-400">Kullanıcı</p>
+                <p className="text-white font-semibold text-lg">{selectedUserForProfit.name}</p>
+                <p className="text-gray-400 text-sm">{selectedUserForProfit.email}</p>
+                <div className="mt-2 pt-2 border-t border-slate-700">
+                  <p className="text-sm text-gray-400">Mevcut Bakiye</p>
+                  <p className="text-green-400 font-semibold">${selectedUserForProfit.wallet_balance?.toLocaleString('tr-TR') || '0'}</p>
+                </div>
+              </div>
+            )}
+            
+            <div>
+              <Label className="text-gray-300">Kar Miktarı ($)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={profitAmount}
+                onChange={(e) => setProfitAmount(e.target.value)}
+                placeholder="Örn: 50.00"
+                className="bg-slate-900 border-slate-700 text-white mt-2"
+                required
+                min="0.01"
+              />
+            </div>
+            
+            <div>
+              <Label className="text-gray-300">Açıklama</Label>
+              <Input
+                type="text"
+                value={profitDescription}
+                onChange={(e) => setProfitDescription(e.target.value)}
+                placeholder="Kar açıklaması"
+                className="bg-slate-900 border-slate-700 text-white mt-2"
+              />
+            </div>
+            
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+              <p className="text-green-400 text-sm">
+                ℹ️ Kar kullanıcının cüzdan bakiyesine eklenecektir. İşlem geri alınamaz.
+              </p>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                onClick={() => {
+                  setProfitModalOpen(false);
+                  setProfitAmount('');
+                  setSelectedUserForProfit(null);
+                }}
+                variant="outline"
+                className="flex-1 border-gray-600 text-gray-300"
+                disabled={distributingProfit}
+              >
+                İptal
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                disabled={distributingProfit}
+              >
+                {distributingProfit ? 'Dağıtılıyor...' : 'Kar Dağıt'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
