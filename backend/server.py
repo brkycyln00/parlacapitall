@@ -756,6 +756,146 @@ async def login(req: LoginRequest):
     }
 
 
+
+@api_router.get("/auth/verify-email/{token}")
+async def verify_email(token: str):
+    """Verify user email with token"""
+    # Find user by verification token
+    user_doc = await db.users.find_one({"verification_token": token}, {"_id": 0})
+    
+    if not user_doc:
+        raise HTTPException(status_code=400, detail="Geçersiz doğrulama linki")
+    
+    user = User(**user_doc)
+    
+    # Check if already verified
+    if user.is_email_verified:
+        raise HTTPException(status_code=400, detail="Email adresi zaten doğrulanmış")
+    
+    # Check if token expired
+    if user.verification_token_expires:
+        expires_at = datetime.fromisoformat(user.verification_token_expires)
+        if expires_at < datetime.now(timezone.utc):
+            raise HTTPException(
+                status_code=400, 
+                detail="Doğrulama linkinin süresi dolmuş. Lütfen yeni kayıt yapın."
+            )
+    
+    # Mark email as verified
+    await db.users.update_one(
+        {"id": user.id},
+        {"$set": {
+            "is_email_verified": True,
+            "verification_token": None,
+            "verification_token_expires": None
+        }}
+    )
+    
+    # Create JWT token for auto-login
+    jwt_token = create_jwt_token(user.id)
+    
+    return {
+        "message": "Email adresiniz başarıyla doğrulandı! Şimdi giriş yapabilirsiniz.",
+        "token": jwt_token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "is_admin": user.is_admin
+        }
+    }
+
+@api_router.post("/auth/request-password-change")
+async def request_password_change(
+    old_password: str,
+    new_password: str,
+    current_user: User = Depends(get_current_user_jwt)
+):
+    """Request password change - sends email confirmation"""
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Giriş yapmalısınız")
+    
+    # Verify old password
+    user_doc = await db.users.find_one({"id": current_user.id}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+    
+    if user_doc["password_hash"] != hash_password(old_password):
+        raise HTTPException(status_code=400, detail="Eski şifre hatalı")
+    
+    # Validate new password
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalıdır")
+    
+    if old_password == new_password:
+        raise HTTPException(status_code=400, detail="Yeni şifre eski şifreyle aynı olamaz")
+    
+    # Generate password change token (valid for 24 hours)
+    password_change_token = secrets.token_urlsafe(32)
+    password_change_expires = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    new_password_hash = hash_password(new_password)
+    
+    # Save token and new password hash (pending confirmation)
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {
+            "password_change_token": password_change_token,
+            "password_change_token_expires": password_change_expires,
+            "new_password_hash": new_password_hash
+        }}
+    )
+    
+    # Send confirmation email
+    try:
+        await send_password_change_email(current_user.email, current_user.name, password_change_token)
+    except Exception as e:
+        logger.error(f"Password change email failed: {e}")
+        raise HTTPException(status_code=500, detail="Email gönderilemedi. Lütfen tekrar deneyin.")
+    
+    return {
+        "message": "Email adresinize onay linki gönderildi. Lütfen email'inizi kontrol edin."
+    }
+
+@api_router.get("/auth/confirm-password-change/{token}")
+async def confirm_password_change(token: str):
+    """Confirm password change with email token"""
+    # Find user by password change token
+    user_doc = await db.users.find_one({"password_change_token": token}, {"_id": 0})
+    
+    if not user_doc:
+        raise HTTPException(status_code=400, detail="Geçersiz onay linki")
+    
+    user = User(**user_doc)
+    
+    # Check if token expired
+    if user.password_change_token_expires:
+        expires_at = datetime.fromisoformat(user.password_change_token_expires)
+        if expires_at < datetime.now(timezone.utc):
+            raise HTTPException(
+                status_code=400, 
+                detail="Onay linkinin süresi dolmuş. Lütfen şifre değiştirme işlemini tekrar başlatın."
+            )
+    
+    # Check if new password hash exists
+    if not user.new_password_hash:
+        raise HTTPException(status_code=400, detail="Geçersiz şifre değişikliği talebi")
+    
+    # Update password
+    await db.users.update_one(
+        {"id": user.id},
+        {"$set": {
+            "password_hash": user.new_password_hash,
+            "password_change_token": None,
+            "password_change_token_expires": None,
+            "new_password_hash": None
+        }}
+    )
+    
+    return {
+        "message": "Şifreniz başarıyla değiştirildi! Yeni şifrenizle giriş yapabilirsiniz."
+    }
+
+
 @api_router.get("/auth/validate-referral/{referral_code}")
 async def validate_referral_code(referral_code: str):
     """Validate if a referral code exists and is valid"""
