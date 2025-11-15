@@ -636,23 +636,12 @@ export default function Dashboard() {
 
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Toplam Komisyon</CardTitle>
-                <Award className="h-4 w-4 text-purple-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-white">${(user?.total_commissions || 0).toLocaleString('tr-TR')}</div>
-                <p className="text-xs text-green-500 mt-2">Referans kazançları</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-slate-800 border-slate-700">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-400">Referans Ağı</CardTitle>
                 <Users className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-white">{dashboard?.referrals?.length || 0}</div>
-                <p className="text-xs text-green-500 mt-2">Aktif üyeler</p>
+                <p className="text-xs text-green-500 mt-2">Toplam Komisyon: ${(user?.total_commissions || 0).toLocaleString('tr-TR')}</p>
               </CardContent>
             </Card>
           </div>
