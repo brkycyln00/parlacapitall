@@ -374,6 +374,208 @@ Başarı ve bolluk dileklerimizle,
         logger.error(f"Failed to send welcome email to {user_email}: {str(e)}")
         return False
 
+async def send_verification_email(user_email: str, user_name: str, verification_token: str):
+    """Send email verification link to new users"""
+    try:
+        smtp_host = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
+        smtp_port = int(os.environ.get('SMTP_PORT', '587'))
+        smtp_email = os.environ.get('SMTP_EMAIL', '')
+        smtp_password = os.environ.get('SMTP_PASSWORD', '')
+        
+        if not smtp_email or not smtp_password:
+            logger.warning("SMTP not configured. Skipping verification email.")
+            return False
+        
+        # Get frontend URL from environment
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://parlamoney.preview.emergentagent.com')
+        verification_link = f"{frontend_url}/verify-email?token={verification_token}"
+        
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = "✅ Email Adresinizi Doğrulayın - Parlacapital"
+        msg['From'] = f"Parlacapital <{smtp_email}>"
+        msg['To'] = user_email
+        
+        text = f"""
+Merhaba {user_name},
+
+Parlacapital'e hoş geldiniz! 🎉
+
+Email adresinizi doğrulamak için aşağıdaki linke tıklayın:
+{verification_link}
+
+Bu link 24 saat geçerlidir.
+
+Email adresinizi doğruladıktan sonra hesabınıza giriş yapabilir ve yatırım yapmaya başlayabilirsiniz.
+
+Saygılarımızla,
+Parlacapital Ekibi
+        """
+        
+        html = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0;">Email Adresinizi Doğrulayın ✅</h1>
+            </div>
+            <div style="padding: 30px; background: #f9f9f9;">
+              <h2 style="color: #667eea;">Merhaba {user_name},</h2>
+              
+              <p style="font-size: 16px;">
+                Parlacapital'e hoş geldiniz! 🎉
+              </p>
+              
+              <p style="font-size: 16px;">
+                Hesabınızı aktifleştirmek için email adresinizi doğrulamanız gerekmektedir.
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{verification_link}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; display: inline-block;">
+                  Email Adresimi Doğrula
+                </a>
+              </div>
+              
+              <p style="font-size: 14px; color: #666;">
+                Eğer butona tıklayamıyorsanız, aşağıdaki linki tarayıcınıza kopyalayın:<br/>
+                <a href="{verification_link}" style="color: #667eea; word-break: break-all;">{verification_link}</a>
+              </p>
+              
+              <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 14px; color: #856404;">
+                  ⚠️ Bu link 24 saat geçerlidir. Süre sonunda yeni bir doğrulama linki talep etmeniz gerekecektir.
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                <p style="color: #667eea; font-size: 16px; margin: 0;">
+                  Saygılarımızla,<br/>
+                  <strong>✨ Parlacapital Ekibi</strong>
+                </p>
+              </div>
+            </div>
+          </body>
+        </html>
+        """
+        
+        part1 = MIMEText(text, 'plain', 'utf-8')
+        part2 = MIMEText(html, 'html', 'utf-8')
+        msg.attach(part1)
+        msg.attach(part2)
+        
+        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+            server.login(smtp_email, smtp_password)
+            server.send_message(msg)
+        
+        logger.info(f"Verification email sent to {user_email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {user_email}: {str(e)}")
+        return False
+
+async def send_password_change_email(user_email: str, user_name: str, password_change_token: str):
+    """Send password change confirmation email"""
+    try:
+        smtp_host = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
+        smtp_port = int(os.environ.get('SMTP_PORT', '587'))
+        smtp_email = os.environ.get('SMTP_EMAIL', '')
+        smtp_password = os.environ.get('SMTP_PASSWORD', '')
+        
+        if not smtp_email or not smtp_password:
+            logger.warning("SMTP not configured. Skipping password change email.")
+            return False
+        
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://parlamoney.preview.emergentagent.com')
+        confirmation_link = f"{frontend_url}/confirm-password-change?token={password_change_token}"
+        
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = "🔐 Şifre Değişikliği Onayı - Parlacapital"
+        msg['From'] = f"Parlacapital <{smtp_email}>"
+        msg['To'] = user_email
+        
+        text = f"""
+Merhaba {user_name},
+
+Hesabınız için şifre değişikliği talebinde bulundunuz.
+
+Şifre değişikliğini onaylamak için aşağıdaki linke tıklayın:
+{confirmation_link}
+
+Bu link 24 saat geçerlidir.
+
+Eğer bu talebi siz yapmadıysanız, bu emaili görmezden gelebilirsiniz. Şifreniz değiştirilmeyecektir.
+
+Saygılarımızla,
+Parlacapital Ekibi
+        """
+        
+        html = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0;">Şifre Değişikliği Onayı 🔐</h1>
+            </div>
+            <div style="padding: 30px; background: #f9f9f9;">
+              <h2 style="color: #667eea;">Merhaba {user_name},</h2>
+              
+              <p style="font-size: 16px;">
+                Hesabınız için şifre değişikliği talebinde bulundunuz.
+              </p>
+              
+              <p style="font-size: 16px;">
+                Şifre değişikliğini onaylamak için aşağıdaki butona tıklayın:
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="{confirmation_link}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; display: inline-block;">
+                  Şifre Değişikliğini Onayla
+                </a>
+              </div>
+              
+              <p style="font-size: 14px; color: #666;">
+                Eğer butona tıklayamıyorsanız, aşağıdaki linki tarayıcınıza kopyalayın:<br/>
+                <a href="{confirmation_link}" style="color: #667eea; word-break: break-all;">{confirmation_link}</a>
+              </p>
+              
+              <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 14px; color: #856404;">
+                  ⚠️ Bu link 24 saat geçerlidir.
+                </p>
+              </div>
+              
+              <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0; font-size: 14px; color: #721c24;">
+                  🚨 Eğer bu talebi siz yapmadıysanız, bu emaili görmezden gelebilirsiniz. Şifreniz değiştirilmeyecektir.
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                <p style="color: #667eea; font-size: 16px; margin: 0;">
+                  Saygılarımızla,<br/>
+                  <strong>✨ Parlacapital Ekibi</strong>
+                </p>
+              </div>
+            </div>
+          </body>
+        </html>
+        """
+        
+        part1 = MIMEText(text, 'plain', 'utf-8')
+        part2 = MIMEText(html, 'html', 'utf-8')
+        msg.attach(part1)
+        msg.attach(part2)
+        
+        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+            server.login(smtp_email, smtp_password)
+            server.send_message(msg)
+        
+        logger.info(f"Password change email sent to {user_email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to send password change email to {user_email}: {str(e)}")
+        return False
+
+
 def create_jwt_token(user_id: str) -> str:
     payload = {
         'user_id': user_id,
