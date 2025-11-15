@@ -662,12 +662,19 @@ async def register(req: RegisterRequest):
         
         upline_user = User(**upline)
     
-    # Create new user
+    # Generate verification token (valid for 24 hours)
+    verification_token = secrets.token_urlsafe(32)
+    verification_expires = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    
+    # Create new user (email not verified yet)
     user = User(
         email=req.email,
         name=req.name,
         password_hash=hash_password(req.password),
-        upline_id=upline_user.id if upline_user else None
+        upline_id=upline_user.id if upline_user else None,
+        is_email_verified=False,
+        verification_token=verification_token,
+        verification_token_expires=verification_expires
     )
     
     # NOTE: We do NOT automatically place user in binary tree during registration
@@ -688,14 +695,14 @@ async def register(req: RegisterRequest):
     user_dict = user.model_dump()
     await db.users.insert_one(user_dict)
     
-    # Send welcome email (async, don't wait for it)
+    # Send verification email
     try:
-        await send_welcome_email(user.email, user.name)
+        await send_verification_email(user.email, user.name, verification_token)
     except Exception as e:
-        logger.error(f"Welcome email failed but user created: {e}")
+        logger.error(f"Verification email failed but user created: {e}")
     
-    # Create JWT token
-    token = create_jwt_token(user.id)
+    # Don't create token yet - user needs to verify email first
+    # token = create_jwt_token(user.id)
     
     # Prepare response
     if upline_user:
