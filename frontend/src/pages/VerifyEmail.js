@@ -14,16 +14,26 @@ export default function VerifyEmail() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let isMounted = true;
     const token = searchParams.get('token');
+    
     if (!token) {
       setError('Geçersiz doğrulama linki');
       setLoading(false);
       return;
     }
 
-    verifyEmail(token);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+    const verify = async () => {
+      if (!isMounted) return;
+      await verifyEmail(token);
+    };
+    
+    verify();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [searchParams, verifyEmail]);
 
   const verifyEmail = async (token) => {
     try {
