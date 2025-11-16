@@ -1,158 +1,160 @@
-<analysis>**original_problem_statement:**
-Kullanıcının hedefi, ParlaCapital adında, Türkçe arayüze sahip, tam donanımlı bir Çok Katmanlı Pazarlama (MLM) kripto yatırım platformu oluşturmaktır.
-
-**Temel Ürün Gereksinimleri:**
-- **Kayıt ve Kimlik Doğrulama:** Kullanıcılar e-posta/şifre ile kayıt olabilir. Kayıt sırasında kullanıcı adı istenmez ve e-posta doğruluğu kontrol edilir. Başarılı kayıt sonrası SMTP üzerinden hoş geldin e-postası gönderilir.
-- **Yatırım ve Komisyonlar:** Kullanıcılar sadece bir kez yatırım yapabilir. Yatırım talebi yönetici tarafından onaylandığında, sadece direkt sponsor (tek seviye) komisyon kazanır. Çok seviyeli komisyon sistemi uygulanmış ancak sonrasında kullanıcının isteği üzerine geri alınmıştır.
-- **Ağ Yönetimi:**
-  - **Binary Tree:** Kullanıcılar, referanslarıyla gelen ve başlangıçta yerleştirilmemiş olarak görünen yeni üyeleri, kendi panellerinden interaktif bir şekilde ağaçlarındaki (kendi altları veya kendi altlarındaki başka bir üyenin altı) herhangi bir boş pozisyona (sol/sağ) manuel olarak yerleştirebilir.
-  - **Referans Kodu:** Kullanıcılar kendi kodlarını oluşturabilir. Daha önce referanssız kayıt olmuş bir kullanıcı, panelinden tek seferlik olmak üzere başka bir kullanıcının kodunu girerek ağa dahil olabilir.
-- **Kullanıcı Paneli (Dashboard):**
-  - Kullanıcının bakiyesini, komisyonlarını, ağ hacimlerini gösterir.
-  - Yerleştirilmemiş Referanslar bölümü bulunur.
-  - Gelişmiş, iç içe açılabilen ve tüm alt üyeleri gösteren, her koldaki toplam yatırım hacmini de içeren bir Referans Ağı görselleştirmesi içerir.
-  - Kariyer Hedefleri bölümü, kullanıcının ağ hacmine göre ulaştığı seviyeyi ve bir sonraki hedef için gerekenleri gösterir.
-  - Ana site sayfalarına (Anasayfa, Hakkımızda vb.) geçiş linkleri içerir.
-- **Yönetici Paneli (Admin Panel):**
-  - Bekleyen yatırım talepleri için bir bildirim sayacı bulunur.
-  - Onaylanmış yatırım talepleri, kullanıcının tüm form bilgileri ve talep tarihi/saati ile birlikte listelenir.
-  - Kullanıcıları ve talepleri yönetme yetkisi vardır.
+<analysis>
+**original_problem_statement:**
+The user's initial problem was a critical login failure on their deployed production website. Over the session, the user also requested several new features and refinements:
+1.  **Email Verification:** New users must verify their email address via a link before they can log in. The welcome email should only be sent *after* successful verification.
+2.  **Password Reset:** Users should be able to change their password from a Settings section in their dashboard, with the change being confirmed via an email link.
+3.  **Homepage UI:** Simplify the homepage statistics to only show a single card for Aktif Yatırımcı (Active Investors) with a static value of 1000+.
+4.  **Admin Profit Distribution:** Admins need a Kar Dağıt (Distribute Profit) button for each user in the admin panel to manually add profits to their balance.
+5.  **Dashboard UI for Profits:** The user dashboard must show separate balances for:
+    *   **Haftalık Kazanç (Weekly Profit):** Shows the total profit received and which week of earning the user is in (e.g., 2. hafta).
+    *   **Cüzdan Bakiyesi (Wallet Balance):** Shows only the withdrawable profits. The initial investment amount must **not** be added to this balance.
+    *   A note should state that profit withdrawals are processed on Fridays.
+6.  **Database Reset:** All users and related data (except the admin account) should be deleted.
+7.  **Custom Domain Login:** The primary and recurring issue is that login functionality does not work on the custom domain (), although it works on the preview domain.
 
 **User's preferred language**: Turkish
 
 **what currently exists?**
-Uygulama, FastAPI (backend) ve React (frontend) kullanılan, tam özellikli bir MLM platformudur. Yukarıda belirtilen tüm temel gereksinimler (manuel binary ağaç yönetimi, kariyer hedefleri, tek yatırım kuralı, yönetici paneli geliştirmeleri, SMTP ile e-posta gönderimi, gelişmiş ağ görselleştirmesi) kodlanmış ve lokal ortamda test edilmiştir. Mobil uyumluluk için arayüzde düzeltmeler yapılmıştır.
+The application is a full-stack MLM platform. All requested features, including email verification, password reset, admin profit distribution, and the refined dashboard UI, have been implemented and tested via API calls and screenshots on the preview URL. The database was successfully reset, leaving only the admin user. The core unresolved issue is the login failure on the custom domain. The agent, with help from the , identified that the frontend was serving a stale build. A new production build has been created and the frontend service was restarted, but user verification is pending.
 
 **Last working item**:
-- **Last item agent was working**: Kullanıcı, siteyi deploy ettikten sonra kullanıcı paneline giriş yapamadığını bildirdi. Ajan, bu tür production sonrası sorunları çözmekte uzman olan  veya 'ı çağırmak üzereydi.
-- **Status**: IN PROGRESS
-- **Agent Testing Done**: N
-- **Which testing method agent to use?**: troubleshoot agent. This is a post-deployment issue, likely related to environment variables, CORS, or proxy configurations, not application logic. Standard testing agents will not be effective.
-- **User Testing Done**: Y (User discovered the issue on the deployed site)
+- **Last item agent was working**: Resolving the persistent login failure on the custom domain (). The  diagnosed that the frontend was not serving a proper build, causing it to use incorrect, cached environment variables. The agent has just completed a new frontend production build (yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.) and restarted the service.
+- **Status**: USER VERIFICATION PENDING
+- **Agent Testing Done**: Y (Agent confirmed the new build artifact was created and does not contain old, incorrect URLs. API calls were also successful.)
+- **Which testing method agent to use?**: manual testing by curl. First, verify with  that API requests to the preview backend URL from the custom domain are successful. Then, use the screenshot tool to test the complete login flow on .
+- **User Testing Done**: N (The user's last message was that it's still not working, but this was *before* the agent performed the final fix of creating a new build.)
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Production ortamında kullanıcı girişi yapılamıyor. (P0)**
-  - **Attempted fixes**: Henüz bir düzeltme denenmedi. Ajan sorunu yeni teşhis etti.
+- **Issue 1: Login on custom domain () is not working. (P0)**
+  - **Attempted fixes**:
+    - Incorrectly changed  to the custom domain, then reverted.
+    - Restarted services multiple times.
+    - **Final Fix Attempted**: Identified that the frontend  directory was missing/stale. A new production build was successfully created using yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. and the frontend service was restarted. This should make the frontend use the correct  (the preview domain) for API calls.
   - **Next debug checklist**:
-    1. 'ı çağırarak deployment log'larını analiz etmesini isteyin.
-    2. Production environment'taki  dosyalarını kontrol edin (, ,  vb.). Özellikle frontend'in backend'e doğru URL ile ulaştığından emin olun.
-    3. Tarayıcı geliştirici konsolunda network (ağ) hatalarını ve console log'larını inceleyin (CORS, 401, 403, 5xx hataları).
-    4. Kubernetes Ingress ve servis konfigürasyonlarını kontrol edin.
-  - **Why fix this issue and what will be achieved with the fix?**: Bu, uygulamanın production'da tamamen kullanılamaz olduğu anlamına gelen kritik bir hatadır. Çözülmesi, sitenin canlıya alınmasını ve kullanıcıların sistemi kullanmaya başlamasını sağlayacaktır.
-  - **Status**: IN PROGRESS
-  - **Is recurring issue?**: N
-  - **Should Test frontend/backend/both after fix?**: both (Login flow needs to be tested on the production URL).
+    1.  Ask the user to clear their browser cache and test logging in on  again.
+    2.  If it still fails, use the screenshot tool on the custom domain and inspect the browser's developer console for network errors (especially CORS or 404s on API calls).
+    3.  Verify the URL being called in the network tab. It **must** be .
+    4.  If the issue persists, check the Nginx configuration for the custom domain to ensure requests are being served from the  directory.
+  - **Why fix this issue and what will be achieved with the fix?**: This is the most critical issue. Resolving it will make the application fully functional for end-users on its intended domain.
+  - **Status**: USER VERIFICATION PENDING
+  - **Is recurring issue?**: Y
+  - **Should Test frontend/backend/both after fix?**: frontend
   - **Blocked on other issue**: None
 
 **In progress Task List**:
-Bu oturumda devam eden bir görev bulunmamaktadır.
+There are no in-progress tasks.
 
 **Upcoming and Future Tasks**
 - **Future Tasks**:
-    - **Canlı Ödeme Entegrasyonu (P1)**: Mevcut statik cüzdan adresleri ve manuel onay süreci yerine, USDT, BTC ve ETH için gerçek bir kripto ödeme ağ geçidi entegrasyonu yapılması.
+  - **Canlı Ödeme Entegrasyonu (P1)**: Integrate a real crypto payment gateway for USDT, BTC, and ETH to replace the manual investment approval process.
 
 **Completed work in this session**
-- **Ağ Yönetimi Geliştirmeleri**:
-  - **Kullanıcı Taraflı Ağ Yönetimi**: Admin paneli yerine her kullanıcının kendi Yerleştirilmemiş Referanslarını kendi Dashboard'undan ağacındaki herhangi birinin (sadece direkt altı değil) altına yerleştirmesi sağlandı.
-  - **Sınırsız Referans**: Kayıt sırasında otomatik yerleştirme kaldırılarak, sponsorun iki kolu dolu olsa bile yeni referansların sorunsuzca kaydedilmesi ve daha sonra manuel yerleştirilmesi sağlandı.
-  - **Sonradan Ağa Katılma**: Referanssız kayıt olan kullanıcıların, Dashboard üzerinden tek seferlik bir kod girerek bir ağa katılması sağlandı.
-  - **Gelişmiş Ağ Görselleştirmesi**: Binary tree şeması, tüm alt üyeleri gösterecek, her koldaki toplam hacmi içerecek ve sınırsız derinliğe sahip olacak şekilde tamamen yenilendi.
-- **Komisyon Sistemi Revizyonu**:
-  - Başlangıçta istenen çok seviyeli (multi-level) komisyon sistemi kodlandı, ancak daha sonra kullanıcının talebi üzerine **iptal edilerek** sadece direkt sponsora komisyon veren tek seviyeli sisteme geri dönüldü.
-- **Kayıt ve Doğrulama**:
-  - Kayıt formundan kullanıcı adı alanı kaldırıldı.
-  - Pydantic  ile e-posta formatı doğrulaması eklendi.
-  - Kayıt olan kullanıcıya SMTP üzerinden formatlanmış bir Hoş Geldin e-postası gönderim altyapısı kuruldu.
-- **Yönetici ve Kullanıcı Paneli Özellikleri**:
-  - **Tek Yatırım Kuralı**: Kullanıcıların birden fazla yatırım yapması engellendi.
-  - **Yönetici Bildirimleri**: Bekleyen yatırım talepleri için Admin paneli başlığında bir bildirim sayacı eklendi.
-  - **Detaylı Raporlama**: Admin panelinde Onaylanmış Yatırımlar sekmesi, kullanıcıların tüm form bilgileri ve talep tarihiyle birlikte gösterilecek şekilde güncellendi.
-  - **Kariyer Sistemi**: Kullanıcı panelinde, ağ hacmine dayalı Kariyer Hedefleri kartı oluşturuldu ve ilerleme çubuğu eklendi.
-  - **Dashboard Navigasyonu**: Kullanıcı paneli kenar çubuğuna ana site sayfalarına (Anasayfa, Hakkımızda vb.) giden linkler eklendi.
-- **Hata Düzeltmeleri ve İyileştirmeler**:
-  - Mobil cihazlarda kapanan navigasyon menüsü için hamburger menü eklendi ve düzeltildi.
-  - Ağaç verisinin yüklenememesine neden olan çift  ön ekli URL hatası düzeltildi.
-  - Referans kodu giriş alanındaki  nedeniyle yaşanan sorun giderildi.
-  - Çeşitli JSX ve linting hataları temizlendi.
-- **Dokümantasyon**:
-  - Projenin tüm kodlarını içeren  dosyası oluşturuldu.
-  - Turhost için DNS ayarlarını açıklayan  dosyası oluşturuldu.
+- **Production Login Issue (Partially Fixed)**: Diagnosed and fixed a backend issue where the admin user was missing a , which initially blocked all logins.
+- **Email Verification Flow**: Implemented a complete email verification system. New users are created as  and receive a verification email. The Welcome email is now sent only *after* successful verification.
+- **Password Reset Functionality**: Added a Settings section in the user dashboard allowing users to request a password change, which is confirmed via an email link.
+- **Admin Profit Distribution**:
+  - Created a  endpoint.
+  - Added a Kar Dağıt button and modal in the Admin Panel to allow admins to distribute profits to individual users.
+- **Dashboard UI Overhaul**:
+  - Separated user balances into Haftalık Kazanç (Weekly Profit) and Cüzdan Bakiyesi (Wallet Balance).
+  - Ensured that the initial investment amount no longer incorrectly inflates the Wallet Balance.
+  - Added dynamic text to show the profit week (e.g., 2. hafta) and a static note about Friday withdrawals.
+- **Database Cleanup**: Wrote and executed a script to delete all non-admin users and their associated data.
+- **Bug Fixes**:
+  - Resolved an SMTP authentication error by updating the  with correct user credentials.
+  - Fixed a UI glitch on the  page that showed success and error messages simultaneously by refactoring the  hook.
+  - Corrected incorrect wallet balances for existing users affected by a previous bug.
+- **Homepage UI Update**: Removed the Total Investment card and updated the Active Investors card to a static 1000+.
+
+**Earlier issues found/mentioned but not fixed**
+None. All reported issues were addressed.
+
+**Known issue recurrence from previous fork**
+- **Issue recurrence in previous fork**: None, but the custom domain login issue has been a recurring blocker throughout *this* session.
+- **Recurrence count**: ~5 attempts
+- **Status**: USER VERIFICATION PENDING
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend**: FastAPI, Pydantic (EmailStr ile), Motor (Async MongoDB), python-jose (JWT), SMTP (smtplib)
-- **Frontend**: React, React Router, Axios, TailwindCSS, 
+- **Backend**: FastAPI, Motor (Async MongoDB), Pydantic, python-jose (JWT), smtplib for emails.
+- **Frontend**: React (with Create React App/Craco), React Router, Axios, TailwindCSS, .
 - **Database**: MongoDB
-- **Architecture**: Monolithic RESTful API & Single Page Application (SPA)
+- **Deployment**: The architecture relies on the frontend (served from the custom domain) making API calls to the backend (served from the preview domain).
 
 **key DB schema**
-- : { ..., upline_id, children: {left, right}, ..., **career_level**: str, **career_points**: int, **left_volume**: float, **right_volume**: float, **has_invested**: bool }
-- : { ..., **position**: left | right }
-- : { ..., user_id, user_email, user_name, package, amount, status, **tx_hash**, **wallet_address**, **created_at**: datetime }
+- : { ..., **is_email_verified**: bool, **verification_token**: str, **password_change_token**: str, **total_weekly_profit**: float, **weekly_profit_count**: int, **wallet_balance**: float, ... }
+- : { ..., user_id, amount, status, ... }
 
 **changes in tech stack**
--  kütüphanesi backend'e eklendi.
+No changes to the tech stack.
 
 **All files**
 - **Created/Updated Critical Files**:
-  - : Neredeyse tüm özellikler (yeni endpointler, modeller, iş mantığı değişiklikleri) için yoğun şekilde düzenlendi. SMTP, kariyer seviyeleri, tek yatırım kontrolü ve komisyon mantığı geri alma işlemleri burada yapıldı.
-  - : En çok değiştirilen dosya. İnteraktif ağ yönetimi, gelişmiş ağaç görselleştirmesi, kariyer kartı, sonradan ağa katılma modal'ı ve çok sayıda state/fonksiyon eklendi.
-  - : Bildirim sayacı ve onaylanmış yatırımlar için detaylı tablo eklendi.
-  - : Mobil uyumluluk için hamburger menü mantığı eklendi.
-  - : SMTP ayarları için yeni değişkenler eklendi (, , , ).
-  -  ve : Talep üzerine oluşturulan yeni dokümanlar.
+  - : Heavily modified to add endpoints for email verification, password reset, profit distribution, and to fix the logic for investment approval.
+  - : Updated to add the password reset form and completely refactor the statistics cards to separate weekly profit from wallet balance.
+  - : Updated to add the Distribute Profit button, state, and modal logic.
+  - : Created and later refactored to fix a UI bug.
+  - : Created for the password reset flow.
+  - : Updated to include routes for the new pages.
+  - : Updated to change the post-registration message.
+  - : Updated to simplify the statistics section.
+  -  & : Updated with SMTP credentials and correct frontend/backend URLs.
+- **Other important files**:
+    - : This directory was missing and has now been created. It is critical for serving the app on the custom domain.
 
 **Areas that need refactoring**:
--  (1500+ satır) ve  (800+ satır) acilen bileşenlere ayrılmalıdır. State yönetimi ve UI mantığı iç içe geçmiş durumdadır. Ağaç görselleştirmesi, modal'lar ve kartlar kendi bileşen dosyalarına taşınmalıdır.
--  (1500+ satır) monolitik bir yapıdadır. API endpoint'leri (routes), veritabanı modelleri (models) ve iş mantığı (services/logic) ayrı dosyalara bölünmelidir.
+-  and  remain extremely large and would benefit from being broken down into smaller, reusable components.
+-  is a very large monolithic file that could be split into separate files for routes, models, and services to improve maintainability.
 
 **key api endpoints**
-- : (Admin için) Bir kullanıcıyı başka bir kullanıcının altına yerleştirir.
-- : (Kullanıcı için) Kendi yerleştirilmemiş referansını ağacına yerleştirir.
-- : Mevcut kullanıcı için tüm ağaç yapısını, üyeleri ve her koldaki toplam hacmi döndürür. Sınırsız derinliğe ayarlanmıştır.
-- : Mevcut bir kullanıcının, referans kodu girerek bir ağa katılmasını sağlar.
-- : Kullanıcı kaydı. Artık otomatik yerleştirme yapmıyor ve hoş geldin e-postası gönderiyor.
-- : Onaylanmış tüm yatırım taleplerini detaylarıyla listeler.
+- : Verifies a user's email using a token.
+- : Sends a password reset link to the user.
+- : Sets a new password using a token.
+- : Adds a specified profit amount to a user's balance and updates their weekly profit stats.
+- : Approves an investment and updates the user's  amount (no longer affects ).
 
 **Critical Info for New Agent**
-- **En Önemli Blocker**: Uygulama production'da konuşlandırıldıktan sonra giriş yapılamıyor. Bu sorun lokalde mevcut değil, tamamen production ortamıyla ilgili.
-- **Kullanıcı Dinamikleri**: Kullanıcı çok aktif, sık sık yeni fikirler sunuyor ve mevcut özellikler üzerinde değişiklik talep ediyor. Örneğin, çok seviyeli komisyon sistemi uygulandıktan sonra iptal edilmesini istedi. Her adımdan önce onay almak kritiktir.
-- **SMTP Yapılandırması**:  dosyasına SMTP değişkenleri eklendi. E-posta gönderiminin çalışması için bu değişkenlerin production ortamında kullanıcı tarafından sağlanan gerçek değerlerle doldurulması gerekir.
-- **Mimari**: Proje, ,  ve  gibi çok büyük monolitik dosyalarla büyüdü. Gelecekteki geliştirmeleri kolaylaştırmak için refactoring düşünülmelidir.
+- **The #1 Priority is the Custom Domain Login.** The user has been blocked by this for a long time. Your first action should be to confirm if the latest fix (creating a new frontend build) has resolved the issue. Do not assume it is fixed. Ask the user to test, and if it fails, immediately start debugging the frontend on the custom domain.
+- **Platform Architecture is Key:** The correct setup for this platform is:
+  - Frontend () makes API calls to...
+  - Backend ().
+  - Do NOT change  to the custom domain. The issue was a stale/missing frontend build, not an incorrect URL in the  file.
+- **User Database was Reset:** All test users are gone. Only  exists. You will need to create new users to test any user-facing functionality.
 
 **documents created in this job**
-- 
-- 
+None in this session.
 
 **Last 5 User Messages and any pending user messages**
-1.  **Talep**: Production için DNS ayarları ve deploy sonrası URL hakkında bilgi.
-    - **Durum**: Tamamlandı. Destek ajanı çağrılarak ve rehber HTML dosyası oluşturularak yanıtlandı.
-2.  **Talep**: Deploy ettikten sonra siteye giriş yapamıyorum.
-    - **Durum**: **MEVCUT SORUN (P0)**. Ajan, sorunu çözmek için bir sonraki adımı atmak üzereydi.
-3.  **Talep**:  dosyasının bir domaine yerleştirilmeye uygun hale getirilmesi.
-    - **Durum**: Tamamlandı. Agent, bunun üzerine deployment ile ilgili sorular sordu.
-4.  **Talep**: Site için yazılan tüm kodların HTML dökümantasyonu.
-    - **Durum**: Tamamlandı.  dosyası oluşturuldu.
-5.  **Talep**: Kayıt sırasında email validasyonu, kullanıcı adı alanının kaldırılması ve SMTP ile hoş geldin maili gönderimi.
-    - **Durum**: Tamamlandı.
+1.  **User**: I still can't log in on the custom domain.
+    - **Status**: In Progress. This is the main issue being worked on.
+2.  **User**: When does pending become verified for my domain?
+    - **Status**: Completed. Agent called support agent, which provided a detailed explanation of the DNS propagation process.
+3.  **User**: The email verification page shows both success and failure messages at the same time.
+    - **Status**: Completed. Agent refactored the  component to fix the state management issue.
+4.  **User (sends screenshot)**: The investment amount is still showing up in my wallet balance.
+    - **Status**: Completed. Agent identified this was due to old data for that specific user and manually corrected the user's  in the database.
+5.  **User**: The investment balance shouldn't be reflected in the wallet balance.
+    - **Status**: Completed. Agent removed the logic that added the investment amount to the  upon approval.
 
 **Project Health Check:**
-- **Broken**: Production ortamındaki kullanıcı kimlik doğrulama/giriş akışı.
-- **Mocked**: Kripto para ödeme sistemi hala manuel onaya dayalı ve statik cüzdan adresleri kullanıyor. Gerçek bir ödeme ağ geçidi entegre edilmedi.
+- **Broken**: The login flow on the custom domain is potentially still broken, pending user verification of the latest fix.
+- **Mocked**: The crypto payment system remains a manual process.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES
-- **Troubleshoot agent used after agent stuck in loop**: NO (Ancak son adımda çağrılması planlanıyordu)
+- **Testing agent used after significant changes**: NO
+- **Troubleshoot agent used after agent stuck in loop**: YES (Successfully diagnosed the missing frontend  directory).
 - **Test files created**: []
-- **Known regressions**: Production'da login fonksiyonunun bozulması.
+- **Known regressions**: The custom domain login functionality has been regressed/broken for most of the session.
 
 **Credentials to test flow:**
 - **Yönetici Kullanıcı**:
   - E-posta: 
   - Şifre: 
-- **Normal Kullanıcı**: Lokal ortamda yeni bir hesap oluşturularak test edilebilir. Production'da şu an kayıt ve giriş yapılamıyor.
 
 **What agent forgot to execute**
-- Ajan, kullanıcıdan gelen yoğun ve değişen taleplere odaklandığı için herhangi bir görevi unutmadı. Ancak, projenin en başından beri gelecek görev olarak listelenen **canlı kripto ödeme ağ geçidi entegrasyonu** henüz başlatılmadı.</analysis>
+- Nothing was forgotten. The agent has been systematically addressing user requests and bug reports, with the custom domain login being the final, persistent challenge.
+</analysis>
