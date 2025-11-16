@@ -703,11 +703,14 @@ async def register(req: RegisterRequest):
     
     # Send verification email
     try:
-        print(f"📧 Attempting to send verification email to: {user.email}")
+        with open("/tmp/email_debug.log", "a") as f:
+            f.write(f"📧 Attempting to send verification email to: {user.email}\n")
         await send_verification_email(user.email, user.name, verification_token)
-        print(f"✅ Verification email sent successfully to: {user.email}")
+        with open("/tmp/email_debug.log", "a") as f:
+            f.write(f"✅ Verification email sent successfully to: {user.email}\n")
     except Exception as e:
-        print(f"❌ Verification email failed: {e}")
+        with open("/tmp/email_debug.log", "a") as f:
+            f.write(f"❌ Verification email failed: {e}\n")
         logger.error(f"Verification email failed but user created: {e}")
     
     # Don't create token yet - user needs to verify email first
