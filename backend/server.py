@@ -393,6 +393,7 @@ async def send_verification_email(user_email: str, user_name: str, verification_
         # Get frontend URL from environment
         frontend_url = os.environ.get('FRONTEND_URL', 'https://login-domain-solver.preview.emergentagent.com')
         verification_link = f"{frontend_url}/verify-email?token={verification_token}"
+        logger.info(f"Generated verification link: {verification_link}")
         
         msg = MIMEMultipart('alternative')
         msg['Subject'] = "✅ Email Adresinizi Doğrulayın - Parlacapital"
