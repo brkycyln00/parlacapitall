@@ -41,12 +41,6 @@ export default function Navbar() {
                 Paketler
               </button>
               <button 
-                onClick={() => navigate('/crypto-market')} 
-                className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
-              >
-                Kripto Piyasası
-              </button>
-              <button 
                 onClick={() => navigate('/earning-systems')} 
                 className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
@@ -148,12 +142,6 @@ export default function Navbar() {
               className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
             >
               Paketler
-            </button>
-            <button 
-              onClick={() => { navigate('/crypto-market'); setMobileMenuOpen(false); }} 
-              className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
-            >
-              Kripto Piyasası
             </button>
             <button 
               onClick={() => { navigate('/earning-systems'); setMobileMenuOpen(false); }} 
