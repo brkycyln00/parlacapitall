@@ -393,6 +393,7 @@ async def send_verification_email(user_email: str, user_name: str, verification_
         # Get frontend URL from environment
         frontend_url = os.environ.get('FRONTEND_URL', 'https://domain-repair.preview.emergentagent.com')
         verification_link = f"{frontend_url}/verify-email?token={verification_token}"
+        print(f"🔗 VERIFICATION LINK GENERATED: {verification_link}")
         logger.info(f"Generated verification link: {verification_link}")
         
         msg = MIMEMultipart('alternative')
