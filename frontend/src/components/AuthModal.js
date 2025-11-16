@@ -106,7 +106,7 @@ export default function AuthModal({ open, onClose, onSuccess }) {
       // Store token in localStorage
       localStorage.setItem('auth_token', response.data.token);
       
-      toast.success('Giriş başarılı!');
+      toast.success('Giriş başarılı! Dashboard\'a yönlendiriliyorsunuz...');
       
       if (onSuccess) {
         onSuccess(response.data.user);
@@ -114,8 +114,10 @@ export default function AuthModal({ open, onClose, onSuccess }) {
       
       onClose();
       
-      // Reload to update auth state
-      window.location.href = '/dashboard';
+      // Force page reload to update auth state and navigate to dashboard
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Giriş başarısız');
     } finally {
