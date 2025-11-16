@@ -391,7 +391,7 @@ async def send_verification_email(user_email: str, user_name: str, verification_
             return False
         
         # Get frontend URL from environment
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://auth-flow-fixes-1.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://login-domain-solver.preview.emergentagent.com')
         verification_link = f"{frontend_url}/verify-email?token={verification_token}"
         
         msg = MIMEMultipart('alternative')
@@ -488,7 +488,7 @@ async def send_password_change_email(user_email: str, user_name: str, password_c
             logger.warning("SMTP not configured. Skipping password change email.")
             return False
         
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://auth-flow-fixes-1.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://login-domain-solver.preview.emergentagent.com')
         confirmation_link = f"{frontend_url}/confirm-password-change?token={password_change_token}"
         
         msg = MIMEMultipart('alternative')
