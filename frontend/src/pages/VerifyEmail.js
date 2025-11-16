@@ -20,7 +20,8 @@ export default function VerifyEmail() {
     verifiedRef.current = true;
     
     try {
-      const response = await axios.get(`${API}/auth/verify-email/${token}`);
+      // Backend endpoint expects token as path parameter
+      const response = await axios.get(`${API}/auth/verify-email/${encodeURIComponent(token)}`);
       
       // Save token and redirect to dashboard
       localStorage.setItem('auth_token', response.data.token);
@@ -35,8 +36,9 @@ export default function VerifyEmail() {
       
     } catch (error) {
       setVerified(false); // Ensure verified is false
-      setError(error.response?.data?.detail || 'Email doğrulama başarısız');
-      toast.error(error.response?.data?.detail || 'Email doğrulama başarısız');
+      const errorMsg = error.response?.data?.detail || 'Email doğrulama başarısız';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
