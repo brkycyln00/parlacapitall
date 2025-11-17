@@ -919,9 +919,21 @@ export default function AdminPanel() {
                               className="border-red-500 text-red-400 hover:bg-red-500/10"
                             >
                               Kullanıcıyı Sil
+                            </Button>
+                          </>
+                        )}
+                        {u.is_admin && user?.email === 'admin@parlacapital.com' && u.email !== 'admin@parlacapital.com' && (
+                          <Button
+                            data-testid={`revoke-admin-${idx}`}
+                            onClick={() => handleRevokeAdmin(u.id, u.name)}
+                            size="sm"
+                            variant="outline"
+                            className="border-orange-500 text-orange-400 hover:bg-orange-500/10"
+                          >
+                            ⚠️ Admin Yetkisini Kaldır
                           </Button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
