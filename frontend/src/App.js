@@ -164,44 +164,49 @@ import Contact from './pages/Contact';
 import CryptoMarket from './pages/CryptoMarket';
 import VerifyEmail from './pages/VerifyEmail';
 import ConfirmPasswordChange from './pages/ConfirmPasswordChange';
+import { LanguageProvider } from './contexts/LanguageContext';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="App">
-        <BrowserRouter>
-          <AuthHandler />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/packages" element={<Packages />} />
-            <Route path="/crypto-market" element={<CryptoMarket />} />
-            <Route path="/earning-systems" element={<EarningSystems />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/confirm-password-change" element={<ConfirmPasswordChange />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AdminPanel />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-          <Toaster position="top-right" richColors />
-        </BrowserRouter>
-      </div>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <div className="App">
+          <BrowserRouter>
+            <AuthHandler />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/packages" element={<Packages />} />
+              <Route path="/crypto-market" element={<CryptoMarket />} />
+              <Route path="/earning-systems" element={<EarningSystems />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/confirm-password-change" element={<ConfirmPasswordChange />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+            <LanguageSwitcher />
+            <Toaster position="top-right" richColors />
+          </BrowserRouter>
+        </div>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 
