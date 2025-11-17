@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { Button } from '@/components/ui/button';
 import AuthModal from './AuthModal';
+import { useLanguage } from '../contexts/LanguageContext';
+import { t } from '../translations';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout, checkAuth } = useAuth();
+  const { language } = useLanguage();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -26,37 +29,37 @@ export default function Navbar() {
                 onClick={() => navigate('/')} 
                 className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70 whitespace-nowrap"
               >
-                Ana Sayfa
+                {t(language, 'nav.home')}
               </button>
               <button 
                 onClick={() => navigate('/about')} 
                 className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
-                Hakkımızda
+                {t(language, 'nav.about')}
               </button>
               <button 
                 onClick={() => navigate('/packages')} 
                 className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
-                Paketler
+                {t(language, 'nav.packages')}
               </button>
               <button 
                 onClick={() => navigate('/earning-systems')} 
                 className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
-                Kazanç Sistemleri
+                {t(language, 'nav.earningSystems')}
               </button>
               <button 
                 onClick={() => navigate('/faq')} 
                 className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
-                SSS
+                {t(language, 'nav.faq')}
               </button>
               <button 
                 onClick={() => navigate('/contact')} 
                 className="text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
               >
-                İletişim
+                {t(language, 'nav.contact')}
               </button>
             </div>
           </div>
@@ -72,7 +75,7 @@ export default function Navbar() {
                     className="border-amber-500 text-amber-400 hover:bg-amber-500/10"
                     data-testid="nav-dashboard-button"
                   >
-                    Panelim
+                    {t(language, 'nav.dashboard')}
                   </Button>
                   {user.is_admin && (
                     <Button 
@@ -81,7 +84,7 @@ export default function Navbar() {
                       className="border-purple-500 text-purple-400 hover:bg-purple-500/10"
                       data-testid="nav-admin-button"
                     >
-                      Admin
+                      {t(language, 'nav.admin')}
                     </Button>
                   )}
                   <Button 
@@ -90,7 +93,7 @@ export default function Navbar() {
                     className="border-red-500 text-red-400 hover:bg-red-500/10"
                     data-testid="nav-logout-button"
                   >
-                    Çıkış
+                    {t(language, 'nav.logout')}
                   </Button>
                 </>
               ) : (
@@ -99,7 +102,7 @@ export default function Navbar() {
                   className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-2 rounded-full font-semibold"
                   data-testid="nav-login-button"
                 >
-                  Giriş Yap
+                  {t(language, 'nav.login')}
                 </Button>
               )}
             </div>
@@ -129,37 +132,37 @@ export default function Navbar() {
               onClick={() => { navigate('/'); setMobileMenuOpen(false); }} 
               className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
             >
-              Ana Sayfa
+              {t(language, 'nav.home')}
             </button>
             <button 
               onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} 
               className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
             >
-              Hakkımızda
+              {t(language, 'nav.about')}
             </button>
             <button 
               onClick={() => { navigate('/packages'); setMobileMenuOpen(false); }} 
               className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
             >
-              Paketler
+              {t(language, 'nav.packages')}
             </button>
             <button 
               onClick={() => { navigate('/earning-systems'); setMobileMenuOpen(false); }} 
               className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
             >
-              Kazanç Sistemleri
+              {t(language, 'nav.earningSystems')}
             </button>
             <button 
               onClick={() => { navigate('/faq'); setMobileMenuOpen(false); }} 
               className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
             >
-              SSS
+              {t(language, 'nav.faq')}
             </button>
             <button 
               onClick={() => { navigate('/contact'); setMobileMenuOpen(false); }} 
               className="block w-full text-left text-white hover:text-amber-400 transition-all font-bold px-4 py-2 rounded-lg hover:bg-slate-800/70"
             >
-              İletişim
+              {t(language, 'nav.contact')}
             </button>
 
             {/* Mobile Auth Buttons */}
@@ -170,14 +173,14 @@ export default function Navbar() {
                     onClick={() => { navigate('/dashboard'); setMobileMenuOpen(false); }} 
                     className="w-full bg-amber-500 hover:bg-amber-600 text-white"
                   >
-                    Panelim
+                    {t(language, 'nav.dashboard')}
                   </Button>
                   {user.is_admin && (
                     <Button 
                       onClick={() => { navigate('/admin'); setMobileMenuOpen(false); }} 
                       className="w-full bg-purple-500 hover:bg-purple-600 text-white"
                     >
-                      Admin
+                      {t(language, 'nav.admin')}
                     </Button>
                   )}
                   <Button 
@@ -185,7 +188,7 @@ export default function Navbar() {
                     variant="outline"
                     className="w-full border-red-500 text-red-400 hover:bg-red-500/10"
                   >
-                    Çıkış
+                    {t(language, 'nav.logout')}
                   </Button>
                 </>
               ) : (
@@ -193,7 +196,7 @@ export default function Navbar() {
                   onClick={() => { setAuthModalOpen(true); setMobileMenuOpen(false); }}
                   className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
                 >
-                  Giriş Yap
+                  {t(language, 'nav.login')}
                 </Button>
               )}
             </div>
