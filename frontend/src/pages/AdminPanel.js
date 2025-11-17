@@ -893,31 +893,32 @@ export default function AdminPanel() {
                           <p className="text-gray-400 text-sm">Komisyon: ${u.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
                         </div>
                       </div>
-                      {!u.is_admin && (
-                        <div className="mt-3 flex gap-2">
-                          <Button
-                            onClick={() => openProfitModal(u)}
-                            size="sm"
-                            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
-                          >
-                            💰 Kar Dağıt
-                          </Button>
-                          <Button
-                            data-testid={`make-admin-${idx}`}
-                            onClick={() => handleMakeAdmin(u.id)}
-                            size="sm"
-                            variant="outline"
-                            className="border-amber-500 text-amber-400 hover:bg-amber-500/10"
-                          >
-                            Admin Yap
-                          </Button>
-                          <Button
-                            onClick={() => handleDeleteUser(u.id, u.name)}
-                            size="sm"
-                            variant="outline"
-                            className="border-red-500 text-red-400 hover:bg-red-500/10"
-                          >
-                            Kullanıcıyı Sil
+                      <div className="mt-3 flex gap-2">
+                        {!u.is_admin && (
+                          <>
+                            <Button
+                              onClick={() => openProfitModal(u)}
+                              size="sm"
+                              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
+                            >
+                              💰 Kar Dağıt
+                            </Button>
+                            <Button
+                              data-testid={`make-admin-${idx}`}
+                              onClick={() => handleMakeAdmin(u.id)}
+                              size="sm"
+                              variant="outline"
+                              className="border-amber-500 text-amber-400 hover:bg-amber-500/10"
+                            >
+                              Admin Yap
+                            </Button>
+                            <Button
+                              onClick={() => handleDeleteUser(u.id, u.name)}
+                              size="sm"
+                              variant="outline"
+                              className="border-red-500 text-red-400 hover:bg-red-500/10"
+                            >
+                              Kullanıcıyı Sil
                           </Button>
                         </div>
                       )}
