@@ -266,6 +266,22 @@ export default function AdminPanel() {
     }
   };
 
+  const handleRevokeAdmin = async (userId, userName) => {
+    if (!window.confirm(`${userName} kullanıcısının admin yetkisini kaldırmak istediğinizden emin misiniz? Bu işlem geri alınamaz.`)) return;
+    
+    try {
+      await axios.post(
+        `${API}/admin/users/${userId}/revoke-admin`,
+        {},
+        { withCredentials: true }
+      );
+      toast.success('Admin yetkisi kaldırıldı');
+      fetchAdminData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'İşlem başarısız');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center admin-panel">
