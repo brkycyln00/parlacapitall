@@ -2011,6 +2011,21 @@ async def make_user_admin(user_id: str, admin: User = Depends(require_admin)):
     await db.users.update_one({"id": user_id}, {"$set": {"is_admin": True}})
     return {"message": "User is now an admin"}
 
+@api_router.post("/admin/users/{user_id}/revoke-admin")
+async def revoke_user_admin(user_id: str, super_admin: User = Depends(require_super_admin)):
+    # Get target user
+    target_user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent removing super admin's own admin status
+    if target_user.get("email") == "admin@parlacapital.com":
+        raise HTTPException(status_code=400, detail="Cannot revoke super admin status")
+    
+    # Remove admin status
+    await db.users.update_one({"id": user_id}, {"$set": {"is_admin": False}})
+    return {"message": "Admin status revoked successfully"}
+
 @api_router.post("/users/place-referral")
 async def user_place_referral(req: PlaceUserRequest, current_user: User = Depends(require_auth)):
     """
