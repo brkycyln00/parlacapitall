@@ -239,6 +239,13 @@ async def require_admin(request: Request) -> User:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
+async def require_super_admin(request: Request) -> User:
+    user = await require_auth(request)
+    # Super admin is the main admin account
+    if user.email != "admin@parlacapital.com":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    return user
+
 class InvestmentRequestCreate(BaseModel):
     full_name: str
     username: str
