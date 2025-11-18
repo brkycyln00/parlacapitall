@@ -1815,6 +1815,58 @@ async def get_network_tree(user: User = Depends(require_auth)):
     tree = await build_tree(user.id)
     return tree
 
+@api_router.get("/admin/network/full-tree")
+async def get_full_network_tree(admin: User = Depends(require_super_admin)):
+    """
+    Super admin can see the entire binary tree network
+    Returns all root nodes and their complete trees
+    """
+    async def build_tree(user_id: str, depth: int = 0, max_depth: int = 100):
+        if depth >= max_depth:
+            return None
+        
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user_doc:
+            return None
+        
+        node = {
+            "id": user_doc["id"],
+            "name": user_doc["name"],
+            "email": user_doc.get("email", ""),
+            "package": user_doc.get("package"),
+            "total_invested": user_doc.get("total_invested", 0),
+            "left_volume": user_doc.get("left_volume", 0),
+            "right_volume": user_doc.get("right_volume", 0),
+            "position": user_doc.get("position"),
+            "upline_id": user_doc.get("upline_id"),
+            "is_admin": user_doc.get("is_admin", False),
+            "left": None,
+            "right": None,
+            "depth": depth
+        }
+        
+        if user_doc.get("left_child_id"):
+            node["left"] = await build_tree(user_doc["left_child_id"], depth + 1, max_depth)
+        
+        if user_doc.get("right_child_id"):
+            node["right"] = await build_tree(user_doc["right_child_id"], depth + 1, max_depth)
+        
+        return node
+    
+    # Find all root nodes (users without parent_id or not placed in tree)
+    root_users = await db.users.find(
+        {"$or": [{"parent_id": None}, {"parent_id": {"$exists": False}}]},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    trees = []
+    for root_user in root_users:
+        tree = await build_tree(root_user["id"])
+        if tree:
+            trees.append(tree)
+    
+    return {"trees": trees, "total_roots": len(trees)}
+
 # ==================== WITHDRAWAL REQUESTS ====================
 
 @api_router.post("/withdrawal/request")
