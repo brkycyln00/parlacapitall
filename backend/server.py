@@ -1487,48 +1487,16 @@ async def approve_withdrawal_request(request_id: str, user: User = Depends(requi
     
     target_user = User(**user_doc)
     
-    # Check available balance (including binary earnings)
-    available_balance = target_user.weekly_earnings + target_user.total_commissions + target_user.binary_earnings
+    # Check available balance (from wallet_balance only)
+    available_balance = target_user.wallet_balance
     
     if withdrawal.amount > available_balance:
         raise HTTPException(status_code=400, detail="User has insufficient balance")
     
-    # Deduct priority: 1) commissions, 2) binary_earnings, 3) weekly_earnings
-    # This ensures immediate bonuses are withdrawn first, weekly earnings last
-    remaining_amount = withdrawal.amount
-    new_commissions = target_user.total_commissions
-    new_binary = target_user.binary_earnings
-    new_weekly_earnings = target_user.weekly_earnings
-    
-    # First deduct from commissions (immediately withdrawable)
-    if remaining_amount <= new_commissions:
-        new_commissions -= remaining_amount
-        remaining_amount = 0
-    else:
-        remaining_amount -= new_commissions
-        new_commissions = 0
-    
-    # Then deduct from binary earnings (immediately withdrawable)
-    if remaining_amount > 0:
-        if remaining_amount <= new_binary:
-            new_binary -= remaining_amount
-            remaining_amount = 0
-        else:
-            remaining_amount -= new_binary
-            new_binary = 0
-    
-    # Finally deduct from weekly earnings (if needed)
-    if remaining_amount > 0:
-        new_weekly_earnings -= remaining_amount
-    
-    # Update user balance
+    # Simply deduct from wallet_balance
     await db.users.update_one(
         {"id": target_user.id},
-        {"$set": {
-            "weekly_earnings": new_weekly_earnings,
-            "total_commissions": new_commissions,
-            "binary_earnings": new_binary
-        }}
+        {"$inc": {"wallet_balance": -withdrawal.amount}}
     )
     
     # Mark request as approved
