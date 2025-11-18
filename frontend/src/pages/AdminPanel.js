@@ -907,6 +907,7 @@ export default function AdminPanel() {
                           <p className="text-gray-400 text-sm">Bakiye: ${u.wallet_balance?.toLocaleString('tr-TR') || '0'}</p>
                           <p className="text-gray-400 text-sm">Yatırım: ${u.total_invested?.toLocaleString('tr-TR') || '0'}</p>
                           <p className="text-gray-400 text-sm">Komisyon: ${u.total_commissions?.toLocaleString('tr-TR') || '0'}</p>
+                          <p className="text-purple-400 text-sm font-semibold">💎 Binary Bonus: ${u.binary_earnings?.toLocaleString('tr-TR') || '0'}</p>
                         </div>
                       </div>
                       <div className="mt-3 flex gap-2">
