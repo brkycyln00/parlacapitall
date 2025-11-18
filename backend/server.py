@@ -1488,30 +1488,47 @@ async def approve_withdrawal_request(request_id: str, user: User = Depends(requi
     
     target_user = User(**user_doc)
     
-    # Check available balance
-    available_balance = target_user.weekly_earnings + target_user.total_commissions
+    # Check available balance (including binary earnings)
+    available_balance = target_user.weekly_earnings + target_user.total_commissions + target_user.binary_earnings
     
     if withdrawal.amount > available_balance:
         raise HTTPException(status_code=400, detail="User has insufficient balance")
     
-    # Deduct from weekly_earnings first, then from commissions
+    # Deduct priority: 1) commissions, 2) binary_earnings, 3) weekly_earnings
+    # This ensures immediate bonuses are withdrawn first, weekly earnings last
     remaining_amount = withdrawal.amount
-    new_weekly_earnings = target_user.weekly_earnings
     new_commissions = target_user.total_commissions
+    new_binary = target_user.binary_earnings
+    new_weekly_earnings = target_user.weekly_earnings
     
-    if remaining_amount <= new_weekly_earnings:
-        new_weekly_earnings -= remaining_amount
-    else:
-        remaining_amount -= new_weekly_earnings
-        new_weekly_earnings = 0
+    # First deduct from commissions (immediately withdrawable)
+    if remaining_amount <= new_commissions:
         new_commissions -= remaining_amount
+        remaining_amount = 0
+    else:
+        remaining_amount -= new_commissions
+        new_commissions = 0
+    
+    # Then deduct from binary earnings (immediately withdrawable)
+    if remaining_amount > 0:
+        if remaining_amount <= new_binary:
+            new_binary -= remaining_amount
+            remaining_amount = 0
+        else:
+            remaining_amount -= new_binary
+            new_binary = 0
+    
+    # Finally deduct from weekly earnings (if needed)
+    if remaining_amount > 0:
+        new_weekly_earnings -= remaining_amount
     
     # Update user balance
     await db.users.update_one(
         {"id": target_user.id},
         {"$set": {
             "weekly_earnings": new_weekly_earnings,
-            "total_commissions": new_commissions
+            "total_commissions": new_commissions,
+            "binary_earnings": new_binary
         }}
     )
     
