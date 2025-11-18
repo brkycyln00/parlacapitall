@@ -629,8 +629,8 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-white">${(user?.wallet_balance || 0).toLocaleString('tr-TR')}</div>
-                <p className="text-xs text-amber-400 mt-2">Çekilebilir bakiye</p>
-                <p className="text-[10px] text-gray-500 mt-1">⏰ Kâr çekimleri cuma günü yapılmaktadır</p>
+                <p className="text-xs text-amber-400 mt-2">Toplam kazanç</p>
+                <p className="text-[10px] text-gray-500 mt-1">⏰ Haftalık kâr dışında tüm bakiyeler çekilebilir</p>
               </CardContent>
             </Card>
 
