@@ -272,7 +272,7 @@ export default function Dashboard() {
       return;
     }
 
-    const availableBalance = (user?.weekly_earnings || 0) + (user?.total_commissions || 0) + (user?.binary_earnings || 0);
+    const availableBalance = user?.wallet_balance || 0;
     if (amount > availableBalance) {
       toast.error(`Yetersiz bakiye. Kullanılabilir: $${availableBalance.toFixed(2)}`);
       return;
