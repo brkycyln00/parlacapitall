@@ -634,6 +634,20 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
+            <Card className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 border-purple-500/30">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">Binary Eşleşme Bonusu</CardTitle>
+                <svg className="h-5 w-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-white">${(user?.binary_earnings || 0).toLocaleString('tr-TR')}</div>
+                <p className="text-xs text-purple-300 mt-2">Sol: ${(user?.left_volume || 0).toLocaleString('tr-TR')} | Sağ: ${(user?.right_volume || 0).toLocaleString('tr-TR')}</p>
+                <p className="text-[10px] text-gray-400 mt-1">💎 Her 1000$+1000$ eşleşme = 100$ bonus</p>
+              </CardContent>
+            </Card>
+
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-400">Referans Ağı</CardTitle>
