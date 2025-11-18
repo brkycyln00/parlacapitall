@@ -1412,10 +1412,9 @@ async def create_withdrawal_request(
     req: WithdrawalRequestCreate,
     user: User = Depends(require_auth)
 ):
-    # Calculate available balance (weekly_earnings + total_commissions + binary_earnings)
-    # Binary bonus and commissions are withdrawable immediately
-    # Only weekly profit needs to wait for the week completion
-    available_balance = user.weekly_earnings + user.total_commissions + user.binary_earnings
+    # All earnings are in wallet_balance (commissions and binary bonus)
+    # Weekly earnings are kept separate until week completion
+    available_balance = user.wallet_balance
     
     if req.amount <= 0:
         raise HTTPException(status_code=400, detail="Çekim tutarı 0'dan büyük olmalıdır")
