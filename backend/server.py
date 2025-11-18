@@ -1718,11 +1718,13 @@ async def update_volumes_upline(user_id: str, amount: float):
                 
                 if binary_earnings > upline_user.binary_earnings:
                     new_earnings = binary_earnings - upline_user.binary_earnings
-                    # Update binary_earnings field ONLY (not wallet_balance)
-                    # This keeps binary match bonus separate
+                    # Add to wallet_balance and update binary_earnings tracker
                     await db.users.update_one(
                         {"id": upline_user.id},
-                        {"$set": {"binary_earnings": binary_earnings}}
+                        {
+                            "$set": {"binary_earnings": binary_earnings},
+                            "$inc": {"wallet_balance": new_earnings}
+                        }
                     )
                     
                     # Create transaction for tracking
