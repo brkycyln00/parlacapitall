@@ -1604,8 +1604,13 @@ export default function Dashboard() {
           <DialogHeader>
             <DialogTitle className="text-white text-2xl">Çekim Yap</DialogTitle>
             <p className="text-gray-400 text-sm mt-2">
-              Kullanılabilir Bakiye: ${((user?.weekly_earnings || 0) + (user?.total_commissions || 0)).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              Kullanılabilir Bakiye: ${((user?.weekly_earnings || 0) + (user?.total_commissions || 0) + (user?.binary_earnings || 0)).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </p>
+            <div className="flex gap-2 text-xs mt-1">
+              <span className="text-green-400">Haftalık: ${(user?.weekly_earnings || 0).toFixed(2)}</span>
+              <span className="text-blue-400">Komisyon: ${(user?.total_commissions || 0).toFixed(2)}</span>
+              <span className="text-purple-400">Binary: ${(user?.binary_earnings || 0).toFixed(2)}</span>
+            </div>
           </DialogHeader>
           <div className="mt-4 space-y-4">
             <div>
