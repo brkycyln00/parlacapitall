@@ -117,6 +117,25 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchFullBinaryTree = async () => {
+    if (!user?.is_super_admin) {
+      toast.error('Bu özellik sadece Super Admin için');
+      return;
+    }
+    
+    setLoadingFullTree(true);
+    try {
+      const response = await axios.get(`${API}/admin/network/full-tree`, { withCredentials: true });
+      setFullBinaryTree(response.data);
+      toast.success(`${response.data.total_roots} ana kullanıcı bulundu`);
+    } catch (error) {
+      console.error('Full tree error:', error);
+      toast.error('Binary tree yüklenirken hata oluştu');
+    } finally {
+      setLoadingFullTree(false);
+    }
+  };
+
   const handleDistributeProfit = async (e) => {
     e.preventDefault();
     
