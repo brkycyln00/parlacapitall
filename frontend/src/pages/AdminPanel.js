@@ -32,6 +32,10 @@ export default function AdminPanel() {
   const [profitAmount, setProfitAmount] = useState('');
   const [profitDescription, setProfitDescription] = useState('Haftalık kar payı');
   const [distributingProfit, setDistributingProfit] = useState(false);
+  
+  // Full Binary Tree state (Super Admin only)
+  const [fullBinaryTree, setFullBinaryTree] = useState(null);
+  const [loadingFullTree, setLoadingFullTree] = useState(false);
 
   useEffect(() => {
     if (!user?.is_admin) {
