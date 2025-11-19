@@ -475,6 +475,9 @@ export default function AdminPanel() {
             <TabsTrigger value="placement" className="data-[state=active]:bg-amber-500">Kullanıcı Yerleştirme</TabsTrigger>
             <TabsTrigger data-testid="transactions-tab" value="transactions" className="data-[state=active]:bg-amber-500">İşlemler</TabsTrigger>
             <TabsTrigger data-testid="users-tab" value="users" className="data-[state=active]:bg-amber-500">Kullanıcılar</TabsTrigger>
+            {user?.is_super_admin && (
+              <TabsTrigger value="full-tree" className="data-[state=active]:bg-amber-500">🌳 Tüm Binary Tree</TabsTrigger>
+            )}
           </TabsList>
 
           {/* Investment Requests Tab */}
