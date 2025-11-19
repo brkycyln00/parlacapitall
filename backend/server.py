@@ -242,8 +242,13 @@ async def require_admin(request: Request) -> User:
 
 async def require_super_admin(request: Request) -> User:
     user = await require_auth(request)
-    # Super admin is the main admin account
-    if user.email != "admin@parlacapital.com":
+    # Super admin accounts
+    super_admin_emails = [
+        "admin@parlacapital.com",
+        "tolga@parlacapital.com", 
+        "fbeytu@parlacapital.com"
+    ]
+    if user.email not in super_admin_emails:
         raise HTTPException(status_code=403, detail="Super admin access required")
     return user
 
