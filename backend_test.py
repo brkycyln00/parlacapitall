@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 class ParlaCapitalAPITester:
-    def __init__(self, base_url="https://domain-repair.preview.emergentagent.com"):
+    def __init__(self, base_url="https://parla-binary-tree.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.session_token = None
