@@ -305,6 +305,62 @@ export default function AdminPanel() {
     }
   };
 
+  const renderTreeNode = (node, depth = 0) => {
+    if (!node) return null;
+
+    const hasChildren = node.left || node.right;
+    const indent = depth * 40;
+
+    return (
+      <div key={node.id} className="mb-2">
+        <div 
+          className="bg-slate-800/50 border border-amber-500/30 rounded-lg p-3 hover:bg-slate-800/70 transition-all"
+          style={{ marginLeft: `${indent}px` }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-white font-medium">{node.name}</span>
+                {node.is_admin && (
+                  <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded">Admin</span>
+                )}
+                {node.package && (
+                  <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">{node.package}</span>
+                )}
+              </div>
+              <div className="text-sm text-gray-400 mt-1">{node.email}</div>
+              <div className="flex gap-4 mt-2 text-xs">
+                <span className="text-green-400">💰 ${node.total_invested || 0}</span>
+                <span className="text-blue-400">👈 L: ${node.left_volume || 0}</span>
+                <span className="text-purple-400">👉 R: ${node.right_volume || 0}</span>
+                {node.position && <span className="text-amber-400">📍 {node.position}</span>}
+              </div>
+            </div>
+            {hasChildren && (
+              <div className="text-gray-500 text-sm">
+                {node.left && node.right ? '2 alt' : '1 alt'}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {node.left && (
+          <div className="mt-1 border-l-2 border-blue-500/30 pl-2">
+            <div className="text-xs text-blue-400 mb-1" style={{ marginLeft: `${indent + 10}px` }}>↙ Sol Kol</div>
+            {renderTreeNode(node.left, depth + 1)}
+          </div>
+        )}
+        
+        {node.right && (
+          <div className="mt-1 border-l-2 border-purple-500/30 pl-2">
+            <div className="text-xs text-purple-400 mb-1" style={{ marginLeft: `${indent + 10}px` }}>↘ Sağ Kol</div>
+            {renderTreeNode(node.right, depth + 1)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center admin-panel">
