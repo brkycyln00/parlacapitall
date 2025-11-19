@@ -62,6 +62,7 @@ class User(BaseModel):
     career_rewards: float = 0.0
     wallet_balance: float = 0.0
     is_admin: bool = False
+    is_super_admin: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     last_login: Optional[str] = None
     # Email verification fields
