@@ -1039,6 +1039,102 @@ export default function AdminPanel() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Full Binary Tree Tab - Super Admin Only */}
+          {user?.is_super_admin && (
+            <TabsContent value="full-tree">
+              <Card className="glass-card">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-white text-2xl">🌳 Tam Binary Tree Ağı</CardTitle>
+                      <p className="text-gray-400 mt-1">Tüm kullanıcıların binary tree yapısını görüntüleyin</p>
+                    </div>
+                    <Button
+                      onClick={fetchFullBinaryTree}
+                      disabled={loadingFullTree}
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                    >
+                      {loadingFullTree ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                          Yükleniyor...
+                        </>
+                      ) : (
+                        '🔄 Binary Tree\'yi Yükle'
+                      )}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {!fullBinaryTree ? (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 mb-4">
+                        <svg className="w-24 h-24 mx-auto mb-4 text-amber-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                        <p className="text-lg">Binary tree verisi yüklenmedi</p>
+                        <p className="text-sm mt-2">Yukarıdaki butona tıklayarak tüm network ağını görüntüleyin</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="mb-4 p-4 bg-slate-900/50 rounded-lg border border-amber-500/30">
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <p className="text-2xl font-bold text-amber-400">{fullBinaryTree.total_roots}</p>
+                            <p className="text-sm text-gray-400">Ana Kullanıcı</p>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-blue-400">
+                              {fullBinaryTree.trees?.reduce((acc, tree) => {
+                                const countNodes = (node) => {
+                                  if (!node) return 0;
+                                  return 1 + countNodes(node.left) + countNodes(node.right);
+                                };
+                                return acc + countNodes(tree);
+                              }, 0) || 0}
+                            </p>
+                            <p className="text-sm text-gray-400">Toplam Kullanıcı</p>
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-green-400">
+                              ${fullBinaryTree.trees?.reduce((acc, tree) => {
+                                const sumInvested = (node) => {
+                                  if (!node) return 0;
+                                  return (node.total_invested || 0) + sumInvested(node.left) + sumInvested(node.right);
+                                };
+                                return acc + sumInvested(tree);
+                              }, 0).toFixed(2) || '0.00'}
+                            </p>
+                            <p className="text-sm text-gray-400">Toplam Yatırım</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6 max-h-[600px] overflow-y-auto">
+                        {fullBinaryTree.trees && fullBinaryTree.trees.length > 0 ? (
+                          fullBinaryTree.trees.map((tree, idx) => (
+                            <div key={idx} className="border-2 border-amber-500/50 rounded-lg p-4 bg-slate-900/30">
+                              <div className="mb-3 pb-3 border-b border-amber-500/30">
+                                <h3 className="text-amber-400 font-bold text-lg">🏆 Ana Kullanıcı #{idx + 1}</h3>
+                              </div>
+                              {renderTreeNode(tree)}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-8 text-gray-400">
+                            <p>Henüz binary tree'de kullanıcı yok</p>
+                            <p className="text-sm mt-2">Kullanıcılar yerleştirildikçe burada görünecekler</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
 
