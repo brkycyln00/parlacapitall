@@ -772,7 +772,8 @@ async def login(req: LoginRequest):
             "email": user.email,
             "name": user.name,
             "referral_code": user.referral_code,
-            "is_admin": user.is_admin
+            "is_admin": user.is_admin,
+            "is_super_admin": user.is_super_admin
         }
     }
 
