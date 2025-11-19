@@ -829,7 +829,8 @@ async def verify_email(token: str):
             "id": user.id,
             "email": user.email,
             "name": user.name,
-            "is_admin": user.is_admin
+            "is_admin": user.is_admin,
+            "is_super_admin": user.is_super_admin
         }
     }
 
