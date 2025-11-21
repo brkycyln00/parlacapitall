@@ -192,7 +192,21 @@ export default function AdminPanel() {
     }
   };
 
-
+  const handleRejectInvestmentRequest = async (requestId) => {
+    if (!window.confirm('Bu yatırım talebini reddetmek istediğinizden emin misiniz?')) return;
+    
+    try {
+      await axios.post(
+        `${API}/admin/investment-requests/${requestId}/reject`,
+        {},
+        { withCredentials: true }
+      );
+      toast.success('Yatırım talebi reddedildi');
+      fetchAdminData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Reddetme başarısız');
+    }
+  };
 
   const handleApproveWithdrawal = async (requestId) => {
     try {
