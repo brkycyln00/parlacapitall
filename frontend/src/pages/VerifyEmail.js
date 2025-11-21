@@ -4,7 +4,8 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+// Use current domain for API calls
+const API = `${window.location.origin}/api`;
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
