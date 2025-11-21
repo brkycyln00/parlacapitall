@@ -8,7 +8,8 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+// Use current domain for API calls (works for both preview and custom domain)
+const API = `${window.location.origin}/api`;
 
 export default function AuthModal({ open, onClose, onSuccess }) {
   const navigate = useNavigate();
