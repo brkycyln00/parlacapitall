@@ -340,7 +340,6 @@ export default function Packages() {
                 <SelectContent className="bg-slate-700 border-amber-500/30">
                   <SelectItem value="tether_trc20">Tether (TRC20)</SelectItem>
                   <SelectItem value="ethereum_erc20">Ethereum (ERC20)</SelectItem>
-                  <SelectItem value="iban">IBAN (Banka Transferi)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
