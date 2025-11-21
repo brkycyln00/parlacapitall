@@ -132,8 +132,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-1">E-posta</h3>
-                    <a href="mailto:info@parlacapital.com" className="text-gray-300 hover:text-amber-400">
-                      info@parlacapital.com
+                    <a href="mailto:mail@parlacapital.com" className="text-gray-300 hover:text-amber-400">
+                      mail@parlacapital.com
                     </a>
                   </div>
                 </div>
