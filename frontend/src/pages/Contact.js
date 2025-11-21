@@ -110,14 +110,16 @@ export default function Contact() {
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                    </svg>
+                    <img 
+                      src="https://customer-assets.emergentagent.com/job_investparla/artifacts/pu93i0x2_ChatGPT%20Image%20Nov%209%2C%202025%2C%2008_35_50%20PM.png" 
+                      alt="ParlaCapital Logo" 
+                      className="w-8 h-8 object-contain"
+                    />
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-1">Website</h3>
-                    <a href="https://www.parlacapital.com" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300">
-                      www.parlacapital.com
+                    <a href="https://parlacapital.com.tr" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300">
+                      parlacapital.com.tr
                     </a>
                   </div>
                 </div>
