@@ -5,7 +5,8 @@ import axios from "axios";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// Use current domain for API calls (works for both preview and custom domain)
+const BACKEND_URL = window.location.origin;
 const API = `${BACKEND_URL}/api`;
 
 // Axios interceptor for JWT token
