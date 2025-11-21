@@ -383,47 +383,6 @@ export default function Packages() {
               </div>
             )}
             
-            {platform === 'iban' && (
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 space-y-3">
-                <div>
-                  <p className="text-amber-400 font-semibold mb-2">IBAN:</p>
-                  <div className="flex items-center justify-between bg-slate-900 rounded p-3">
-                    <code className="text-white text-sm">TR13 0020 6002 1703 6757 4700 06</code>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        navigator.clipboard.writeText('TR130020600217036757470006');
-                        toast.success('IBAN kopyalandı!');
-                      }}
-                      className="ml-2 bg-amber-600 hover:bg-amber-700 text-white"
-                    >
-                      Kopyala
-                    </Button>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-amber-400 font-semibold mb-1">Hesap Adı:</p>
-                  <p className="text-white">BPN Ödeme ve Elektronik Para Hizmetleri A.Ş.</p>
-                </div>
-                <div>
-                  <p className="text-amber-400 font-semibold mb-1">Açıklama:</p>
-                  <div className="flex items-center justify-between bg-slate-900 rounded p-3">
-                    <code className="text-white text-sm">7047903631</code>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        navigator.clipboard.writeText('7047903631');
-                        toast.success('Açıklama kopyalandı!');
-                      }}
-                      className="ml-2 bg-amber-600 hover:bg-amber-700 text-white"
-                    >
-                      Kopyala
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-            
             <Button
               onClick={handleInvest}
               disabled={loading || !platform}
