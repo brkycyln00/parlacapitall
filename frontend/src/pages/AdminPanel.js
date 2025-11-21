@@ -309,52 +309,80 @@ export default function AdminPanel() {
     if (!node) return null;
 
     const hasChildren = node.left || node.right;
-    const indent = depth * 40;
-
+    
     return (
-      <div key={node.id} className="mb-2">
-        <div 
-          className="bg-slate-800/50 border border-amber-500/30 rounded-lg p-3 hover:bg-slate-800/70 transition-all"
-          style={{ marginLeft: `${indent}px` }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-white font-medium">{node.name}</span>
-                {node.is_admin && (
-                  <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded">Admin</span>
-                )}
-                {node.package && (
-                  <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">{node.package}</span>
-                )}
-              </div>
-              <div className="text-sm text-gray-400 mt-1">{node.email}</div>
-              <div className="flex gap-4 mt-2 text-xs">
-                <span className="text-green-400">💰 ${node.total_invested || 0}</span>
-                <span className="text-blue-400">👈 L: ${node.left_volume || 0}</span>
-                <span className="text-purple-400">👉 R: ${node.right_volume || 0}</span>
-                {node.position && <span className="text-amber-400">📍 {node.position}</span>}
-              </div>
+      <div key={node.id} className="flex flex-col items-center mb-8">
+        {/* Node Circle */}
+        <div className="relative group">
+          <div className="w-32 h-32 rounded-full bg-slate-900 border-4 border-amber-500 flex items-center justify-center shadow-2xl hover:scale-105 transition-transform cursor-pointer">
+            <div className="text-center">
+              <p className="text-white font-bold text-sm mb-1">{node.name}</p>
+              <p className="text-gray-400 text-xs">{node.email.split('@')[0]}</p>
+              {node.package && (
+                <span className="inline-block mt-1 px-2 py-0.5 bg-amber-500/30 text-amber-400 text-xs rounded">
+                  {node.package}
+                </span>
+              )}
             </div>
-            {hasChildren && (
-              <div className="text-gray-500 text-sm">
-                {node.left && node.right ? '2 alt' : '1 alt'}
-              </div>
-            )}
+          </div>
+          
+          {/* Hover Tooltip */}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+            <div className="bg-slate-800 border border-amber-500/50 rounded-lg p-3 shadow-xl whitespace-nowrap">
+              <p className="text-white text-sm font-semibold mb-2">{node.name}</p>
+              <p className="text-gray-400 text-xs mb-1">📧 {node.email}</p>
+              <p className="text-green-400 text-xs mb-1">💰 Yatırım: ${node.total_invested || 0}</p>
+              <p className="text-blue-400 text-xs mb-1">👈 Sol Volume: ${node.left_volume || 0}</p>
+              <p className="text-purple-400 text-xs">👉 Sağ Volume: ${node.right_volume || 0}</p>
+              {node.position && (
+                <p className="text-amber-400 text-xs mt-1">📍 Pozisyon: {node.position}</p>
+              )}
+              {node.is_admin && (
+                <span className="inline-block mt-1 px-2 py-0.5 bg-purple-500/30 text-purple-400 text-xs rounded">
+                  Admin
+                </span>
+              )}
+            </div>
           </div>
         </div>
         
-        {node.left && (
-          <div className="mt-1 border-l-2 border-blue-500/30 pl-2">
-            <div className="text-xs text-blue-400 mb-1" style={{ marginLeft: `${indent + 10}px` }}>↙ Sol Kol</div>
-            {renderTreeNode(node.left, depth + 1)}
-          </div>
-        )}
-        
-        {node.right && (
-          <div className="mt-1 border-l-2 border-purple-500/30 pl-2">
-            <div className="text-xs text-purple-400 mb-1" style={{ marginLeft: `${indent + 10}px` }}>↘ Sağ Kol</div>
-            {renderTreeNode(node.right, depth + 1)}
+        {/* Children Container */}
+        {hasChildren && (
+          <div className="flex justify-center items-start gap-16 mt-8 relative">
+            {/* Connection Lines */}
+            {(node.left || node.right) && (
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8">
+                <div className="w-0.5 h-8 bg-amber-500/50"></div>
+              </div>
+            )}
+            
+            {/* Left Child */}
+            {node.left && (
+              <div className="relative flex flex-col items-center">
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
+                  <div className="flex items-center">
+                    <div className="w-16 h-0.5 bg-amber-500/50"></div>
+                    <div className="w-0.5 h-8 bg-amber-500/50"></div>
+                  </div>
+                </div>
+                <div className="text-xs text-blue-400 font-semibold mb-2">← SOL KOL</div>
+                {renderTreeNode(node.left, depth + 1)}
+              </div>
+            )}
+            
+            {/* Right Child */}
+            {node.right && (
+              <div className="relative flex flex-col items-center">
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
+                  <div className="flex items-center">
+                    <div className="w-0.5 h-8 bg-amber-500/50"></div>
+                    <div className="w-16 h-0.5 bg-amber-500/50"></div>
+                  </div>
+                </div>
+                <div className="text-xs text-purple-400 font-semibold mb-2">SAĞ KOL →</div>
+                {renderTreeNode(node.right, depth + 1)}
+              </div>
+            )}
           </div>
         )}
       </div>
