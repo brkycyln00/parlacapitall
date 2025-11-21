@@ -1412,6 +1412,26 @@ async def approve_investment_request(request_id: str, user: User = Depends(requi
     return {"success": True, "message": "Investment approved"}
 
 
+@api_router.post("/admin/investment-requests/{request_id}/reject")
+async def reject_investment_request(request_id: str, user: User = Depends(require_admin)):
+    """Reject an investment request"""
+    request_doc = await db.investment_requests.find_one({"id": request_id}, {"_id": 0})
+    if not request_doc:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    request = InvestmentRequest(**request_doc)
+    
+    if request.status != "pending":
+        raise HTTPException(status_code=400, detail="Request already processed")
+    
+    # Mark request as rejected
+    await db.investment_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "rejected"}}
+    )
+    
+    return {"success": True, "message": "Investment rejected"}
+
 
 # ==================== WITHDRAWAL ENDPOINTS ====================
 
