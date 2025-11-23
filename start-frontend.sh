@@ -6,14 +6,14 @@ echo "=========================="
 
 cd /app/frontend
 
-# Check if build directory exists
-if [ ! -d "build" ]; then
-    echo "⚠️  Build directory not found!"
+# Check if build directory exists and has index.html
+if [ ! -f "build/index.html" ]; then
+    echo "⚠️  Build directory empty or missing index.html!"
     echo "🔨 Building frontend..."
     yarn build
     echo "✅ Build completed!"
 else
-    echo "✅ Build directory exists"
+    echo "✅ Build directory exists and ready"
 fi
 
 # Start the server
