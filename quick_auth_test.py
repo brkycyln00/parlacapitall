@@ -46,7 +46,7 @@ except Exception as e:
 print("\nTesting auth endpoint...")
 try:
     response = requests.get(
-        "https://parla-network-fix.preview.emergentagent.com/api/auth/me",
+        "https://parla-recovery.preview.emergentagent.com/api/auth/me",
         headers={"Authorization": f"Bearer {session_token}"},
         timeout=10
     )

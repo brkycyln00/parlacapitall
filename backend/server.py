@@ -404,7 +404,7 @@ async def send_verification_email(user_email: str, user_name: str, verification_
             return False
         
         # Get frontend URL from environment
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://parla-network-fix.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://parla-recovery.preview.emergentagent.com')
         verification_link = f"{frontend_url}/verify-email?token={verification_token}"
         with open("/tmp/email_debug.log", "a") as f:
             f.write(f"🔗 VERIFICATION LINK: {verification_link}\n")
@@ -504,7 +504,7 @@ async def send_password_change_email(user_email: str, user_name: str, password_c
             logger.warning("SMTP not configured. Skipping password change email.")
             return False
         
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://parla-network-fix.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://parla-recovery.preview.emergentagent.com')
         confirmation_link = f"{frontend_url}/confirm-password-change?token={password_change_token}"
         
         msg = MIMEMultipart('alternative')
