@@ -88,7 +88,8 @@ function AuthHandler() {
       const hash = location.hash;
       
       if (hash && hash.includes('session_id=')) {
-        const sessionId = hash.split('session_id=')[1].split('&')[0];
+        const sessionIdPart = hash.split('session_id=')[1];
+        const sessionId = sessionIdPart ? sessionIdPart.split('&')[0] : null;
         
         if (sessionId && !processing) {
           setProcessing(true);
