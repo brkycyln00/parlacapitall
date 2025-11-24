@@ -153,7 +153,6 @@ function ProtectedRoute({ children, adminOnly = false }) {
 }
 
 // Import Pages
-import React from 'react';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
