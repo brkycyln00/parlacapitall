@@ -741,12 +741,7 @@ async def login(req: LoginRequest):
     if user_doc["password_hash"] != hash_password(req.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
-    # Check if email is verified
-    if not user_doc.get("is_email_verified", False):
-        raise HTTPException(
-            status_code=403, 
-            detail="Email adresiniz henüz doğrulanmamış. Lütfen email adresinize gönderilen doğrulama linkine tıklayın."
-        )
+    # Email verification is disabled - skip check
     
     # Create JWT token
     token = create_jwt_token(user_doc["id"])
