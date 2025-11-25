@@ -699,12 +699,36 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Real-time referral code validation"
-    - "Frontend form validation with referral check"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
+  completed_focus:
+    - "Binary earnings calculation logic ($1000+$1000 = $100 bonus) ✅"
+    - "Left and right volume tracking up the tree ✅"
+    - "Binary earnings added to wallet_balance ✅"
+    - "Binary transaction creation ✅"
+    - "End-to-end flow: Create binary tree structure -> Add investments -> Verify volume accumulation -> Verify bonus calculation ✅"
+    - "Manual user placement system - Admin can place users in binary tree ✅"
+    - "POST /api/admin/place-user endpoint ✅"
+    - "Placement history tracking ✅"
+    - "Volume recalculation after repositioning ✅"
+    - "Frontend user placement interface in Admin Panel ✅"
+    - "User-side referral management interface in Dashboard ✅"
+    - "POST /api/users/place-referral endpoint (non-admin users) ✅"
+    - "GET /api/users/my-referrals endpoint ✅"
+    - "Interactive placement system with unplaced/placed referrals ✅"
+    - "Click-to-place functionality (👈 Sol Kola / 👉 Sağ Kola buttons) ✅"
+    - "Multi-level commission system - ALL uplines receive commission up to 11 levels ✅"
+    - "Commission rate verification (Silver 5%, Gold 10%, Platinum 15%) ✅"
+    - "Transaction descriptions with level labels (Direkt, Seviye 2, Seviye 3) ✅"
+    - "Wallet balance and total_commissions updates for all uplines ✅"
+    - "Admin dashboard visibility of commission totals ✅"
+    - "No upline case handling (root user investments) ✅"
+    - "Real-time referral code validation ✅"
+    - "Frontend form validation with referral check ✅"
+    - "Unlimited referrals registration (no auto-placement) feature ✅"
+    - "Complete login flow functionality ✅"
 
 agent_communication:
   - agent: "main"
