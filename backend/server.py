@@ -692,9 +692,9 @@ async def register(req: RegisterRequest):
         name=req.name,
         password_hash=hash_password(req.password),
         upline_id=upline_user.id if upline_user else None,
-        is_email_verified=False,
-        verification_token=verification_token,
-        verification_token_expires=verification_expires
+        is_email_verified=True,  # Email verification disabled
+        verification_token=None,
+        verification_token_expires=None
     )
     
     # NOTE: We do NOT automatically place user in binary tree during registration
