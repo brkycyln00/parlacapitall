@@ -715,26 +715,16 @@ async def register(req: RegisterRequest):
     user_dict = user.model_dump()
     await db.users.insert_one(user_dict)
     
-    # Send verification email
-    try:
-        with open("/tmp/email_debug.log", "a") as f:
-            f.write(f"📧 Attempting to send verification email to: {user.email}\n")
-        await send_verification_email(user.email, user.name, verification_token)
-        with open("/tmp/email_debug.log", "a") as f:
-            f.write(f"✅ Verification email sent successfully to: {user.email}\n")
-    except Exception as e:
-        with open("/tmp/email_debug.log", "a") as f:
-            f.write(f"❌ Verification email failed: {e}\n")
-        logger.error(f"Verification email failed but user created: {e}")
+    # Email verification is disabled - user can login immediately
+    # Create session token
+    token = create_jwt_token(user.id)
     
-    # Don't create token yet - user needs to verify email first
-    # token = create_jwt_token(user.id)
-    
-    # Return success message without token
+    # Return success with token
     return {
-        "message": "Kaydınız oluşturulmuştur lütfen mail adresinizden doğrulama yapınız (spam klasörünü kontrol edin)",
+        "message": "Kaydınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.",
         "email": user.email,
-        "requires_verification": True
+        "token": token,
+        "requires_verification": False
     }
 
 @api_router.post("/auth/login")
