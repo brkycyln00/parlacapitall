@@ -337,7 +337,11 @@ export default function Packages() {
                 <SelectTrigger className="bg-slate-700 border-amber-500/30 text-white mt-2">
                   <SelectValue placeholder="Platform seçin" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-amber-500/30">
+                <SelectContent 
+                  className="bg-slate-700 border-amber-500/30 z-[9999]"
+                  position="popper"
+                  sideOffset={5}
+                >
                   <SelectItem value="tether_trc20">Tether (TRC20)</SelectItem>
                   <SelectItem value="ethereum_erc20">Ethereum (ERC20)</SelectItem>
                 </SelectContent>
