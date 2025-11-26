@@ -692,6 +692,18 @@ frontend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE TESTING COMPLETE! All 10 critical scenarios passed: 1) Dashboard Card - 'Referans Yönetimi' card with title, subtitle, stats (Yerleşmemiş, Sol Kol, Sağ Kol), and management button ✅ 2) Modal Structure - Two-column layout with proper headers and info box ✅ 3) Empty States - Proper messages when no referrals ✅ 4) Referral Display - Cards show user info, investment amounts, position badges ✅ 5) Placement Buttons - '👈 Sol Kola' and '👉 Sağ Kola' functional ✅ 6) Color Coding - Blue (left), purple (right), amber (unplaced) themes ✅ 7) Repositioning - Move users between positions ✅ 8) Turkish Localization - All text properly localized ✅ 9) Responsive Design - Works on mobile and desktop ✅ 10) Modal Persistence - Data persists on close/reopen ✅. User-side referral management is PRODUCTION-READY!"
 
+  - task: "Mobile investment dialog functionality"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/Packages.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL MOBILE BUG: Investment dialog does not open on mobile devices (iPhone SE 375x667 viewport). When clicking 'Bu Paketi Seç' button, the mobile navigation menu opens instead of the investment dialog. This prevents testing of the white screen bug fix for the platform select dropdown. The dialog opening mechanism needs to be fixed for mobile devices before the z-index fixes can be properly tested."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
