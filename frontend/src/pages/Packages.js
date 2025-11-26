@@ -264,8 +264,8 @@ export default function Packages() {
       </div>
 
       {/* Investment Dialog */}
-      <Dialog open={investDialogOpen} onOpenChange={setInvestDialogOpen}>
-        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={investDialogOpen} onOpenChange={setInvestDialogOpen} modal={true}>
+        <DialogContent className="bg-slate-800 border-amber-500/30 max-w-2xl max-h-[90vh] overflow-y-auto sm:max-w-[90vw]">
           <DialogHeader>
             <DialogTitle className="text-white text-2xl">Yatırım Yap - {selectedPackage?.name}</DialogTitle>
           </DialogHeader>
